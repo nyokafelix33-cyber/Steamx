@@ -1,180 +1,151 @@
-                                                                                                                                                                                                                                                                     <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+ <!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>StreamX Ultimate</title>
+    <title>StreamX Pro</title>
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#e50914">
-    
     <style>
-        :root { --accent: #e50914; --bg: #050505; --surf: #121212; --text: #ffffff; --brd: #282828; }
-        body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', Roboto, sans-serif; margin: 0; padding-bottom: 80px; overflow-x: hidden; }
+        :root { --accent: #e50914; --bg: #000; --surf: #121212; --text: #fff; --gray: #888; }
+        body { background: var(--bg); color: var(--text); font-family: 'Helvetica Neue', Arial, sans-serif; margin: 0; padding-bottom: 80px; overflow-x: hidden; }
         
-        /* Header & Search */
-        header { background: var(--bg); padding: 15px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; }
-        .logo { color: var(--accent); font-size: 24px; font-weight: bold; letter-spacing: -1px; }
-        .search-container { padding: 0 15px 10px; }
-        #searchInput { width: 100%; padding: 12px; border-radius: 8px; border: none; background: var(--surf); color: white; box-sizing: border-box; }
+        /* Premium Header */
+        header { padding: 15px; display: flex; justify-content: space-between; align-items: center; background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent); position: fixed; top: 0; width: 100%; z-index: 1000; box-sizing: border-box; }
+        .logo { color: var(--accent); font-size: 26px; font-weight: 900; letter-spacing: -1.5px; }
 
-        /* Video Player Section */
-        .player-box { width: 100%; aspect-ratio: 16/9; background: #000; position: sticky; top: 0; z-index: 999; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        video { width: 100%; height: 100%; outline: none; }
-        
-        /* Navigation Tabs */
-        .content-section { display: none; padding: 10px; animation: fadeIn 0.4s; }
-        .active-section { display: block; }
+        /* Cinematic Hero Player */
+        .player-container { width: 100%; aspect-ratio: 16/9; background: #000; margin-top: 0; position: sticky; top: 0; z-index: 900; box-shadow: 0 5px 20px rgba(0,0,0,0.9); }
+        video { width: 100%; height: 100%; object-fit: contain; }
+
+        /* Tab Content */
+        .page { display: none; padding: 15px; animation: fadeIn 0.3s ease; }
+        .page.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* Movie Grid Style */
-        .grid-title { margin: 20px 0 10px 5px; font-size: 18px; border-left: 4px solid var(--accent); padding-left: 10px; }
-        .movie-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
-        .movie-card { background: var(--surf); border-radius: 8px; overflow: hidden; border: 1px solid var(--brd); transition: 0.3s; }
-        .poster-placeholder { width: 100%; aspect-ratio: 2/3; background: linear-gradient(45deg, #1a1a1a, #222); display: flex; align-items: center; justify-content: center; color: #444; font-size: 40px; }
-        .card-info { padding: 8px; font-size: 13px; font-weight: 500; }
+        /* Search Bar Style */
+        .search-box { width: 100%; padding: 12px; border-radius: 25px; border: none; background: #222; color: #fff; margin-bottom: 20px; font-size: 14px; outline: none; }
 
-        /* Admin Panel Drawer */
-        #adminPanel { display: none; background: var(--surf); padding: 20px; border-radius: 15px 15px 0 0; position: fixed; bottom: 0; width: 100%; z-index: 2000; box-sizing: border-box; border-top: 3px solid var(--accent); }
-        input { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 6px; border: 1px solid var(--brd); background: #000; color: #fff; box-sizing: border-box; }
-        
-        /* Bottom Navigation */
-        .bottom-nav { position: fixed; bottom: 0; width: 100%; height: 70px; background: rgba(18,18,18,0.95); display: flex; justify-content: space-around; align-items: center; border-top: 1px solid var(--brd); backdrop-filter: blur(10px); z-index: 1500; }
-        .nav-btn { display: flex; flex-direction: column; align-items: center; font-size: 11px; color: #888; text-decoration: none; border: none; background: none; width: 100%; }
-        .nav-btn.active { color: var(--accent); }
-        .nav-btn i { font-size: 20px; margin-bottom: 4px; }
+        /* Movie Grid (OnStream Style) */
+        .section-title { font-size: 18px; font-weight: bold; margin: 15px 0; border-left: 4px solid var(--accent); padding-left: 10px; }
+        .movie-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .movie-card { position: relative; border-radius: 6px; overflow: hidden; background: var(--surf); aspect-ratio: 2/3; border: 1px solid #222; }
+        .movie-card img { width: 100%; height: 100%; object-fit: cover; }
+        .card-label { position: absolute; bottom: 0; width: 100%; padding: 5px; background: rgba(0,0,0,0.7); font-size: 10px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        /* Utilities */
-        #statsOverlay { position: absolute; top: 10px; left: 10px; font-family: monospace; font-size: 10px; color: #0f0; background: rgba(0,0,0,0.6); padding: 5px; display: none; }
+        /* Admin/Add Panel */
+        #adminPanel { display: none; position: fixed; bottom: 70px; left: 0; width: 100%; background: var(--surf); padding: 20px; border-top: 2px solid var(--accent); box-sizing: border-box; z-index: 1100; border-radius: 20px 20px 0 0; }
+        .input-group { margin-bottom: 15px; }
+        input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #333; background: #000; color: #fff; box-sizing: border-box; }
+        .save-btn { width: 100%; padding: 12px; background: var(--accent); color: #fff; border: none; border-radius: 8px; font-weight: bold; }
+
+        /* Bottom Nav (Premium Feel) */
+        nav { position: fixed; bottom: 0; width: 100%; height: 70px; background: rgba(10,10,10,0.95); backdrop-filter: blur(10px); display: flex; border-top: 1px solid #222; z-index: 1000; }
+        .nav-link { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--gray); font-size: 10px; font-weight: 500; transition: 0.2s; }
+        .nav-link.active { color: var(--accent); }
+        .nav-link span { font-size: 20px; margin-bottom: 4px; }
     </style>
 </head>
 <body>
 
     <header>
         <div class="logo">STREAMX</div>
-        <div>
-            <button onclick="toggleStats()" style="background:none; border:none; color:#555;">📊</button>
-            <button onclick="openAdmin()" style="background:none; border:none; color:white; font-size:20px;">⚙️</button>
-        </div>
+        <div onclick="openAdmin()" style="font-size: 20px; opacity: 0.6;">⚙️</div>
     </header>
 
-    <div class="player-box">
-        <div id="statsOverlay">FPS: <span id="fps">0</span> | MEM: <span id="mem">0</span></div>
-        <video id="mainPlayer" controls playsinline>
-            <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
+    <div class="player-container">
+        <video id="mainPlayer" controls playsinline poster="https://via.placeholder.com/800x450/000/fff?text=Select+a+Movie">
+            <source src="" type="video/mp4">
         </video>
     </div>
 
-    <div id="home" class="content-section active-section">
-        <div class="search-container">
-            <input type="text" id="searchInput" placeholder="Search movies, series..." onkeyup="search()">
-        </div>
-        <div class="grid-title">Trending Movies</div>
-        <div class="movie-grid" id="movieList">
+    <div id="homePage" class="page active">
+        <input type="text" class="search-box" placeholder="Search movies or series..." onkeyup="searchApp(this.value)">
+        <div class="section-title">Recently Added</div>
+        <div class="movie-grid" id="mainGrid">
             </div>
     </div>
 
-    <div id="series" class="content-section">
-        <div class="grid-title">Popular Series</div>
-        <div class="movie-grid" id="seriesList">
+    <div id="seriesPage" class="page">
+        <div class="section-title">TV Series</div>
+        <div class="movie-grid" id="seriesGrid">
             <div class="movie-card">
-                <div class="poster-placeholder">🎬</div>
-                <div class="card-info">Sample Series S1</div>
+                <div style="height:100%; display:flex; align-items:center; justify-content:center; color:#333;">Coming Soon</div>
             </div>
         </div>
     </div>
 
     <div id="adminPanel">
-        <h3 style="margin-top:0">Content Manager</h3>
-        <input type="text" id="newTitle" placeholder="Movie Title">
-        <input type="text" id="newUrl" placeholder="Video MP4 Link">
-        <button onclick="addContent()" style="width:100%; padding:15px; background:var(--accent); color:white; border:none; border-radius:8px; font-weight:bold;">PUBLISH TO APP</button>
-        <button onclick="closeAdmin()" style="width:100%; background:none; color:#888; border:none; margin-top:10px;">Cancel</button>
+        <h3 style="margin:0 0 15px 0">Add to Library</h3>
+        <input type="text" id="mName" placeholder="Enter Title (e.g. Deadpool 3)" style="margin-bottom:10px;">
+        <input type="text" id="mUrl" placeholder="Paste Direct MP4 Link" style="margin-bottom:10px;">
+        <button class="save-btn" onclick="saveToLib()">PUBLISH NOW</button>
+        <button onclick="document.getElementById('adminPanel').style.display='none'" style="width:100%; background:none; border:none; color:var(--gray); margin-top:10px;">Cancel</button>
     </div>
 
-    <nav class="bottom-nav">
-        <button class="nav-btn active" onclick="switchTab('home', this)"><i>🏠</i><span>Home</span></button>
-        <button class="nav-btn" onclick="switchTab('series', this)"><i>📺</i><span>Series</span></button>
-        <button class="nav-btn" onclick="openAdmin()"><i>➕</i><span>Add</span></button>
+    <nav>
+        <div class="nav-link active" onclick="switchTab('homePage', this)"><span>🏠</span>Home</div>
+        <div class="nav-link" onclick="switchTab('seriesPage', this)"><span>📺</span>Series</div>
+        <div class="nav-link" onclick="openAdmin()"><span>➕</span>Add</div>
     </nav>
 
     <script>
+        let data = JSON.parse(localStorage.getItem('streamx_lib')) || [];
         const player = document.getElementById('mainPlayer');
-        let library = JSON.parse(localStorage.getItem('myStreamLibrary')) || [];
 
-        function switchTab(tabId, btn) {
-            document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active-section'));
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(tabId).classList.add('active-section');
-            btn.classList.add('active');
+        function switchTab(id, el) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            el.classList.add('active');
+            window.scrollTo(0,0);
         }
 
         function openAdmin() {
-            if(prompt("Enter Admin PIN:") === "1234") {
+            if(prompt("Admin Access Code:") === "1234") {
                 document.getElementById('adminPanel').style.display = 'block';
             }
         }
 
-        function closeAdmin() { document.getElementById('adminPanel').style.display = 'none'; }
-
-        function addContent() {
-            const title = document.getElementById('newTitle').value;
-            const url = document.getElementById('newUrl').value;
-            if(title && url) {
-                library.push({title, url});
-                localStorage.setItem('myStreamLibrary', JSON.stringify(library));
-                renderLibrary();
-                closeAdmin();
-                alert("Success! Added to library.");
+        function saveToLib() {
+            let n = document.getElementById('mName').value;
+            let u = document.getElementById('mUrl').value;
+            if(n && u) {
+                data.push({n, u});
+                localStorage.setItem('streamx_lib', JSON.stringify(data));
+                render();
+                document.getElementById('adminPanel').style.display = 'none';
+                document.getElementById('mName').value = '';
+                document.getElementById('mUrl').value = '';
             }
         }
 
-        function renderLibrary() {
-            const container = document.getElementById('movieList');
-            container.innerHTML = library.map((item, index) => `
-                <div class="movie-card" onclick="playVideo('${item.url}')">
-                    <div class="poster-placeholder">🍿</div>
-                    <div class="card-info">${item.title}</div>
+        function render() {
+            document.getElementById('mainGrid').innerHTML = data.map((m, i) => `
+                <div class="movie-card" onclick="play('${m.u}')">
+                    <div style="height:100%; background:linear-gradient(45deg, #111, #222); display:flex; align-items:center; justify-content:center; font-size:30px;">🎬</div>
+                    <div class="card-label">${m.n}</div>
                 </div>
             `).join('');
         }
 
-        function playVideo(url) {
-            player.src = url;
+        function play(link) {
+            player.src = link;
             player.play();
             window.scrollTo({top: 0, behavior: 'smooth'});
         }
 
-        function toggleStats() {
-            const s = document.getElementById('statsOverlay');
-            s.style.display = s.style.display === 'none' ? 'block' : 'none';
-        }
-
-        // Search logic
-        function search() {
-            let filter = document.getElementById('searchInput').value.toUpperCase();
-            let cards = document.querySelectorAll('.movie-card');
-            cards.forEach(card => {
-                let text = card.innerText.toUpperCase();
-                card.style.display = text.includes(filter) ? "" : "none";
+        function searchApp(q) {
+            let query = q.toLowerCase();
+            document.querySelectorAll('.movie-card').forEach(c => {
+                c.style.display = c.innerText.toLowerCase().includes(query) ? 'block' : 'none';
             });
         }
 
-        // Performance monitoring for 4GB RAM phones
-        setInterval(() => {
-            if(performance.memory) {
-                document.getElementById('mem').innerText = Math.round(performance.memory.usedJSHeapSize/1048576) + 'MB';
-            }
-        }, 2000);
-
-        renderLibrary();
+        render();
     </script>
 </body>
 </html>
-                                     /* Admin/Settings Drawer */
-                                                                                                                                                                                                                                                                                                                        #adminPanel { display: none; padding: 15px; background: var(--surf); border-top: 2px solid var(--accent); }
-                                                                                                                                                                                                                                                                                                                                input { width: 92%; padding: 10px; margin: 5px 0; border-radius: 6px; border: 1px solid var(--brd); background: var(--bg); color: var(--text); }
-
-                                                                                                                                                                                                                                                                                                                                        #toast {
+                                          #toast {
                                                                                                                                                                                                                                                                                                                                                     position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
                                                                                                                                                                                                                                                                                                                                                                 background: var(--accent); color: #fff; padding: 8px 20px; border-radius: 20px;
                                                                                                                                                                                                                                                                                                                                                                             display: none; font-size: 12px; font-weight: bold; z-index: 1000;
