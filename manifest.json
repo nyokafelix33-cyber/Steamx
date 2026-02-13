@@ -1,0 +1,19 @@
+{
+  "name": "StreamX Studio Pro",
+    "short_name": "StreamX",
+      "description": "High-performance mobile streaming engine.",
+        "start_url": "index.html",
+          "display": "standalone",
+            "background_color": "#0c0c0c",
+              "theme_color": "#e50914",
+                "orientation": "portrait-primary",
+                  "icons": [
+                      {
+                            "src": "https://cdn-icons-png.flaticon.com/512/705/705062.png",
+                                  "sizes": "512x512",
+                                        "type": "image/png",
+                                              "purpose": "any maskable"
+                                                  }
+                                                    ]
+                                                    }
+                                                    
