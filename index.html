@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StreamX | Live Global Library</title>
+    <title>StreamX | World Wide Pro</title>
     <style>
         :root { --main: #d3f243; --bg: #080808; --card: #121212; --transition: 0.4s ease; }
         body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; overflow-x: hidden; }
@@ -11,16 +11,15 @@
         /* --- AUTH SCREEN --- */
         #loginScreen {
             position: fixed; inset: 0; z-index: 10000; display: flex; align-items: center; justify-content: center;
-            background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), url('https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=1000');
+            background: linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.85)), url('https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=1000');
             background-size: cover; background-position: center; backdrop-filter: blur(10px);
         }
         .login-box { background: rgba(15,15,15,0.95); padding: 40px; border-radius: 15px; width: 340px; text-align: center; border: 1px solid #333; }
         .login-box h2 { color: #ff0000; font-weight: 900; font-size: 32px; margin: 0 0 20px 0; }
         .login-box input { width: 100%; padding: 12px; margin: 8px 0; background: #000; border: 1px solid #444; color: white; border-radius: 5px; box-sizing: border-box; outline: none; }
         .login-btn { width: 100%; padding: 12px; background: var(--main); color: #000; font-weight: bold; border: none; cursor: pointer; border-radius: 5px; margin-top: 10px; }
-        .forgot-link { color: #888; font-size: 12px; margin-top: 15px; cursor: pointer; display: block; text-decoration: none; }
 
-        /* --- MAIN INTERFACE --- */
+        /* --- INTERFACE --- */
         #mainSite { display: none; }
         header { background: #000; padding: 15px 5%; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #222; position: sticky; top: 0; z-index: 1000; }
         .logo { font-weight: 900; color: #ff0000; font-size: 24px; text-decoration: none; }
@@ -28,19 +27,24 @@
         .search-container { position: absolute; left: 50%; transform: translateX(-50%); display: flex; align-items: center; background: #111; border-radius: 30px; padding: 5px 20px; border: 1px solid #333; width: 30%; min-width: 250px; }
         .search-container input { background: none; border: none; color: white; width: 100%; outline: none; text-align: center; }
 
-        .hero { height: 55vh; background: linear-gradient(to right, #000 20%, transparent), url('https://images.unsplash.com/photo-1626814026160-2237a95fc5a0?auto=format&fit=crop&w=1200'); background-size: cover; background-position: center; display: flex; align-items: center; padding: 0 5%; }
-        
+        /* --- CONTENT --- */
         .container { padding: 30px 5%; }
         .movie-row { display: flex; overflow-x: auto; gap: 20px; padding-bottom: 20px; scrollbar-width: none; }
         .movie-card { min-width: 170px; background: var(--card); border-radius: 12px; overflow: hidden; border: 1px solid #222; transition: 0.3s; cursor: pointer; }
         .movie-card:hover { transform: scale(1.05); border-color: var(--main); }
         .movie-card img { width: 100%; aspect-ratio: 2/3; object-fit: cover; }
 
-        /* --- MODALS --- */
+        /* --- VIDEO PLAYER --- */
+        #playerModal { position: fixed; inset: 0; background: black; z-index: 5000; display: none; flex-direction: column; }
+        #videoFrame { width: 100%; height: 90%; border: none; }
+        .close-player { padding: 15px; color: var(--main); font-weight: bold; cursor: pointer; text-align: center; background: #111; }
+
+        /* --- SETTINGS & ABOUT --- */
         #settingsMenu { position: fixed; right: -320px; top: 0; width: 300px; height: 100%; background: #111; z-index: 2000; padding: 40px 20px; transition: var(--transition); border-left: 1px solid #333; }
         #settingsMenu.active { right: 0; }
-        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 3000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
-        .modal-content { background: #181818; padding: 40px; border-radius: 20px; width: 80%; max-width: 450px; text-align: center; border: 1px solid var(--main); }
+        
+        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 4000; display: none; align-items: center; justify-content: center; padding: 20px; }
+        .modal-content { background: #1a1a1a; padding: 40px; border-radius: 20px; max-width: 500px; text-align: center; border: 1px solid #333; line-height: 1.6; }
     </style>
 </head>
 <body>
@@ -51,13 +55,13 @@
             <input type="text" id="username" placeholder="Username">
             <input type="password" id="password" placeholder="Password">
             <button class="login-btn" onclick="handleAuth()">SIGN IN</button>
-            <span class="forgot-link" onclick="openModal('forgotModal')">Forgot Password?</span>
+            <p onclick="openModal('forgotModal')" style="color:#666; font-size:12px; cursor:pointer; margin-top:15px;">Forgot Password?</p>
         </div>
     </div>
 
     <div id="mainSite">
         <header>
-            <a href="#" class="logo" onclick="location.reload()">STREAMX</a>
+            <a href="#" class="logo">STREAMX</a>
             <div class="search-container">
                 <input type="text" id="searchBar" placeholder="Search world wide..." onkeyup="searchAPI()">
                 <span onclick="startVoice()" style="cursor:pointer; color:var(--main);">🎤</span>
@@ -69,16 +73,8 @@
             </div>
         </header>
 
-        <div class="hero">
-            <div>
-                <p style="color:var(--main); letter-spacing:4px; font-weight:bold;">API LIVE FEED</p>
-                <h1 style="font-size: clamp(30px, 6vw, 60px);">WORLD WIDE LIBRARY</h1>
-                <button style="background:var(--main); border:none; padding:15px 40px; font-weight:bold; border-radius:5px; cursor:pointer;">BROWSE ALL</button>
-            </div>
-        </div>
-
         <div class="container" id="historySection" style="display:none;">
-            <h3 style="color:var(--main);">🕒 Continue Watching</h3>
+            <h3 style="color:var(--main);">🕒 Your History</h3>
             <div class="movie-row" id="historyGrid"></div>
         </div>
 
@@ -86,6 +82,11 @@
             <h3 id="rowTitle">🔥 Trending Now</h3>
             <div class="movie-row" id="mainGrid"></div>
         </div>
+    </div>
+
+    <div id="playerModal">
+        <div class="close-player" onclick="closePlayer()">✕ CLOSE PLAYER</div>
+        <iframe id="videoFrame" src="" allowfullscreen></iframe>
     </div>
 
     <div id="settingsMenu">
@@ -97,28 +98,21 @@
         <p onclick="location.reload()" style="color:red; cursor:pointer; padding: 10px 0;">Logout</p>
     </div>
 
-    <div id="forgotModal" class="modal">
-        <div class="modal-content">
-            <h2 style="color:var(--main)">Recovery</h2>
-            <p>Enter username for a reset code.</p>
-            <input type="text" id="recoverUser" placeholder="Username" style="width:100%; padding:10px; margin:10px 0; background:#000; border:1px solid #444; color:white;">
-            <button onclick="sendRecovery()" style="background:var(--main); border:none; padding:10px 20px; border-radius:5px; width:100%; font-weight:bold; cursor:pointer;">REQUEST CODE</button>
-            <button onclick="closeModals()" style="margin-top:10px; background:none; border:none; color:#888; cursor:pointer;">Cancel</button>
-        </div>
-    </div>
-
     <div id="aboutModal" class="modal">
         <div class="modal-content">
-            <h2 style="color:var(--main)">About StreamX</h2>
-            <p>Developed by <b>Felix Nyoka</b>.</p>
-            <p style="color:#888;">Live Global Content powered by TMDB API.</p>
-            <button onclick="closeModals()" style="margin-top:20px; background:white; border:none; padding:10px 20px; border-radius:5px; cursor:pointer; font-weight:bold;">Close</button>
+            <h1 style="color:var(--main); font-size:28px;">StreamX World Wide</h1>
+            <p style="color:#aaa;">Version 4.0 "Infinite"</p>
+            <p>StreamX is a global entertainment gateway designed to bring high-definition cinema to every screen. Founded and directed by <b>Felix Nyoka</b>, we bridge the gap between global libraries and local viewers.</p>
+            <div style="margin:20px 0; border:1px solid #333; padding:15px; border-radius:10px;">
+                <p style="margin:0;"><b>CEO & Founder:</b> Felix Nyoka</p>
+                <p style="margin:5px 0;"><b>Instagram:</b> @felix_ny10</p>
+            </div>
+            <button onclick="closeModals()" style="background:var(--main); border:none; padding:10px 30px; border-radius:5px; font-weight:bold; cursor:pointer;">BACK TO MOVIES</button>
         </div>
     </div>
 
     <script>
-        // API CONFIG - This pulls the real movies!
-        const API_KEY = '8093d6645564c71853a8089408018e6e'; // Public Test Key
+        const API_KEY = '8093d6645564c71853a8089408018e6e';
         const IMG_URL = 'https://image.tmdb.org/t/p/w500';
         let watchHistory = [];
 
@@ -131,7 +125,7 @@
                 document.getElementById('profileName').innerText = u;
                 document.getElementById('profileInitial').innerText = u[0].toUpperCase();
                 loadTrending();
-            } else { alert("Enter details"); }
+            }
         }
 
         async function loadTrending() {
@@ -141,7 +135,6 @@
         }
 
         async function loadCategory(type) {
-            document.getElementById('rowTitle').innerText = type === 'movie' ? "🔥 Popular Movies" : "📺 Popular TV Shows";
             const res = await fetch(`https://api.themoviedb.org/3/discover/${type}?api_key=${API_KEY}`);
             const data = await res.json();
             render(data.results);
@@ -157,39 +150,38 @@
         }
 
         function render(items) {
-            document.getElementById('mainGrid').innerHTML = items.map(m => {
-                if(!m.poster_path) return ''; 
-                return `
-                    <div class="movie-card" onclick="playMovie('${m.title || m.name}', '${IMG_URL + m.poster_path}')">
-                        <img src="${IMG_URL + m.poster_path}">
-                        <div style="padding:10px; font-weight:bold; font-size:12px;">${m.title || m.name}</div>
-                    </div>
-                `;
-            }).join('');
+            document.getElementById('mainGrid').innerHTML = items.map(m => `
+                <div class="movie-card" onclick="openPlayer('${m.title || m.name}', '${IMG_URL + m.poster_path}')">
+                    <img src="${IMG_URL + m.poster_path}" onerror="this.src='https://via.placeholder.com/170x250/111/fff?text=StreamX'">
+                    <div style="padding:10px; font-weight:bold; font-size:12px; text-align:center;">${m.title || m.name}</div>
+                </div>
+            `).join('');
         }
 
-        function playMovie(t, img) {
-            alert("Streaming: " + t);
-            if(!watchHistory.find(x => x.t === t)) {
-                watchHistory.unshift({t, i: img});
+        function openPlayer(title, img) {
+            // Track History
+            if(!watchHistory.find(x => x.t === title)) {
+                watchHistory.unshift({t: title, i: img});
                 document.getElementById('historySection').style.display = 'block';
                 document.getElementById('historyGrid').innerHTML = watchHistory.map(h => `<div class="movie-card" style="min-width:120px;"><img src="${h.i}"></div>`).join('');
             }
+            
+            // Open Video
+            document.getElementById('playerModal').style.display = 'flex';
+            // Logic: Searches YouTube for the trailer of the clicked title
+            document.getElementById('videoFrame').src = `https://www.youtube.com/embed?listType=search&list=${title}+official+trailer`;
         }
 
-        // NAVIGATION & MODALS
+        function closePlayer() {
+            document.getElementById('playerModal').style.display = 'none';
+            document.getElementById('videoFrame').src = ""; // Stops the video
+        }
+
         function toggleSettings() { document.getElementById('settingsMenu').classList.toggle('active'); }
         function openModal(id) { document.getElementById(id).style.display = 'flex'; }
-        function closeModals() { 
-            document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); 
-        }
-        function sendRecovery() {
-            const email = "felixnyoka@example.com"; // Set your email
-            window.location.href = `mailto:${email}?subject=Reset&body=Code please`;
-            closeModals();
-        }
+        function closeModals() { document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); }
         function startVoice() {
-            const rec = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            const rec = new (window.webkitSpeechRecognition)();
             rec.onresult = (e) => { document.getElementById('searchBar').value = e.results[0][0].transcript; searchAPI(); };
             rec.start();
         }
