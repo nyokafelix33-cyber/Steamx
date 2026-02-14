@@ -3,54 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StreamX | World Wide Premium</title>
+    <title>StreamX | Premium World Wide</title>
     <style>
         :root { --main: #d3f243; --bg: #080808; --card: #121212; --transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
         body { background: var(--bg); color: white; font-family: 'Inter', sans-serif; margin: 0; overflow-x: hidden; }
 
-        /* --- 1. LOGIN WALL --- */
+        /* --- LOGIN PAGE --- */
         #loginScreen {
             position: fixed; inset: 0; z-index: 10000; display: flex; align-items: center; justify-content: center;
-            background: linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.85)), url('https://image.tmdb.org/t/p/original/7RyHs7yYpSduUjH19uSdrzB7CHu.jpg');
-            background-size: cover; background-position: center; backdrop-filter: blur(15px);
+            background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), url('https://image.tmdb.org/t/p/original/7RyHs7yYpSduUjH19uSdrzB7CHu.jpg');
+            background-size: cover; background-position: center; backdrop-filter: blur(10px);
         }
-        .login-box { background: rgba(15,15,15,0.95); padding: 40px; border-radius: 15px; width: 90%; max-width: 380px; text-align: center; border: 1px solid #333; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
-        .login-box h2 { font-size: 32px; color: #ff0000; font-weight: 900; margin-bottom: 20px; text-transform: uppercase; }
-        .login-box input { width: 100%; padding: 14px; margin: 10px 0; background: #000; border: 1px solid #444; color: white; border-radius: 8px; outline: none; }
-        .login-btn { width: 100%; padding: 14px; background: var(--main); color: #000; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; margin-top: 10px; }
+        .login-box { background: rgba(15,15,15,0.95); padding: 40px; border-radius: 15px; width: 320px; text-align: center; border: 1px solid #333; }
+        .login-box h2 { color: #ff0000; font-weight: 900; font-size: 32px; margin-bottom: 20px; }
+        .login-box input { width: 100%; padding: 12px; margin: 10px 0; background: #000; border: 1px solid #444; color: white; border-radius: 5px; box-sizing: border-box; }
+        .login-btn { width: 100%; padding: 12px; background: var(--main); color: #000; font-weight: bold; border: none; cursor: pointer; border-radius: 5px; margin-top: 10px; }
 
-        /* --- 2. MAIN APP --- */
+        /* --- MAIN INTERFACE --- */
         #mainSite { display: none; }
-
-        /* Centered Header */
-        header { background: #000; padding: 15px 5%; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 1000; border-bottom: 1px solid #222; }
-        .logo { font-size: 24px; font-weight: 900; color: #ff0000; text-decoration: none; }
+        header { background: #000; padding: 15px 5%; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #222; position: sticky; top: 0; z-index: 1000; }
         
-        /* Centered Search + Mic */
-        .search-container { position: absolute; left: 50%; transform: translateX(-50%); display: flex; align-items: center; background: rgba(255,255,255,0.1); border-radius: 30px; padding: 5px 20px; border: 1px solid #333; width: 30%; min-width: 250px; }
+        .search-container { position: absolute; left: 50%; transform: translateX(-50%); display: flex; align-items: center; background: #111; border-radius: 30px; padding: 5px 20px; border: 1px solid #333; width: 30%; min-width: 250px; }
         .search-container input { background: none; border: none; color: white; width: 100%; outline: none; text-align: center; }
-        .mic-icon { color: var(--main); cursor: pointer; margin-left: 10px; font-size: 18px; }
+        .mic-icon { color: var(--main); cursor: pointer; margin-left: 10px; }
 
         .nav-links { display: flex; gap: 20px; align-items: center; }
         .nav-item { color: #888; cursor: pointer; font-size: 14px; font-weight: bold; }
         .nav-item.active { color: var(--main); }
 
-        /* Hero Banner */
-        .hero { height: 65vh; background: linear-gradient(to right, #000 10%, transparent 80%), url('https://image.tmdb.org/t/p/original/7RyHs7yYpSduUjH19uSdrzB7CHu.jpg'); background-size: cover; background-position: center top; display: flex; align-items: center; padding: 0 5%; }
-        .hero-content h1 { font-size: 50px; margin: 10px 0; font-weight: 900; }
+        /* HERO SECTION */
+        .hero { height: 60vh; background: linear-gradient(to right, #000 20%, transparent), url('https://image.tmdb.org/t/p/original/7RyHs7yYpSduUjH19uSdrzB7CHu.jpg'); background-size: cover; background-position: center top; display: flex; align-items: center; padding: 0 5%; }
+        .hero h1 { font-size: 50px; margin: 10px 0; font-weight: 900; }
 
-        /* Content Rows */
+        /* MOVIE GRID */
         .container { padding: 30px 5%; }
         .movie-row { display: flex; overflow-x: auto; gap: 20px; padding-bottom: 20px; scrollbar-width: none; }
         .movie-card { min-width: 170px; background: var(--card); border-radius: 12px; overflow: hidden; border: 1px solid #222; position: relative; transition: 0.3s; cursor: pointer; }
         .movie-card:hover { transform: scale(1.05); border-color: var(--main); }
         .movie-card img { width: 100%; aspect-ratio: 2/3; object-fit: cover; }
-        .rank-tag { position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.8); color: var(--main); padding: 5px 10px; border-radius: 5px; font-weight: bold; border: 1px solid var(--main); }
+        .rank { position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.8); color: var(--main); padding: 5px 10px; border-radius: 5px; font-weight: bold; border: 1px solid var(--main); }
 
-        /* Settings Sidebar */
+        /* SETTINGS MENU */
         #settingsMenu { position: fixed; right: -320px; top: 0; width: 300px; height: 100%; background: #111; z-index: 2000; padding: 40px 20px; transition: var(--transition); border-left: 1px solid #333; }
         #settingsMenu.active { right: 0; }
-        .profile-circle { width: 80px; height: 80px; background: var(--main); border-radius: 50%; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; font-size: 35px; color: black; font-weight: 900; }
+        .profile-pic { width: 80px; height: 80px; background: var(--main); border-radius: 50%; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; font-size: 35px; color: black; font-weight: 900; }
     </style>
 </head>
 <body>
@@ -58,38 +54,38 @@
     <div id="loginScreen">
         <div class="login-box">
             <h2>STREAM<span>X</span></h2>
-            <p style="color:#666; font-size: 14px; margin-bottom: 20px;">Premium World Wide Access</p>
-            <input type="text" id="userIn" placeholder="Username (Mars)">
-            <input type="password" id="passIn" placeholder="Password (1234)">
+            <p style="color:#666; font-size:12px; margin-bottom:20px;">WORLD WIDE ACCESS</p>
+            <input type="text" id="user" placeholder="Username (Mars)">
+            <input type="password" id="pass" placeholder="Password (1234)">
             <button class="login-btn" onclick="checkLogin()">SIGN IN</button>
-            <p id="err" style="color:red; font-size:12px; margin-top:10px; display:none;">Access Denied. Check Credentials.</p>
+            <p id="error" style="color:red; font-size:12px; margin-top:10px; display:none;">Wrong credentials!</p>
         </div>
     </div>
 
     <div id="mainSite">
         <header>
-            <a href="#" class="logo">STREAM<span>X</span></a>
+            <div style="font-weight:900; color:#ff0000; font-size:24px;">STREAMX</div>
             <div class="search-container">
-                <input type="text" id="searchBar" placeholder="Search world wide..." onkeyup="runSearch()">
+                <input type="text" id="searchBar" placeholder="Search world wide..." onkeyup="doSearch()">
                 <span class="mic-icon" onclick="startVoice()">🎤</span>
             </div>
             <div class="nav-links">
-                <span class="nav-item active" onclick="showCategory('movie')">Movies</span>
-                <span class="nav-item" onclick="showCategory('series')">Series</span>
-                <span class="nav-item" style="color:white; font-size:20px;" onclick="toggleMenu()">⚙️</span>
+                <span class="nav-item" onclick="filter('movie')">Movies</span>
+                <span class="nav-item" onclick="filter('series')">Series</span>
+                <span class="nav-item" style="color:var(--main);" onclick="toggleSettings()">Mars ⚙️</span>
             </div>
         </header>
 
         <div class="hero">
-            <div class="hero-content">
-                <p style="color:var(--main); letter-spacing:4px; font-weight:bold;">NOW STREAMING GLOBAL</p>
+            <div>
+                <p style="color:var(--main); letter-spacing:4px; font-weight:bold;">PREMIUM PREMIERE</p>
                 <h1>AVENGERS: ENDGAME</h1>
-                <button style="background:var(--main); border:none; padding:15px 40px; font-weight:bold; border-radius:5px; cursor:pointer;">WATCH NOW</button>
+                <button onclick="playMovie('Avengers: Endgame', 'https://image.tmdb.org/t/p/original/7RyHs7yYpSduUjH19uSdrzB7CHu.jpg')" style="background:var(--main); border:none; padding:15px 40px; font-weight:bold; border-radius:5px; cursor:pointer;">PLAY NOW</button>
             </div>
         </div>
 
         <div class="container" id="historySection" style="display:none;">
-            <h3 style="color:var(--main);">🕒 Your History</h3>
+            <h3 style="color:var(--main);">🕒 Continue Watching</h3>
             <div class="movie-row" id="historyGrid"></div>
         </div>
 
@@ -100,65 +96,64 @@
     </div>
 
     <div id="settingsMenu">
-        <div onclick="toggleMenu()" style="text-align:right; cursor:pointer; font-size:24px;">✕</div>
-        <div class="profile-circle">M</div>
+        <div onclick="toggleSettings()" style="text-align:right; cursor:pointer; font-size:24px;">✕</div>
+        <div class="profile-pic">M</div>
         <h2 style="text-align:center; margin:0;">Mars</h2>
-        <p style="text-align:center; color:#666; font-size:13px;">Pro Member • Worldwide</p>
+        <p style="text-align:center; color:#555; font-size:13px;">Premium Worldwide Member</p>
         <hr style="border:0; border-top:1px solid #222; margin:30px 0;">
-        <div class="nav-item" style="padding:15px 0; color:white;" onclick="alert('StreamX: Felix Nyoka Vision 2026')">About Us</div>
-        <div class="nav-item" style="padding:15px 0; color:red;" onclick="location.reload()">Logout</div>
+        <p onclick="alert('StreamX: Vision by Felix Nyoka @felix_ny10')" style="cursor:pointer;">About Us</p>
+        <p onclick="location.reload()" style="color:red; cursor:pointer; margin-top:20px;">Logout</p>
     </div>
 
     <script>
-        const database = [
-            { t: "Avatar: Way of Water", i: "https://image.tmdb.org/t/p/w500/t6pEKntAI2ZzdvUv3pk679p36vu.jpg", cat: "movie" },
-            { t: "The Last of Us", i: "https://image.tmdb.org/t/p/w500/uKVH56J20o77vovm0Ym4u6Q6mnd.jpg", cat: "series" },
-            { t: "Spider-Man: No Way Home", i: "https://image.tmdb.org/t/p/w500/1g0m2YpScy62BC4t1q6qZ6FXuwi.jpg", cat: "movie" },
-            { t: "Stranger Things", i: "https://image.tmdb.org/t/p/w500/49Wf9S1Cbgq93R6S66oR0Y96JvB.jpg", cat: "series" },
-            { t: "John Wick 4", i: "https://image.tmdb.org/t/p/w500/v796S79hDma9TZo9auY9LS6Y0B.jpg", cat: "movie" }
+        const movies = [
+            { t: "Avatar: Way of Water", i: "https://image.tmdb.org/t/p/w500/t6pEKntAI2ZzdvUv3pk679p36vu.jpg", type: "movie" },
+            { t: "The Last of Us", i: "https://image.tmdb.org/t/p/w500/uKVH56J20o77vovm0Ym4u6Q6mnd.jpg", type: "series" },
+            { t: "Spider-Man: No Way Home", i: "https://image.tmdb.org/t/p/w500/1g0m2YpScy62BC4t1q6qZ6FXuwi.jpg", type: "movie" },
+            { t: "Stranger Things", i: "https://image.tmdb.org/t/p/w500/49Wf9S1Cbgq93R6S66oR0Y96JvB.jpg", type: "series" },
+            { t: "John Wick 4", i: "https://image.tmdb.org/t/p/w500/v796S79hDma9TZo9auY9LS6Y0B.jpg", type: "movie" }
         ];
 
-        let history = [];
+        let watchHistory = [];
 
         function checkLogin() {
-            if(document.getElementById('userIn').value === 'Mars' && document.getElementById('passIn').value === '1234') {
+            if(document.getElementById('user').value==='Mars' && document.getElementById('pass').value==='1234') {
                 document.getElementById('loginScreen').style.display = 'none';
                 document.getElementById('mainSite').style.display = 'block';
                 window.speechSynthesis.speak(new SpeechSynthesisUtterance("Welcome Mars"));
-                render(database);
-            } else { document.getElementById('err').style.display = 'block'; }
+                render(movies);
+            } else { document.getElementById('error').style.display = 'block'; }
         }
 
-        function render(list) {
-            document.getElementById('mainGrid').innerHTML = list.map((m, i) => `
-                <div class="movie-card" onclick="addToHistory('${m.t}', '${m.i}')">
-                    <div class="rank-tag">#${i+1}</div>
+        function render(data) {
+            document.getElementById('mainGrid').innerHTML = data.map((m, i) => `
+                <div class="movie-card" onclick="playMovie('${m.t}', '${m.i}')">
+                    <div class="rank">#${i+1}</div>
                     <img src="${m.i}">
                     <div style="padding:10px; text-align:center; font-weight:bold; font-size:13px;">${m.t}</div>
                 </div>
             `).join('');
         }
 
-        function showCategory(cat) {
-            const filtered = database.filter(m => m.cat === cat);
-            document.getElementById('rowTitle').innerText = cat === 'movie' ? "🏆 Top Movies" : "📺 Top Series";
-            render(filtered);
-        }
-
-        function addToHistory(title, img) {
-            if(!history.find(x => x.t === title)) {
-                history.unshift({t: title, i: img});
+        function playMovie(t, img) {
+            alert("Now Streaming: " + t);
+            if(!watchHistory.find(x => x.t === t)) {
+                watchHistory.unshift({t, i: img});
                 document.getElementById('historySection').style.display = 'block';
-                document.getElementById('historyGrid').innerHTML = history.map(h => `
+                document.getElementById('historyGrid').innerHTML = watchHistory.map(h => `
                     <div class="movie-card" style="min-width:130px;"><img src="${h.i}"></div>
                 `).join('');
             }
-            alert("Streaming: " + title);
         }
 
-        function runSearch() {
-            const query = document.getElementById('searchBar').value.toLowerCase();
-            render(database.filter(m => m.t.toLowerCase().includes(query)));
+        function filter(type) {
+            document.getElementById('rowTitle').innerText = type === 'movie' ? "Top Movies" : "Top TV Series";
+            render(movies.filter(m => m.type === type));
+        }
+
+        function doSearch() {
+            const q = document.getElementById('searchBar').value.toLowerCase();
+            render(movies.filter(m => m.t.toLowerCase().includes(q)));
         }
 
         function startVoice() {
@@ -166,12 +161,12 @@
             rec.onstart = () => { window.speechSynthesis.speak(new SpeechSynthesisUtterance("Listening")); };
             rec.onresult = (e) => { 
                 document.getElementById('searchBar').value = e.results[0][0].transcript;
-                runSearch();
+                doSearch();
             };
             rec.start();
         }
 
-        function toggleMenu() { document.getElementById('settingsMenu').classList.toggle('active'); }
+        function toggleSettings() { document.getElementById('settingsMenu').classList.toggle('active'); }
     </script>
 </body>
 </html>
