@@ -10,7 +10,7 @@
 
         /* --- AUTH SECTION --- */
         #authScreen { position: fixed; inset: 0; z-index: 9999; background: #000; display: flex; align-items: center; justify-content: center; }
-        .auth-box { background: #111; padding: 30px; border-radius: 15px; width: 320px; text-align: center; border: 1px solid #333; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .auth-box { background: #111; padding: 30px; border-radius: 15px; width: 320px; text-align: center; border: 1px solid #333; }
         .auth-box h2 { color: #ff0000; margin-bottom: 20px; font-size: 28px; font-weight: 900; }
         .auth-box input { width: 100%; padding: 12px; margin: 10px 0; background: #000; border: 1px solid #444; color: white; border-radius: 5px; box-sizing: border-box; outline: none; }
         .auth-btn { width: 100%; padding: 12px; background: var(--main); color: #000; font-weight: bold; border: none; border-radius: 5px; cursor: pointer; margin-top: 10px; }
@@ -19,29 +19,30 @@
         /* --- MAIN UI --- */
         #mainSite { display: none; }
         header { background: #000; padding: 15px 5%; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #222; position: sticky; top: 0; z-index: 100; }
-        .logo { font-weight: 900; color: #ff0000; font-size: 24px; cursor: pointer; letter-spacing: 1px; }
-        
+        .logo { font-weight: 900; color: #ff0000; font-size: 24px; cursor: pointer; }
         .search-box { background: #111; border: 1px solid #333; padding: 8px 15px; border-radius: 20px; width: 250px; }
         .search-box input { background: none; border: none; color: white; outline: none; width: 100%; text-align: center; }
-
         .nav-links span { margin-left: 20px; font-size: 14px; cursor: pointer; font-weight: 600; }
-        .nav-links span:hover { color: var(--main); }
 
+        /* --- CONTENT --- */
         .container { padding: 20px 5%; }
         .row { display: flex; overflow-x: auto; gap: 15px; padding-bottom: 20px; scrollbar-width: none; min-height: 240px; }
-        
-        .card { min-width: 160px; max-width: 160px; background: var(--card); border-radius: 10px; overflow: hidden; border: 1px solid #222; cursor: pointer; transition: 0.3s; }
-        .card:hover { border-color: var(--main); transform: translateY(-5px); }
-        .card img { width: 100%; height: 230px; object-fit: cover; background: #1a1a1a; }
-        .card p { font-size: 12px; text-align: center; padding: 10px; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .badge { position: absolute; top: 8px; left: 8px; background: red; color: white; font-size: 10px; padding: 2px 6px; border-radius: 3px; font-weight: bold; z-index: 10; }
+        .card { min-width: 160px; background: var(--card); border-radius: 10px; overflow: hidden; border: 1px solid #222; cursor: pointer; position: relative; }
+        .card img { width: 100%; height: 230px; object-fit: cover; }
+        .card p { font-size: 12px; text-align: center; padding: 10px; margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-        /* --- PLAYER & SERVER SWITCHER --- */
+        /* --- SETTINGS MODAL --- */
+        #settingsModal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 2000; display: none; align-items: center; justify-content: center; }
+        .settings-content { background: #111; padding: 30px; border-radius: 15px; width: 340px; border: 1px solid #333; text-align: center; }
+        .settings-btn { width: 100%; padding: 12px; margin: 8px 0; background: #222; color: white; border: 1px solid #444; border-radius: 5px; cursor: pointer; font-weight: bold; text-align: left; }
+        .settings-btn:hover { background: #333; border-color: var(--main); }
+        .about-box { background: #000; padding: 15px; border-radius: 10px; margin-top: 15px; display: none; text-align: left; font-size: 13px; border-left: 3px solid var(--main); }
+
+        /* --- PLAYER --- */
         #player { position: fixed; inset: 0; background: #000; z-index: 1000; display: none; flex-direction: column; }
-        .player-nav { background: #111; padding: 10px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; }
-        .server-btn { background: #222; color: #fff; border: 1px solid #444; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-size: 12px; font-weight: bold; margin-right: 10px; }
-        .server-btn.active { background: var(--main); color: #000; border-color: var(--main); }
-        .close-btn { background: #ff0000; color: white; padding: 8px 15px; border: none; font-weight: bold; cursor: pointer; border-radius: 5px; }
+        .player-nav { background: #111; padding: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .server-btn { background: #222; color: #fff; border: 1px solid #444; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-size: 12px; margin-right: 5px; }
+        .server-btn.active { background: var(--main); color: #000; }
         iframe { width: 100%; height: 100%; border: none; }
     </style>
 </head>
@@ -52,12 +53,8 @@
             <h2>STREAM<span>X</span></h2>
             <input type="email" id="logEmail" placeholder="Email">
             <input type="password" id="logPass" placeholder="Password">
-            <div style="text-align:left; font-size:12px; color:#666; margin-top:5px;">
-                <input type="checkbox" id="remember"> Remember Me
-            </div>
             <button class="auth-btn" onclick="tryLogin()">SIGN IN</button>
             <span class="link" onclick="swapAuth('up')">Create Account</span>
-            <span class="link" onclick="alert('System: Recovery link sent to your email.')">Forgot Password?</span>
         </div>
         
         <div class="auth-box" id="signupUI" style="display:none;">
@@ -79,35 +76,33 @@
             <div class="nav-links">
                 <span onclick="load('movie')">Movies</span>
                 <span onclick="load('tv')">Series</span>
-                <span id="userBtn" style="color:var(--main);">Felix</span>
+                <span onclick="openSettings()" style="font-size:18px;">⚙️</span>
             </div>
         </header>
 
         <div class="container">
-            <h3 style="color:var(--main)">🏆 Live Sports & News</h3>
-            <div class="row">
-                <div class="card" style="position:relative;" onclick="playLive('https://www.youtube.com/embed/jfKfPfyJRdk')">
-                    <span class="badge">LIVE</span>
-                    <img src="https://images.unsplash.com/photo-1504450758481-7338eba7524a?w=300">
-                    <p>Sports Network HD</p>
-                </div>
-                <div class="card" style="position:relative;" onclick="playLive('https://www.youtube.com/embed/9Auq9mYxvEE')">
-                    <span class="badge">LIVE</span>
-                    <img src="https://images.unsplash.com/photo-1585829365234-781fcd0d4301?w=300">
-                    <p>Sky News Live</p>
-                </div>
-                <div class="card" style="position:relative;" onclick="playLive('https://www.youtube.com/embed/A47vS_UVR38')">
-                    <span class="badge">LIVE</span>
-                    <img src="https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=300">
-                    <p>Eurosport World</p>
-                </div>
-            </div>
+            <h3 id="rowTitle">🔥 Popular Now</h3>
+            <div class="row" id="grid"></div>
         </div>
+    </div>
 
-        <div class="container">
-            <h3 id="rowTitle">🔥 Trending Now</h3>
-            <div class="row" id="grid">
-                </div>
+    <div id="settingsModal">
+        <div class="settings-content">
+            <h3 style="margin-top:0;">Account Settings</h3>
+            
+            <button class="settings-btn" onclick="toggleAbout()">ℹ️ About StreamX</button>
+            
+            <div id="aboutMenu" class="about-box">
+                <p><strong>Founder:</strong> Felix Nyoka</p>
+                <p><strong>Version:</strong> 8.5 (Final Build)</p>
+                <p><strong>Status:</strong> Online / Premium</p>
+                <p style="color:#888; font-size:11px;">Empowering global entertainment through secure streaming.</p>
+            </div>
+
+            <button class="settings-btn" onclick="sendFeedback()" style="color:#ff4d4d; border-color:#ff4d4d;">💬 Report Issue</button>
+            <button class="settings-btn" style="background:#ff4444; border:none; margin-top:20px;" onclick="location.reload()">Logout</button>
+            
+            <p class="link" onclick="closeSettings()">Close Menu</p>
         </div>
     </div>
 
@@ -117,7 +112,7 @@
                 <button class="server-btn active" id="s1" onclick="switchServer(1)">Server 1</button>
                 <button class="server-btn" id="s2" onclick="switchServer(2)">Server 2</button>
             </div>
-            <button class="close-btn" onclick="closePlayer()">✕ CLOSE</button>
+            <button onclick="closePlayer()" style="background:#ff4d4d; color:white; border:none; padding:8px 15px; border-radius:5px; cursor:pointer;">✕ CLOSE</button>
         </div>
         <iframe id="venom" allowfullscreen src=""></iframe>
     </div>
@@ -125,10 +120,8 @@
     <script>
         const KEY = '8093d6645564c71853a8089408018e6e';
         const IMG = 'https://image.tmdb.org/t/p/w500';
-        let currentID = '';
-        let currentType = '';
+        let currentID = '', currentType = '';
 
-        // 1. AUTH LOGIC
         function swapAuth(t) {
             document.getElementById('loginUI').style.display = t === 'in' ? 'block' : 'none';
             document.getElementById('signupUI').style.display = t === 'up' ? 'block' : 'none';
@@ -141,17 +134,13 @@
 
         function tryLogin() {
             const e = document.getElementById('logEmail').value, p = document.getElementById('logPass').value, u = JSON.parse(localStorage.getItem(e));
-            if(u && u.p === p) { enter(u.n); } else { alert("User not found"); }
+            if(u && u.p === p) { 
+                document.getElementById('authScreen').style.display = 'none';
+                document.getElementById('mainSite').style.display = 'block';
+                load('movie'); 
+            } else { alert("Access Denied"); }
         }
 
-        function enter(name) {
-            document.getElementById('authScreen').style.display = 'none';
-            document.getElementById('mainSite').style.display = 'block';
-            document.getElementById('userBtn').innerText = name;
-            load('movie');
-        }
-
-        // 2. DATA LOGIC
         async function load(type) {
             document.getElementById('rowTitle').innerText = type === 'movie' ? "🔥 Popular Movies" : "📺 Popular Series";
             try {
@@ -165,45 +154,35 @@
             const container = document.getElementById('grid');
             container.innerHTML = ""; 
             list.forEach(m => {
-                if(!m.poster_path) return;
                 const div = document.createElement('div');
                 div.className = "card";
-                div.onclick = () => startPlayback(m.id, type);
+                div.onclick = () => { currentID=m.id; currentType=type; document.getElementById('player').style.display = 'flex'; switchServer(1); };
                 div.innerHTML = `<img src="${IMG + m.poster_path}"><p>${m.title || m.name}</p>`;
                 container.appendChild(div);
             });
-        }
-
-        // 3. PLAYER LOGIC
-        function startPlayback(id, type) {
-            currentID = id;
-            currentType = type;
-            document.getElementById('player').style.display = 'flex';
-            switchServer(1);
         }
 
         function switchServer(num) {
             const v = document.getElementById('venom');
             document.getElementById('s1').classList.toggle('active', num === 1);
             document.getElementById('s2').classList.toggle('active', num === 2);
-            
-            const serverUrl = num === 1 
-                ? (currentType === 'tv' ? `https://vidsrc.to/embed/tv/${currentID}` : `https://vidsrc.to/embed/movie/${currentID}`)
-                : (currentType === 'tv' ? `https://vidsrc.me/embed/tv?tmdb=${currentID}` : `https://vidsrc.me/embed/movie?tmdb=${currentID}`);
-            
-            v.src = serverUrl;
+            v.src = num === 1 
+                ? `https://vidsrc.to/embed/${currentType}/${currentID}` 
+                : `https://vidsrc.me/embed/${currentType}?tmdb=${currentID}`;
         }
 
-        function playLive(url) {
-            document.getElementById('player').style.display = 'flex';
-            document.getElementById('venom').src = url;
-            document.querySelectorAll('.server-btn').forEach(b => b.style.display = 'none');
+        function closePlayer() { document.getElementById('player').style.display = 'none'; document.getElementById('venom').src = ""; }
+        function openSettings() { document.getElementById('settingsModal').style.display = 'flex'; }
+        function closeSettings() { document.getElementById('settingsModal').style.display = 'none'; document.getElementById('aboutMenu').style.display = 'none'; }
+        
+        function toggleAbout() {
+            const menu = document.getElementById('aboutMenu');
+            menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
         }
 
-        function closePlayer() {
-            document.getElementById('player').style.display = 'none';
-            document.getElementById('venom').src = "";
-            document.querySelectorAll('.server-btn').forEach(b => b.style.display = 'inline-block');
+        function sendFeedback() {
+            const msg = prompt("Describe the issue:");
+            if(msg) alert("Report sent to StreamX Dev Team.");
         }
 
         async function search() {
