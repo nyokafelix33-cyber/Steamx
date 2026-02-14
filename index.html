@@ -12,91 +12,112 @@
         header { background: #000; padding: 15px 5%; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 1000; border-bottom: 1px solid #222; }
         .logo { font-size: 24px; font-weight: 900; color: red; text-decoration: none; }
         .logo span { color: white; }
-        .search-bar { flex-grow: 0.5; background: #111; border: 1px solid #333; padding: 10px; border-radius: 5px; color: white; margin: 0 20px; }
+        .search-bar { flex-grow: 0.5; background: #111; border: 1px solid #333; padding: 10px; border-radius: 5px; color: white; margin: 0 20px; outline: none; }
 
-        /* Sidebar - Fixed Hidden State */
+        /* Sidebar */
         #sidebar { position: fixed; top: 0; right: -320px; width: 300px; height: 100%; background: #0a0a0a; z-index: 2000; transition: 0.4s; padding: 20px; border-left: 1px solid #222; box-sizing: border-box; }
         
+        /* New: Notification Toast */
+        #toast { position: fixed; bottom: 20px; left: 20px; background: var(--main); color: black; padding: 15px 25px; border-radius: 8px; font-weight: bold; transform: translateY(100px); transition: 0.5s; z-index: 5000; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
+
         /* Hero */
-        .hero { height: 400px; background: linear-gradient(to top, var(--bg), transparent), url('https://m.media-amazon.com/images/M/MV5BYjhiNjBlODctY2ZiOC00YjVlLWFlNzAtNTVhNzM1YjI1NzMxXkEyXkFqcGdeQXVyMjkwOTAyMDU@._V1_.jpg'); background-size: cover; background-position: center; display: flex; flex-direction: column; justify-content: center; padding: 0 5%; }
-        .play-btn { background: var(--main); color: black; border: none; padding: 15px 30px; border-radius: 5px; font-weight: bold; cursor: pointer; width: fit-content; }
+        .hero { height: 450px; background: linear-gradient(to top, var(--bg), transparent), url('https://image.tmdb.org/t/p/original/69Uqt7vLYv5897o76U9Y939GR95.jpg'); background-size: cover; background-position: center; display: flex; flex-direction: column; justify-content: center; padding: 0 5%; }
+        .play-btn { background: var(--main); color: black; border: none; padding: 15px 35px; border-radius: 5px; font-weight: bold; cursor: pointer; width: fit-content; transition: 0.3s; }
+        .play-btn:hover { background: white; transform: scale(1.05); }
 
         /* Movie Grid */
         .container { padding: 30px 5%; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px; }
-        .card { background: var(--card); border-radius: 8px; overflow: hidden; border: 1px solid #222; cursor: pointer; transition: 0.3s; }
-        .card:hover { border-color: var(--main); transform: translateY(-5px); }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 25px; }
+        .card { background: var(--card); border-radius: 10px; overflow: hidden; border: 1px solid #222; cursor: pointer; transition: 0.3s; position: relative; }
+        .card:hover { border-color: var(--main); transform: translateY(-10px); }
         .card img { width: 100%; aspect-ratio: 2/3; object-fit: cover; }
-        .card-title { padding: 10px; text-align: center; font-size: 14px; font-weight: bold; }
+        .card-title { padding: 12px; text-align: center; font-size: 13px; font-weight: bold; color: #ccc; }
 
-        /* Player & Comments Area */
+        /* Player & Comments */
         #playerOverlay { display: none; position: fixed; inset: 0; background: #000; z-index: 3000; overflow-y: auto; padding: 20px; }
         .comment-box { background: #111; padding: 20px; margin-top: 20px; border-radius: 8px; border: 1px solid #222; }
-        #commentList { list-style: none; padding: 0; }
+        #commentList { list-style: none; padding: 0; max-height: 200px; overflow-y: auto; }
         .c-item { padding: 10px; border-bottom: 1px solid #222; font-size: 14px; }
         .c-item b { color: var(--main); margin-right: 10px; }
     </style>
 </head>
 <body>
 
+    <div id="toast">Welcome back, Felix! 🎬</div>
+
     <div id="sidebar">
         <div onclick="toggleSidebar()" style="cursor:pointer; color:var(--main); text-align:right;">✕ CLOSE</div>
         <div style="text-align:center; margin-top:30px;">
             <div style="font-size: 50px;">👤</div>
             <h3>Felix Nyoka</h3>
-            <p style="color:#666;">felix@streamx.com</p>
+            <p style="color:#666;">Premium Member</p>
         </div>
         <div style="margin-top:30px;">
-            <div style="padding:10px; border-bottom:1px solid #222;">⭐ Watchlist</div>
-            <div style="padding:10px; border-bottom:1px solid #222;">⚙️ Settings</div>
+            <div style="padding:10px; border-bottom:1px solid #222; cursor:pointer;">⭐ My Watchlist</div>
+            <div style="padding:10px; border-bottom:1px solid #222; cursor:pointer;">⚙️ Account Settings</div>
         </div>
     </div>
 
     <div id="playerOverlay">
-        <button onclick="closePlayer()" style="background:var(--main); padding:10px; border:none; font-weight:bold; margin-bottom:10px;">✕ CLOSE MOVIE</button>
-        <video id="mainVid" controls style="width:100%; background:#000;"><source src="https://www.w3schools.com/html/mov_bbb.mp4"></video>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+            <h2 id="nowPlayingTitle" style="color:var(--main); margin:0;"></h2>
+            <button onclick="closePlayer()" style="background:none; border:1px solid #444; color:white; padding:10px 20px; cursor:pointer;">✕ EXIT</button>
+        </div>
+        <video id="mainVid" controls style="width:100%; max-height:70vh; background:#000;"><source src="https://www.w3schools.com/html/mov_bbb.mp4"></video>
         
         <div class="comment-box">
-            <h3>Comments</h3>
+            <h3>Community Chat</h3>
             <ul id="commentList"></ul>
-            <input type="text" id="cInput" placeholder="Add a comment..." style="width:70%; padding:10px; background:#000; color:white; border:1px solid #333;">
-            <button onclick="saveComment()" style="padding:10px; background:var(--main); border:none; font-weight:bold;">POST</button>
+            <div style="display:flex; gap:10px; margin-top:15px;">
+                <input type="text" id="cInput" placeholder="Write a comment..." style="flex-grow:1; padding:12px; background:#000; color:white; border:1px solid #333; border-radius:4px;">
+                <button onclick="saveComment()" style="padding:10px 25px; background:var(--main); border:none; font-weight:bold; cursor:pointer; border-radius:4px;">POST</button>
+            </div>
         </div>
     </div>
 
     <header>
         <a href="#" class="logo">STREAM<span>X</span></a>
-        <input type="text" id="srch" class="search-bar" placeholder="Search movies..." oninput="doSearch()">
-        <div onclick="toggleSidebar()" style="cursor:pointer; font-size:20px;">👤</div>
+        <input type="text" id="srch" class="search-bar" placeholder="Search for movies, actors, genres..." oninput="doSearch()">
+        <div onclick="toggleSidebar()" style="cursor:pointer; font-size:20px; color:white;">👤</div>
     </header>
 
     <div id="hero" class="hero">
-        <h1>Greenland 2</h1>
+        <div style="color:var(--main); font-weight:bold; letter-spacing:3px; margin-bottom:10px;">NOW TRENDING</div>
+        <h1 style="font-size:48px; margin:0 0 20px;">Greenland 2</h1>
         <button class="play-btn" onclick="startMovie('Greenland 2')">WATCH NOW</button>
     </div>
 
     <div class="container">
-        <h2 style="border-left:4px solid var(--main); padding-left:10px;">Latest Uploads</h2>
+        <h2 style="border-left:5px solid var(--main); padding-left:15px; margin-bottom:30px;">Latest Uploads</h2>
         <div class="grid" id="movieGrid"></div>
     </div>
 
     <script>
+        // Updated Image URLs to ensure they load
         const movies = [
             { t: "The Evil Inside", i: "https://image.tmdb.org/t/p/w500/b69m9v5s6Y0B1U7y8vL6bX3Y1.jpg" },
             { t: "Angel Flight", i: "https://image.tmdb.org/t/p/w500/v9Y69m9v5s6Y0B1U7y8vL6bX3Y1.jpg" },
             { t: "Cold Storage", i: "https://image.tmdb.org/t/p/w500/96KfTsvY9o6S17s5Y1JqVp6tA8Z.jpg" },
             { t: "Joe's Road Trip", i: "https://image.tmdb.org/t/p/w500/2u7BUzqC0S7Y0XU9sn69v5S6Y0B.jpg" },
-            { t: "Greenland 2", i: "https://m.media-amazon.com/images/M/MV5BYjhiNjBlODctY2ZiOC00YjVlLWFlNzAtNTVhNzM1YjI1NzMxXkEyXkFqcGdeQXVyMjkwOTAyMDU@._V1_.jpg" }
+            { t: "Greenland 2", i: "https://image.tmdb.org/t/p/w500/69Uqt7vLYv5897o76U9Y939GR95.jpg" }
         ];
 
         function draw(list) {
             const g = document.getElementById('movieGrid');
-            if(g) g.innerHTML = list.map(m => `<div class="card" onclick="startMovie('${m.t}')"><img src="${m.i}"><div class="card-title">${m.t}</div></div>`).join('');
+            if(g) {
+                g.innerHTML = list.map(m => `
+                    <div class="card" onclick="startMovie('${m.t}')">
+                        <img src="${m.i}" onerror="this.src='https://via.placeholder.com/500x750?text=Poster+Loading...'">
+                        <div class="card-title">${m.t}</div>
+                    </div>
+                `).join('');
+            }
         }
 
         function startMovie(t) {
-            const speak = new SpeechSynthesisUtterance("Streaming " + t);
+            const speak = new SpeechSynthesisUtterance("Now streaming " + t);
             window.speechSynthesis.speak(speak);
+            document.getElementById('nowPlayingTitle').innerText = t;
             document.getElementById('playerOverlay').style.display = 'block';
             document.getElementById('mainVid').play();
             loadComments();
@@ -118,7 +139,6 @@
             draw(movies.filter(m => m.t.toLowerCase().includes(q)));
         }
 
-        // Permanent Comments Logic
         function saveComment() {
             const val = document.getElementById('cInput').value;
             if(!val) return;
@@ -133,9 +153,19 @@
             const list = document.getElementById('commentList');
             let existing = JSON.parse(localStorage.getItem('stream_comments') || '[]');
             list.innerHTML = existing.map(c => `<li class="c-item"><b>${c.user}</b> ${c.text}</li>`).join('');
+            list.scrollTop = list.scrollHeight;
         }
 
-        window.onload = () => draw(movies);
+        // Show welcome toast after 2 seconds
+        window.onload = () => {
+            draw(movies);
+            setTimeout(() => {
+                document.getElementById('toast').style.transform = "translateY(0)";
+                setTimeout(() => {
+                    document.getElementById('toast').style.transform = "translateY(100px)";
+                }, 4000);
+            }, 2000);
+        };
     </script>
 </body>
 </html>
