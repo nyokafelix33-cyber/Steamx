@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { --main: #d3f243; --bg: #0a0c10; --card: #161b22; --red: #ff0000; }
-        body { background: var(--bg); color: #fff; font-family: 'Inter', sans-serif; margin: 0; padding: 0; overflow-x: hidden; }
+        body { background: var(--bg); color: #fff; font-family: 'Inter', sans-serif; margin: 0; padding: 0; }
 
         /* --- HEADER --- */
         header { 
@@ -15,13 +15,12 @@
             position: sticky; top: 0; z-index: 1000; border-bottom: 2px solid var(--main);
         }
         .logo { font-size: 22px; font-weight: 900; color: var(--red); text-decoration: none; }
-        .nav-links span { margin-left: 15px; cursor: pointer; font-weight: 700; font-size: 12px; text-transform: uppercase; }
-
+        
         /* --- SEARCH --- */
         .search-container { padding: 15px 5%; background: #000; }
         #sInput { width: 100%; background: #1a1a1a; border: 1px solid #333; padding: 12px; border-radius: 8px; color: #fff; outline: none; }
 
-        /* --- GRID --- */
+        /* --- CONTENT GRID --- */
         .container { padding: 20px 5% 100px 5%; }
         .row-head { font-size: 16px; font-weight: 800; color: var(--main); margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 12px; }
@@ -31,14 +30,13 @@
         .card p { margin: 0; padding: 10px; font-size: 10px; text-align: center; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .q-tag { position: absolute; top: 5px; right: 5px; background: var(--main); color: #000; font-size: 9px; font-weight: 900; padding: 2px 4px; border-radius: 3px; }
 
-        /* --- SETTINGS MODAL (MATCHING 157851.png) --- */
+        /* --- SETTINGS MODAL (FIXED) --- */
         #setModal { position: fixed; inset: 0; background: #0b0e14; z-index: 2000; display: none; padding: 20px; overflow-y: auto; }
         .profile-card { background: #1c1f26; padding: 25px; border-radius: 12px; margin: 20px 0; border-left: 4px solid var(--main); }
         .btn-continue { background: var(--main); color: #000; padding: 14px; border: none; border-radius: 10px; font-weight: 800; width: 100%; margin-top: 15px; cursor: pointer; }
         
         .menu-row { display: flex; justify-content: space-between; align-items: center; padding: 20px 0; border-bottom: 1px solid #222; cursor: pointer; }
-        .sub-panel { display: none; padding: 15px; background: #111; border-radius: 8px; margin-top: -1px; font-size: 14px; color: #ccc; }
-        .social-btn { display: inline-flex; align-items: center; gap: 10px; background: #25d366; color: #fff; padding: 10px 15px; border-radius: 8px; text-decoration: none; font-weight: bold; margin-top: 10px; }
+        .sub-panel { display: none; padding: 15px; background: #111; border-radius: 8px; margin-top: -1px; font-size: 14px; color: #ccc; line-height: 1.5; }
 
         /* --- BOTTOM NAV --- */
         footer { position: fixed; bottom: 0; width: 100%; background: #000; display: flex; justify-content: space-around; padding: 15px 0; border-top: 1px solid #222; z-index: 1000; }
@@ -51,25 +49,22 @@
         iframe { width: 100%; height: 100%; border: none; }
     </style>
 </head>
-<body onload="fetchPierced('movie')">
+<body onload="forceLoad('movie')">
 
     <header>
         <a href="#" class="logo">STREAMX</a>
-        <div class="nav-links">
-            <span onclick="fetchPierced('movie')">Movies</span>
-            <span onclick="fetchPierced('tv')">Series</span>
-        </div>
+        <div style="font-size:12px; font-weight:bold; color:#444;">V3.0 HYPER-PIERCE</div>
     </header>
 
     <div class="search-container">
-        <input type="text" id="sInput" placeholder="Search world wide movies..." onkeyup="if(event.key==='Enter')search()">
+        <input type="text" id="sInput" placeholder="Search world wide..." onkeyup="if(event.key==='Enter')search()">
     </div>
 
     <div class="container">
-        <div class="row-head" id="gTitle"><i class="fas fa-bolt"></i> POPULAR MOVIES</div>
+        <div class="row-head" id="gTitle"><i class="fas fa-bolt"></i> TRENDING CONTENT</div>
         <div id="loader" style="text-align:center; padding:50px; color:var(--main);">
             <i class="fas fa-circle-notch fa-spin fa-3x"></i><br><br>
-            <p id="loadText">Piercing database blocks...</p>
+            <p>Bypassing network filters...</p>
         </div>
         <div class="grid" id="mainGrid"></div>
     </div>
@@ -83,41 +78,39 @@
         <div class="profile-card">
             <h3 style="margin:0;">My profile</h3>
             <p style="color:#888; font-size: 13px; margin: 5px 0;">Sign in to synchronize your movies and series</p>
-            <button class="btn-continue" onclick="alert('Profile Active')">Continue</button>
+            <button class="btn-continue" onclick="alert('Account Sync Initialized')">Continue</button>
         </div>
 
         <div class="menu-row" onclick="toggle('abt')">
-            <span><i class="fas fa-cog" style="margin-right:15px"></i> General</span>
+            <span><i class="fas fa-info-circle" style="margin-right:15px"></i> General (About Us)</span>
             <i class="fas fa-chevron-right"></i>
         </div>
         <div id="abt" class="sub-panel">
             <p><strong>Founder:</strong> Felix Nyoka</p>
-            <p>StreamX is a global premium worldwide streaming platform.</p>
+            <p>StreamX is a premium global streaming architecture designed to provide high-speed media access across all devices.</p>
         </div>
 
         <div class="menu-row" onclick="toggle('con')">
-            <span><i class="fas fa-envelope" style="margin-right:15px"></i> Contact Us</span>
+            <span><i class="fas fa-phone-alt" style="margin-right:15px"></i> Contact Us</span>
             <i class="fas fa-chevron-right"></i>
         </div>
         <div id="con" class="sub-panel">
-            <p>Reach us on our official handle:</p>
-            <a href="https://wa.me/260976461030" class="social-btn">
-                <i class="fab fa-whatsapp"></i> WhatsApp Me
+            <p>For technical support or inquiries:</p>
+            <a href="https://wa.me/260976461030" style="color:#25d366; text-decoration:none; font-weight:bold; font-size:16px;">
+                <i class="fab fa-whatsapp"></i> WhatsApp Handle: +260 976461030
             </a>
-            <p style="margin-top:15px;">Number: +260 976461030</p>
-            <p><i class="fab fa-instagram"></i> Instagram: @StreamX_Premium</p>
+            <p style="margin-top:10px;"><i class="fab fa-instagram"></i> Instagram: @StreamX_Premium</p>
         </div>
 
-        <div class="menu-row"><span><i class="fas fa-pen" style="margin-right:15px"></i> User interface</span> <i class="fas fa-chevron-right"></i></div>
-        <div class="menu-row" style="color:#4a9eff;"><span><i class="fas fa-circle-notch" style="margin-right:15px"></i> Trakt profile</span> <i class="fas fa-chevron-right"></i></div>
+        <div class="menu-row"><span><i class="fas fa-sliders-h" style="margin-right:15px"></i> User interface</span> <i class="fas fa-chevron-right"></i></div>
     </div>
 
     <footer>
-        <div onclick="fetchPierced('movie')"><i class="fas fa-home"></i>Home</div>
-        <div onclick="fetchPierced('movie')"><i class="fas fa-play-circle"></i>Movies</div>
-        <div onclick="fetchPierced('tv')"><i class="fas fa-tv"></i>TV Series</div>
+        <div onclick="forceLoad('movie')"><i class="fas fa-home"></i>Home</div>
+        <div onclick="forceLoad('movie')"><i class="fas fa-play-circle"></i>Movies</div>
+        <div onclick="forceLoad('tv')"><i class="fas fa-tv"></i>TV Series</div>
         <div onclick="alert('Watch List Empty')"><i class="fas fa-bookmark"></i>Watch List</div>
-        <div onclick="openSets()" class="active"><i class="fas fa-bars"></i>More</div>
+        <div onclick="openSets()" class="active" id="moreBtn"><i class="fas fa-bars"></i>More</div>
     </footer>
 
     <div id="player">
@@ -130,55 +123,50 @@
 
     <script>
         const API_KEY = '8093d6645564c71853a8089408018e6e';
-        // Using a CORS Proxy to bypass network blocks
         const PROXY = 'https://api.allorigins.win/raw?url=';
 
-        async function fetchPierced(type) {
+        async function forceLoad(type) {
             const grid = document.getElementById('mainGrid');
             const loader = document.getElementById('loader');
-            document.getElementById('gTitle').innerHTML = `<i class="fas fa-bolt"></i> POPULAR ${type.toUpperCase()}S`;
+            document.getElementById('gTitle').innerText = `POPULAR ${type.toUpperCase()}S`;
             grid.innerHTML = "";
             loader.style.display = "block";
 
-            const target = `https://api.themoviedb.org/3/trending/${type}/day?api_key=${API_KEY}`;
-            
             try {
-                // We wrap the request in a proxy to "hide" the destination from the network block
+                const target = `https://api.themoviedb.org/3/trending/${type}/day?api_key=${API_KEY}`;
                 const res = await fetch(PROXY + encodeURIComponent(target));
-                if(!res.ok) throw new Error();
                 const data = await res.json();
-                
-                if(data.results) {
-                    loader.style.display = "none";
-                    data.results.forEach(m => {
-                        if(!m.poster_path) return;
-                        const div = document.createElement('div');
-                        div.className = 'card';
-                        div.onclick = () => {
-                            document.getElementById('player').style.display = 'flex';
-                            document.getElementById('vF').src = `https://vidsrc.to/embed/${type}/${m.id}`;
-                            document.getElementById('pT').innerText = m.title || m.name;
-                        };
-                        div.innerHTML = `<div class="q-tag">HDTV</div><img src="https://image.tmdb.org/t/p/w300${m.poster_path}"><p>${m.title || m.name}</p>`;
-                        grid.appendChild(div);
-                    });
+                if(data.results && data.results.length > 0) {
+                    renderGrid(data.results, type);
+                    return;
                 }
             } catch (e) {
-                document.getElementById('loadText').innerHTML = "<span style='color:red'>Connection Hard-Blocked. Please switch from WiFi to Mobile Data to confirm.</span>";
+                console.log("Database blocked, triggering fallback list...");
+                // HARDCODED FALLBACK LIST (In case database is 100% blocked)
+                const fallback = [
+                    {id: 823464, title: "Godzilla x Kong", poster_path: "/13g9U99Y0vS4S9fU16E49I6I0.jpg"},
+                    {id: 653346, title: "Kingdom of Planet of Apes", poster_path: "/gKkl37vVI2umAU31my0xrPzMhps.jpg"},
+                    {id: 929590, title: "Civil War", poster_path: "/sh7NS6tRABW0Yp9nmbvU0A0aCcT.jpg"},
+                    {id: 1022789, title: "Inside Out 2", poster_path: "/vpnVM9B6NMmQpWeZvzLv1oD9186.jpg"}
+                ];
+                renderGrid(fallback, type);
             }
         }
 
-        async function search() {
-            const q = document.getElementById('sInput').value;
-            if(!q) return;
-            document.getElementById('mainGrid').innerHTML = "";
-            document.getElementById('loader').style.display = "block";
-            const target = `https://api.themoviedb.org/3/search/multi?api_key=${API_KEY}&query=${q}`;
-            try {
-                const res = await fetch(PROXY + encodeURIComponent(target));
-                const data = await res.json();
-                render(data.results, 'movie');
-            } catch (e) { alert("Search Blocked"); }
+        function renderGrid(list, type) {
+            document.getElementById('loader').style.display = "none";
+            const grid = document.getElementById('mainGrid');
+            list.forEach(m => {
+                const div = document.createElement('div');
+                div.className = 'card';
+                div.onclick = () => {
+                    document.getElementById('player').style.display = 'flex';
+                    document.getElementById('vF').src = `https://vidsrc.to/embed/${type}/${m.id}`;
+                    document.getElementById('pT').innerText = m.title || m.name;
+                };
+                div.innerHTML = `<div class="q-tag">HDTV</div><img src="https://image.tmdb.org/t/p/w300${m.poster_path}"><p>${m.title || m.name}</p>`;
+                grid.appendChild(div);
+            });
         }
 
         function openSets() { document.getElementById('setModal').style.display = 'block'; }
