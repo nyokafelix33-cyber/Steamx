@@ -5,83 +5,102 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>StreamX | Premium World Wide</title>
     <style>
-        :root { --main: #d3f243; --bg: #080808; --card: #121212; }
+        :root { --main: #d3f243; --bg: #080808; --card: #121212; --red: #ff0000; }
         body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; overflow-x: hidden; }
 
         /* --- HEADER --- */
         header { background: #000; padding: 15px 5%; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #222; position: sticky; top: 0; z-index: 100; }
-        .logo { font-weight: 900; color: #ff0000; font-size: 24px; cursor: pointer; }
-        .search-box { background: #111; border: 1px solid #333; padding: 8px 15px; border-radius: 20px; width: 220px; }
+        .logo { font-weight: 900; color: var(--red); font-size: 24px; cursor: pointer; text-transform: uppercase; }
+        .search-box { background: #111; border: 1px solid #333; padding: 8px 15px; border-radius: 20px; width: 250px; }
         .search-box input { background: none; border: none; color: white; outline: none; width: 100%; text-align: center; }
-        .nav-links span { margin-left: 15px; font-size: 14px; cursor: pointer; font-weight: 600; }
+        .nav-links span { margin-left: 20px; font-size: 14px; cursor: pointer; font-weight: 600; text-transform: uppercase; }
+        .nav-links .live-btn { color: var(--red); display: flex; align-items: center; gap: 5px; }
 
-        /* --- MOVIE CARDS --- */
+        /* --- CONTENT ROWS --- */
         .container { padding: 20px 5%; }
-        .row { display: flex; overflow-x: auto; gap: 15px; padding-bottom: 20px; scrollbar-width: none; }
-        .card { min-width: 160px; background: var(--card); border-radius: 10px; overflow: hidden; border: 1px solid #222; cursor: pointer; position: relative; transition: 0.3s; }
-        .card:hover { border-color: var(--main); transform: scale(1.02); }
-        .card img { width: 100%; height: 230px; object-fit: cover; }
-        .card p { font-size: 12px; text-align: center; padding: 10px; margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .row-header { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; color: var(--red); font-weight: bold; }
+        .row { display: flex; overflow-x: auto; gap: 15px; padding-bottom: 20px; scrollbar-width: none; min-height: 250px; align-items: flex-start; }
         
-        /* WATCH LATER BUTTON ON CARD */
-        .bookmark-btn { position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.7); border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; font-size: 14px; border: 1px solid #444; color: white; z-index: 5; }
-        .bookmark-btn:hover { background: var(--main); color: black; border-color: var(--main); }
+        /* --- CARDS --- */
+        .card { min-width: 170px; max-width: 170px; background: var(--card); border-radius: 8px; overflow: hidden; border: 1px solid #222; cursor: pointer; position: relative; transition: 0.3s; }
+        .card:hover { border-color: var(--main); transform: translateY(-5px); }
+        .card img { width: 100%; height: 240px; object-fit: cover; background: #1a1a1a; display: block; }
+        .card p { font-size: 12px; text-align: center; padding: 10px; margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .live-label { position: absolute; top: 10px; left: 10px; background: var(--red); color: white; font-size: 10px; padding: 3px 7px; border-radius: 3px; font-weight: bold; z-index: 5; }
 
-        /* --- SETTINGS & WATCHLIST MODAL --- */
-        #settingsModal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 2000; display: none; align-items: center; justify-content: center; }
-        .settings-content { background: #111; padding: 25px; border-radius: 15px; width: 350px; border: 1px solid #333; max-height: 80vh; overflow-y: auto; }
+        /* --- SETTINGS MODAL --- */
+        #settingsModal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 2000; display: none; align-items: center; justify-content: center; }
+        .settings-content { background: #111; padding: 30px; border-radius: 15px; width: 350px; border: 1px solid #333; text-align: center; }
         .settings-btn { width: 100%; padding: 12px; margin: 8px 0; background: #222; color: white; border: 1px solid #444; border-radius: 5px; cursor: pointer; font-weight: bold; text-align: left; }
-        .watchlist-item { display: flex; align-items: center; gap: 10px; background: #000; padding: 10px; border-radius: 5px; margin-bottom: 10px; border: 1px solid #222; }
-        .watchlist-item img { width: 40px; height: 60px; object-fit: cover; border-radius: 3px; }
-        .watchlist-item div { flex-grow: 1; font-size: 13px; font-weight: bold; }
-        .remove-btn { color: #ff4d4d; font-size: 18px; cursor: pointer; padding: 0 5px; }
+        .about-box { background: #000; padding: 15px; border-radius: 10px; margin-top: 15px; text-align: left; font-size: 13px; border-left: 3px solid var(--red); display: none; }
 
         /* --- PLAYER --- */
         #player { position: fixed; inset: 0; background: #000; z-index: 1000; display: none; flex-direction: column; }
-        .player-nav { background: #111; padding: 10px; display: flex; justify-content: space-between; }
+        .player-nav { background: #111; padding: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .close-btn { background: var(--red); color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; }
         iframe { width: 100%; height: 100%; border: none; }
     </style>
 </head>
-<body onload="load('movie')">
+<body onload="init()">
 
     <header>
-        <div class="logo" onclick="location.reload()">STREAMX</div>
-        <div class="search-box"><input type="text" id="search" placeholder="Search..." onkeyup="search()"></div>
+        <div class="logo" onclick="location.reload()">StreamX</div>
+        <div class="search-box">
+            <input type="text" id="search" placeholder="Search world wide..." onkeyup="search()">
+        </div>
         <div class="nav-links">
             <span onclick="load('movie')">Movies</span>
             <span onclick="load('tv')">Series</span>
-            <span onclick="openSettings()" style="font-size:20px;">⚙️</span>
+            <span class="live-btn" onclick="document.getElementById('live-section').scrollIntoView()">● Live TV</span>
+            <span onclick="openSettings()">⚙️</span>
         </div>
     </header>
 
+    <div class="container" id="live-section">
+        <div class="row-header">📺 Live World Wide Channels</div>
+        <div class="row">
+            <div class="card" onclick="playLive('https://www.youtube.com/embed/9Auq9mYxvEE')">
+                <span class="live-label">LIVE</span>
+                <img src="https://images.unsplash.com/photo-1585829365234-781fcd0d4301?w=400">
+                <p>LBC News HD</p>
+            </div>
+            <div class="card" onclick="playLive('https://www.youtube.com/embed/jfKfPfyJRdk')">
+                <span class="live-label">LIVE</span>
+                <img src="https://images.unsplash.com/photo-1504450758481-7338eba7524a?w=400">
+                <p>Global Sports Live</p>
+            </div>
+            <div class="card" onclick="playLive('https://www.youtube.com/embed/A47vS_UVR38')">
+                <span class="live-label">LIVE</span>
+                <img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400">
+                <p>Music World TV</p>
+            </div>
+        </div>
+    </div>
+
     <div class="container">
-        <h3 id="rowTitle">🔥 Popular Now</h3>
-        <div class="row" id="grid"></div>
+        <div class="row-header" id="rowTitle">🔥 Popular Movies</div>
+        <div class="row" id="grid">
+            </div>
     </div>
 
     <div id="settingsModal">
         <div class="settings-content">
-            <h2 style="text-align:center; color:var(--main);">Library</h2>
-            
-            <h4 style="border-bottom: 1px solid #333; padding-bottom: 5px;">📍 Watch Later</h4>
-            <div id="watchlistContainer">
-                <p style="color:#666; font-size:12px; text-align:center;">Your list is empty.</p>
-            </div>
-
-            <h4 style="border-bottom: 1px solid #333; padding-bottom: 5px; margin-top: 25px;">⚙️ Settings</h4>
-            <button class="settings-btn" onclick="toggleAbout()">ℹ️ About StreamX</button>
-            <div id="aboutMenu" style="display:none; padding:10px; font-size:12px; background:#000; border-radius:5px;">
+            <h3 style="margin-top:0;">StreamX Menu</h3>
+            <button class="settings-btn" onclick="toggleAbout()">ℹ️ About Us</button>
+            <div id="aboutMenu" class="about-box">
                 <p><strong>Founder:</strong> Felix Nyoka</p>
-                <p><strong>Safe Mode:</strong> Active (No Adult Content)</p>
+                <p><strong>Platform:</strong> StreamX Global</p>
+                <p>StreamX is a premium worldwide streaming destination dedicated to providing high-quality movies, series, and live global news without compromise.</p>
             </div>
-            <button class="settings-btn" onclick="sendFeedback()">💬 Report Issue</button>
-            <button class="settings-btn" style="background:#ff4d4d; border:none; color:white; margin-top:10px;" onclick="closeSettings()">Close</button>
+            <button class="settings-btn" onclick="sendFeedback()">💬 Report an Issue</button>
+            <button class="settings-btn" style="background:var(--red); border:none; margin-top:20px; text-align:center;" onclick="closeSettings()">Close</button>
         </div>
     </div>
 
     <div id="player">
         <div class="player-nav">
-            <button onclick="closePlayer()" style="background:#ff4d4d; color:white; border:none; padding:8px 15px; border-radius:5px;">✕ CLOSE</button>
+            <span style="font-weight:bold; color:var(--main)">StreamX Player</span>
+            <button class="close-btn" onclick="closePlayer()">✕ CLOSE PLAYER</button>
         </div>
         <iframe id="venom" allowfullscreen src=""></iframe>
     </div>
@@ -89,76 +108,82 @@
     <script>
         const KEY = '8093d6645564c71853a8089408018e6e';
         const IMG = 'https://image.tmdb.org/t/p/w500';
-        let watchlist = JSON.parse(localStorage.getItem('streamx_watchlist')) || [];
+
+        function init() {
+            load('movie');
+        }
 
         async function load(type) {
-            document.getElementById('rowTitle').innerText = type === 'movie' ? "🔥 Popular Movies" : "📺 Popular Series";
-            const res = await fetch(`https://api.themoviedb.org/3/discover/${type}?api_key=${KEY}&include_adult=false&sort_by=popularity.desc`);
-            const data = await res.json();
-            render(data.results, type);
+            const title = document.getElementById('rowTitle');
+            const grid = document.getElementById('grid');
+            title.innerText = type === 'movie' ? "🔥 Popular Movies" : "📺 Popular TV Shows";
+            
+            // Show loading state so you know it's working
+            grid.innerHTML = "<p style='padding:20px;'>Loading content from database...</p>";
+
+            try {
+                const response = await fetch(`https://api.themoviedb.org/3/trending/${type}/week?api_key=${KEY}`);
+                const data = await response.json();
+                
+                if (data.results && data.results.length > 0) {
+                    render(data.results, type);
+                } else {
+                    grid.innerHTML = "<p style='color:red;'>No content found. Check internet connection.</p>";
+                }
+            } catch (error) {
+                grid.innerHTML = "<p style='color:red;'>Connection Error. The movie database is currently unreachable.</p>";
+            }
         }
 
         function render(list, type) {
-            const container = document.getElementById('grid');
-            container.innerHTML = ""; 
+            const grid = document.getElementById('grid');
+            grid.innerHTML = ""; 
+            
             list.forEach(m => {
                 if(!m.poster_path) return;
                 const div = document.createElement('div');
                 div.className = "card";
+                div.onclick = () => playMedia(m.id, type);
                 div.innerHTML = `
-                    <div class="bookmark-btn" onclick="addToWatchlist('${m.id}', '${(m.title || m.name).replace(/'/g, "")}', '${m.poster_path}', event)">🔖</div>
-                    <img src="${IMG + m.poster_path}" onclick="play('${m.id}', '${type}')">
+                    <img src="${IMG + m.poster_path}" onerror="this.src='https://via.placeholder.com/170x240?text=No+Image'">
                     <p>${m.title || m.name}</p>
                 `;
-                container.appendChild(div);
+                grid.appendChild(div);
             });
         }
 
-        function addToWatchlist(id, title, path, e) {
-            e.stopPropagation();
-            if(!watchlist.find(item => item.id === id)) {
-                watchlist.push({id, title, path});
-                localStorage.setItem('streamx_watchlist', JSON.stringify(watchlist));
-                alert(title + " added to Watch Later!");
-            } else {
-                alert("Already in your list!");
-            }
+        function playMedia(id, type) {
+            const player = document.getElementById('player');
+            const frame = document.getElementById('venom');
+            player.style.display = 'flex';
+            frame.src = `https://vidsrc.to/embed/${type}/${id}`;
         }
 
-        function play(id, type) {
-            document.getElementById('player').style.display = 'flex';
-            document.getElementById('venom').src = `https://vidsrc.to/embed/${type}/${id}`;
+        function playLive(url) {
+            const player = document.getElementById('player');
+            const frame = document.getElementById('venom');
+            player.style.display = 'flex';
+            frame.src = url;
         }
 
-        function openSettings() {
-            document.getElementById('settingsModal').style.display = 'flex';
-            const container = document.getElementById('watchlistContainer');
-            container.innerHTML = watchlist.length ? "" : '<p style="color:#666; font-size:12px; text-align:center;">Your list is empty.</p>';
-            watchlist.forEach((m, index) => {
-                container.innerHTML += `
-                    <div class="watchlist-item">
-                        <img src="${IMG + m.path}">
-                        <div>${m.title}</div>
-                        <span class="remove-btn" onclick="removeFromWatchlist(${index})">×</span>
-                    </div>
-                `;
-            });
+        function closePlayer() {
+            document.getElementById('player').style.display = 'none';
+            document.getElementById('venom').src = "";
         }
 
-        function removeFromWatchlist(index) {
-            watchlist.splice(index, 1);
-            localStorage.setItem('streamx_watchlist', JSON.stringify(watchlist));
-            openSettings();
-        }
-
-        function closePlayer() { document.getElementById('player').style.display = 'none'; document.getElementById('venom').src = ""; }
+        function openSettings() { document.getElementById('settingsModal').style.display = 'flex'; }
         function closeSettings() { document.getElementById('settingsModal').style.display = 'none'; }
-        function toggleAbout() { 
-            const el = document.getElementById('aboutMenu');
-            el.style.display = el.style.display === 'block' ? 'none' : 'block';
-        }
-        function sendFeedback() { const m = prompt("Issue?"); if(m) alert("Reported."); }
         
+        function toggleAbout() {
+            const box = document.getElementById('aboutMenu');
+            box.style.display = box.style.display === 'block' ? 'none' : 'block';
+        }
+
+        function sendFeedback() {
+            const msg = prompt("Please describe the issue:");
+            if(msg) alert("Report sent to Felix Nyoka's team.");
+        }
+
         async function search() {
             const q = document.getElementById('search').value;
             if(q.length > 2) {
