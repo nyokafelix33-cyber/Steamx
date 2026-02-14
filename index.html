@@ -6,46 +6,51 @@
     <title>StreamX Pro</title>
     <style>
         :root { --main: #d3f243; --bg: #0a0a0a; --card: #1a1a1a; --text: #ffffff; --accent-red: #ff0000; }
-        body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; margin: 0; padding-bottom: 80px; overflow-x: hidden; }
+        body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; margin: 0; padding-bottom: 80px; overflow-x: hidden; min-height: 100vh; }
 
         /* Header */
         header { display: flex; justify-content: space-between; align-items: center; padding: 20px; position: sticky; top: 0; background: rgba(10,10,10,0.95); z-index: 100; }
-        .logo { color: var(--accent-red); font-weight: 900; font-size: 24px; }
+        .logo { color: var(--accent-red); font-weight: 900; font-size: 24px; text-decoration: none; }
         .logo span { color: #fff; }
 
         /* Hero Banner */
-        .hero { width: 100%; height: 300px; background: linear-gradient(to top, var(--bg), transparent), url('https://m.media-amazon.com/images/M/MV5BYjhiNjBlODctY2ZiOC00YjVlLWFlNzAtNTVhNzM1YjI1NzMxXkEyXkFqcGdeQXVyMjkwOTAyMDU@._V1_.jpg'); background-size: cover; background-position: center; display: flex; flex-direction: column; justify-content: flex-end; padding: 20px; box-sizing: border-box; }
-        .hero h1 { margin: 0; font-size: 24px; }
-        .play-btn { background: var(--main); color: #000; border: none; padding: 12px 24px; border-radius: 6px; font-weight: bold; margin-top: 10px; cursor: pointer; width: fit-content; }
+        .hero { width: 100%; height: 350px; background: linear-gradient(to top, var(--bg), transparent), url('https://m.media-amazon.com/images/M/MV5BYjhiNjBlODctY2ZiOC00YjVlLWFlNzAtNTVhNzM1YjI1NzMxXkEyXkFqcGdeQXVyMjkwOTAyMDU@._V1_.jpg'); background-size: cover; background-position: center; display: flex; flex-direction: column; justify-content: flex-end; padding: 20px; box-sizing: border-box; margin-bottom: 20px; }
+        .hero h1 { margin: 0; font-size: 28px; }
+        .play-btn { background: var(--main); color: #000; border: none; padding: 12px 30px; border-radius: 6px; font-weight: bold; margin-top: 15px; cursor: pointer; width: fit-content; font-size: 16px; }
 
         /* Movie Sections */
-        .section-title { padding: 20px 20px 10px; font-size: 18px; font-weight: bold; border-left: 4px solid var(--main); margin-left: 20px; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; padding: 20px; }
-        .card { background: var(--card); border-radius: 10px; overflow: hidden; transition: 0.3s; cursor: pointer; border: 1px solid #222; }
-        .card:hover { transform: scale(1.05); border-color: var(--main); }
+        .section-title { padding: 10px 20px; font-size: 20px; font-weight: bold; color: var(--main); display: flex; justify-content: space-between; align-items: center; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 20px; padding: 0 20px; }
+        .card { background: var(--card); border-radius: 12px; overflow: hidden; transition: 0.3s; cursor: pointer; border: 1px solid #222; position: relative; }
+        .card:hover { transform: translateY(-5px); border-color: var(--main); }
         .card img { width: 100%; aspect-ratio: 2/3; object-fit: cover; display: block; }
-        .card-info { padding: 10px; font-size: 12px; text-align: center; color: #bbb; }
+        .card-info { padding: 10px; font-size: 13px; text-align: center; color: #fff; font-weight: 500; }
+        .hd-tag { position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.8); color: var(--main); padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; }
 
-        /* Video Player Overlay */
-        #playerOverlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 4000; flex-direction: column; }
-        #playerOverlay video { width: 100%; aspect-ratio: 16/9; }
-        .close-player { padding: 20px; color: var(--main); font-weight: bold; cursor: pointer; text-align: right; }
+        /* Overlays (Settings & Player) */
+        #settingsPage, #playerOverlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0a0a0a; z-index: 5000; overflow-y: auto; }
+        
+        /* Settings Styles */
+        .profile-header { padding: 50px 20px; background: #111; text-align: center; border-bottom: 1px solid #222; }
+        .avatar { width: 90px; height: 90px; border-radius: 50%; background: var(--main); margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; font-size: 40px; color: #000; }
+        .menu-item { display: flex; justify-content: space-between; align-items: center; padding: 20px; border-bottom: 1px solid #1a1a1a; cursor: pointer; font-size: 16px; }
 
-        /* SETTINGS PAGE OVERLAY */
-        #settingsPage { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0a0a0a; z-index: 3000; overflow-y: auto; padding-bottom: 90px; }
-        .profile-header { padding: 40px 20px; background: #111; text-align: center; position: relative; }
-        .close-settings { position: absolute; top: 20px; right: 20px; font-size: 24px; cursor: pointer; }
-        .avatar { width: 80px; height: 80px; border-radius: 50%; background: var(--main); margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; font-size: 40px; }
-        .menu-group { margin-top: 20px; }
-        .menu-item { display: flex; justify-content: space-between; align-items: center; padding: 18px 20px; border-bottom: 1px solid #1a1a1a; cursor: pointer; }
-        .menu-label { display: flex; align-items: center; gap: 15px; color: #eee; font-size: 16px; }
-        .logout-btn { color: #ff4444; text-align: center; padding: 30px; font-weight: bold; cursor: pointer; margin-top: 20px; }
-
-        /* Bottom Nav */
-        nav { position: fixed; bottom: 0; width: 100%; height: 70px; background: #000; display: flex; border-top: 1px solid #222; z-index: 5000; }
-        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #666; font-size: 11px; cursor: pointer; }
+        /* Navigation */
+        nav { position: fixed; bottom: 0; width: 100%; height: 75px; background: #000; display: flex; border-top: 1px solid #222; z-index: 4000; }
+        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #666; font-size: 12px; cursor: pointer; }
         .nav-item.active { color: var(--main); }
-        .nav-icon { font-size: 22px; margin-bottom: 4px; }
+        .nav-icon { font-size: 24px; margin-bottom: 4px; }
+    </style>
+</head>
+<body>
 
-        /* Admin Panel Drawer */
-        #adminDrawer { display: none; position: fixed; bottom: 70px; width: 100%; ba
+    <header>
+        <div class="logo">STREAM<span>X</span></div>
+        <div style="font-size: 22px; cursor: pointer;" onclick="toggleSettings()">👤</div>
+    </header>
+
+    <div id="home-content">
+        <div class="hero">
+            <h1>Greenland 2: Migration</h1>
+            <p style="margin: 5px 0; color: #ccc;">Movie • Action, Sci-Fi</p>
+            <button class="play-btn" onclick="playMovie('https://www.w3school
