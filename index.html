@@ -61,3 +61,81 @@
             <ul id="commentList"></ul>
             <input type="text" id="cInput" placeholder="Add a comment..." style="width:70%; padding:10px; background:#000; color:white; border:1px solid #333;">
             <button onclick="saveComment()" style="padding:10px; background:var(--main); border:none; font-weight:bold;">POST</button>
+        </div>
+    </div>
+
+    <header>
+        <a href="#" class="logo">STREAM<span>X</span></a>
+        <input type="text" id="srch" class="search-bar" placeholder="Search movies..." oninput="doSearch()">
+        <div onclick="toggleSidebar()" style="cursor:pointer; font-size:20px;">👤</div>
+    </header>
+
+    <div id="hero" class="hero">
+        <h1>Greenland 2</h1>
+        <button class="play-btn" onclick="startMovie('Greenland 2')">WATCH NOW</button>
+    </div>
+
+    <div class="container">
+        <h2 style="border-left:4px solid var(--main); padding-left:10px;">Latest Uploads</h2>
+        <div class="grid" id="movieGrid"></div>
+    </div>
+
+    <script>
+        const movies = [
+            { t: "The Evil Inside", i: "https://image.tmdb.org/t/p/w500/b69m9v5s6Y0B1U7y8vL6bX3Y1.jpg" },
+            { t: "Angel Flight", i: "https://image.tmdb.org/t/p/w500/v9Y69m9v5s6Y0B1U7y8vL6bX3Y1.jpg" },
+            { t: "Cold Storage", i: "https://image.tmdb.org/t/p/w500/96KfTsvY9o6S17s5Y1JqVp6tA8Z.jpg" },
+            { t: "Joe's Road Trip", i: "https://image.tmdb.org/t/p/w500/2u7BUzqC0S7Y0XU9sn69v5S6Y0B.jpg" },
+            { t: "Greenland 2", i: "https://m.media-amazon.com/images/M/MV5BYjhiNjBlODctY2ZiOC00YjVlLWFlNzAtNTVhNzM1YjI1NzMxXkEyXkFqcGdeQXVyMjkwOTAyMDU@._V1_.jpg" }
+        ];
+
+        function draw(list) {
+            const g = document.getElementById('movieGrid');
+            if(g) g.innerHTML = list.map(m => `<div class="card" onclick="startMovie('${m.t}')"><img src="${m.i}"><div class="card-title">${m.t}</div></div>`).join('');
+        }
+
+        function startMovie(t) {
+            const speak = new SpeechSynthesisUtterance("Streaming " + t);
+            window.speechSynthesis.speak(speak);
+            document.getElementById('playerOverlay').style.display = 'block';
+            document.getElementById('mainVid').play();
+            loadComments();
+        }
+
+        function closePlayer() {
+            document.getElementById('playerOverlay').style.display = 'none';
+            document.getElementById('mainVid').pause();
+        }
+
+        function toggleSidebar() {
+            const s = document.getElementById('sidebar');
+            s.style.right = (s.style.right === '0px') ? '-320px' : '0px';
+        }
+
+        function doSearch() {
+            const q = document.getElementById('srch').value.toLowerCase();
+            document.getElementById('hero').style.display = q ? 'none' : 'flex';
+            draw(movies.filter(m => m.t.toLowerCase().includes(q)));
+        }
+
+        // Permanent Comments Logic
+        function saveComment() {
+            const val = document.getElementById('cInput').value;
+            if(!val) return;
+            let existing = JSON.parse(localStorage.getItem('stream_comments') || '[]');
+            existing.push({ user: "Felix", text: val });
+            localStorage.setItem('stream_comments', JSON.stringify(existing));
+            document.getElementById('cInput').value = "";
+            loadComments();
+        }
+
+        function loadComments() {
+            const list = document.getElementById('commentList');
+            let existing = JSON.parse(localStorage.getItem('stream_comments') || '[]');
+            list.innerHTML = existing.map(c => `<li class="c-item"><b>${c.user}</b> ${c.text}</li>`).join('');
+        }
+
+        window.onload = () => draw(movies);
+    </script>
+</body>
+</html>
