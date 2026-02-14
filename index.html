@@ -69,42 +69,37 @@
     </nav>
 
    <script>
-    // 1. The Movie Database
     const database = [
-        { title: "The Evil Inside", type: "movie", img: "https://image.tmdb.org/t/p/w500/b69m9v5s6Y0B1U7y8vL6bX3Y1.jpg" },
-        { title: "Angel Flight", type: "movie", img: "https://image.tmdb.org/t/p/w500/v9Y69m9v5s6Y0B1U7y8vL6bX3Y1.jpg" },
-        { title: "Cold Storage", type: "movie", img: "https://image.tmdb.org/t/p/w500/96KfTsvY9o6S17s5Y1JqVp6tA8Z.jpg" },
-        { title: "Joe's Road Trip", type: "movie", img: "https://image.tmdb.org/t/p/w500/2u7BUzqC0S7Y0XU9sn69v5S6Y0B.jpg" },
-        { title: "Greenland 2", type: "movie", img: "https://m.media-amazon.com/images/M/MV5BYjhiNjBlODctY2ZiOC00YjVlLWFlNzAtNTVhNzM1YjI1NzMxXkEyXkFqcGdeQXVyMjkwOTAyMDU@._V1_.jpg" }
+        { title: "The Evil Inside", img: "https://image.tmdb.org/t/p/w500/b69m9v5s6Y0B1U7y8vL6bX3Y1.jpg" },
+        { title: "Angel Flight", img: "https://image.tmdb.org/t/p/w500/v9Y69m9v5s6Y0B1U7y8vL6bX3Y1.jpg" },
+        { title: "Cold Storage", img: "https://image.tmdb.org/t/p/w500/96KfTsvY9o6S17s5Y1JqVp6tA8Z.jpg" },
+        { title: "Joe's Road Trip", img: "https://image.tmdb.org/t/p/w500/2u7BUzqC0S7Y0XU9sn69v5S6Y0B.jpg" },
+        { title: "Greenland 2", img: "https://m.media-amazon.com/images/M/MV5BYjhiNjBlODctY2ZiOC00YjVlLWFlNzAtNTVhNzM1YjI1NzMxXkEyXkFqcGdeQXVyMjkwOTAyMDU@._V1_.jpg" }
     ];
 
-    // 2. The function that draws movies on the screen
-    function render(list) {
-        const grid = document.getElementById('movieGrid') || document.getElementById('contentGrid');
-        if (grid) {
-            grid.innerHTML = list.map(m => `
-                <div class="card" onclick="alert('Opening ' + '${m.title}')">
-                    <img src="${m.img}" onerror="this.src='https://via.placeholder.com/150x225?text=Poster'">
+    function renderContent(list) {
+        // This line checks for both 'movieGrid' or 'contentGrid' to make sure it finds your box
+        const container = document.getElementById('movieGrid') || document.getElementById('contentGrid');
+        
+        if (container) {
+            container.innerHTML = list.map(m => `
+                <div class="card" onclick="alert('Playing: ' + '${m.title}')">
+                    <img src="${m.img}" style="width:100%; display:block;" onerror="this.src='https://via.placeholder.com/150x225?text=Poster'">
                     <div class="card-info">${m.title}</div>
                 </div>
             `).join('');
         }
     }
 
-    // 3. Search Logic
-    function filterContent() {
-        const q = document.getElementById('searchInput').value.toLowerCase();
-        const filtered = database.filter(d => d.title.toLowerCase().includes(q));
-        
-        // Hide hero banner during search to show results
-        const hero = document.getElementById('heroSection');
-        if (hero) hero.style.display = q.length > 0 ? "none" : "block";
-        
-        render(filtered);
-    }
+    // This makes sure the movies appear the second the page opens
+    window.addEventListener('DOMContentLoaded', () => {
+        renderContent(database);
+    });
 
-    // 4. IMPORTANT: This line makes the movies appear as soon as the page loads
-    window.onload = function() {
-        render(database);
-    };
+    // This makes the search bar work without breaking the grid
+    function filterContent() {
+        const query = document.getElementById('searchInput').value.toLowerCase();
+        const filtered = database.filter(d => d.title.toLowerCase().includes(query));
+        renderContent(filtered);
+    }
 </script>
