@@ -3,30 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StreamX | Smart History</title>
+    <title>StreamX | Live Community</title>
     <style>
-        :root { --main: #d3f243; --bg: #080808; --card: #121212; --star: #ffcc00; }
-        body { background: var(--bg); color: white; font-family: 'Inter', sans-serif; margin: 0; }
+        :root { --main: #d3f243; --bg: #080808; --card: #121212; }
+        body { background: var(--bg); color: white; font-family: 'Inter', sans-serif; margin: 0; overflow-x: hidden; }
 
         header { background: #000; padding: 15px 5%; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 1000; border-bottom: 1px solid #222; }
         .logo { font-size: 26px; font-weight: 900; color: #ff0000; text-decoration: none; }
         
         .container { padding: 20px 5%; }
-        .row-title { font-size: 18px; font-weight: bold; margin-bottom: 15px; color: #eee; display: flex; align-items: center; gap: 10px; }
+        .row-title { font-size: 18px; font-weight: bold; margin-bottom: 15px; color: var(--main); }
         
-        /* History Row Styling */
-        #historySection { display: none; background: #0f0f0f; border-bottom: 1px solid #222; }
         .movie-row { display: flex; overflow-x: auto; gap: 15px; padding-bottom: 10px; scrollbar-width: none; }
-        .movie-row::-webkit-scrollbar { display: none; }
-
-        .movie-card { min-width: 140px; background: var(--card); border-radius: 8px; overflow: hidden; border: 1px solid #222; cursor: pointer; transition: 0.3s; }
-        .movie-card:hover { border-color: var(--main); transform: scale(1.03); }
+        .movie-card { min-width: 140px; background: var(--card); border-radius: 8px; overflow: hidden; border: 1px solid #222; cursor: pointer; }
         .movie-card img { width: 100%; aspect-ratio: 2/3; object-fit: cover; }
         
-        .card-info { padding: 8px; text-align: center; font-size: 12px; }
+        /* Player & Chat Layout */
+        #player { display: none; position: fixed; inset: 0; background: #000; z-index: 5000; overflow-y: auto; }
+        .player-content { display: flex; flex-direction: column; height: 100%; padding: 20px; }
+        @media (min-width: 900px) { .player-content { flex-direction: row; gap: 20px; } }
+
+        video { flex: 2; width: 100%; border-radius: 10px; background: #000; max-height: 70vh; }
+
+        /* Chat Panel */
+        .chat-panel { flex: 1; background: #111; border-radius: 10px; display: flex; flex-direction: column; border: 1px solid #222; height: 400px; }
+        @media (min-width: 900px) { .chat-panel { height: 70vh; } }
         
-        #player { display: none; position: fixed; inset: 0; background: #000; z-index: 5000; padding: 20px; }
-        video { width: 100%; border-radius: 10px; }
+        .chat-header { padding: 15px; border-bottom: 1px solid #222; font-weight: bold; display: flex; justify-content: space-between; }
+        .chat-messages { flex: 1; overflow-y: auto; padding: 15px; font-size: 14px; }
+        .msg { margin-bottom: 10px; padding: 8px; background: #1a1a1a; border-radius: 5px; }
+        .msg b { color: var(--main); margin-right: 5px; }
+
+        .chat-input-area { padding: 10px; display: flex; gap: 5px; border-top: 1px solid #222; }
+        .chat-input { flex: 1; background: #000; border: 1px solid #333; color: white; padding: 10px; border-radius: 5px; outline: none; }
+        .send-btn { background: var(--main); border: none; padding: 10px 15px; border-radius: 5px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -36,74 +46,79 @@
         <div style="font-size: 24px;">👤</div>
     </header>
 
-    <div class="container" id="historySection">
-        <div class="row-title" style="color: var(--main);">🕒 Continue Watching</div>
-        <div class="movie-row" id="historyGrid"></div>
-    </div>
-
     <div class="container">
-        <div class="row-title">🔥 Trending Movies</div>
+        <div class="row-title">📺 Now Streaming</div>
         <div class="movie-row" id="mainGrid"></div>
     </div>
 
     <div id="player">
-        <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
+        <div style="padding: 10px 20px; display: flex; justify-content: space-between; align-items: center;">
             <h2 id="pTitle" style="color:var(--main); margin:0;"></h2>
-            <button onclick="closePlayer()" style="background:none; border:1px solid #444; color:white; padding:10px 20px; cursor:pointer;">✕ CLOSE</button>
+            <button onclick="closePlayer()" style="background:#222; color:white; border:none; padding:8px 15px; border-radius:5px; cursor:pointer;">✕ CLOSE</button>
         </div>
-        <video id="v" controls><source src="https://www.w3schools.com/html/mov_bbb.mp4"></video>
+
+        <div class="player-content">
+            <video id="v" controls><source src="https://www.w3schools.com/html/mov_bbb.mp4"></video>
+
+            <div class="chat-panel">
+                <div class="chat-header">LIVE COMMUNITY <span>🟢</span></div>
+                <div class="chat-messages" id="chatMsgs">
+                    <div class="msg"><b>System:</b> Welcome to the live chat! Keep it friendly.</div>
+                </div>
+                <div class="chat-input-area">
+                    <input type="text" id="chatIn" class="chat-input" placeholder="Type a message...">
+                    <button class="send-btn" onclick="sendMsg()">SEND</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
         const movies = [
             { t: "Greenland 2", i: "https://image.tmdb.org/t/p/w500/69Uqt7vLYv5897o76U9Y939GR95.jpg" },
             { t: "The Evil Inside", i: "https://image.tmdb.org/t/p/w500/b69m9v5s6Y0B1U7y8vL6bX3Y1.jpg" },
-            { t: "Fast X", i: "https://image.tmdb.org/t/p/w500/fiVW0BtJm7pPStJ9aN0uO7z9Yp7.jpg" },
-            { t: "Cold Storage", i: "https://image.tmdb.org/t/p/w500/96KfTsvY9o6S17s5Y1JqVp6tA8Z.jpg" }
+            { t: "Fast X", i: "https://image.tmdb.org/t/p/w500/fiVW0BtJm7pPStJ9aN0uO7z9Yp7.jpg" }
         ];
 
-        let watchHistory = JSON.parse(localStorage.getItem('streamx_history') || '[]');
-
-        function renderMain() {
-            const grid = document.getElementById('mainGrid');
-            grid.innerHTML = movies.map(m => `
-                <div class="movie-card" onclick="openPlayer('${m.t}', '${m.i}')">
+        function render() {
+            document.getElementById('mainGrid').innerHTML = movies.map(m => `
+                <div class="movie-card" onclick="openPlayer('${m.t}')">
                     <img src="${m.i}">
-                    <div class="card-info"><b>${m.t}</b></div>
+                    <div style="padding:10px; text-align:center; font-size:12px; font-weight:bold;">${m.t}</div>
                 </div>
             `).join('');
         }
 
-        function renderHistory() {
-            const section = document.getElementById('historySection');
-            const grid = document.getElementById('historyGrid');
-            
-            if (watchHistory.length === 0) {
-                section.style.display = 'none';
-                return;
-            }
-
-            section.style.display = 'block';
-            grid.innerHTML = watchHistory.map(m => `
-                <div class="movie-card" style="min-width: 120px;" onclick="openPlayer('${m.t}', '${m.i}')">
-                    <img src="${m.i}">
-                    <div class="card-info" style="font-size:10px;">${m.t}</div>
-                </div>
-            `).join('');
-        }
-
-        function openPlayer(title, img) {
-            document.getElementById('pTitle').innerText = title;
+        function openPlayer(t) {
+            document.getElementById('pTitle').innerText = t;
             document.getElementById('player').style.display = 'block';
             document.getElementById('v').play();
+            // Clear old chat for new movie session
+            document.getElementById('chatMsgs').innerHTML = `<div class="msg"><b>System:</b> You are now watching ${t}.</div>`;
+        }
 
-            // Add to History Logic
-            watchHistory = watchHistory.filter(m => m.t !== title); // Remove if exists
-            watchHistory.unshift({ t: title, i: img }); // Add to front
-            if (watchHistory.length > 5) watchHistory.pop(); // Keep only last 5
+        function sendMsg() {
+            const input = document.getElementById('chatIn');
+            const box = document.getElementById('chatMsgs');
+            if(!input.value) return;
+
+            const newMsg = document.createElement('div');
+            newMsg.className = 'msg';
+            newMsg.innerHTML = `<b>Felix:</b> ${input.value}`;
+            box.appendChild(newMsg);
             
-            localStorage.setItem('streamx_history', JSON.stringify(watchHistory));
-            renderHistory();
+            // Auto-scroll to bottom
+            box.scrollTop = box.scrollHeight;
+            input.value = "";
+
+            // Simulate a "bot" response to make it feel live
+            setTimeout(() => {
+                const botMsg = document.createElement('div');
+                botMsg.className = 'msg';
+                botMsg.innerHTML = `<b>User_${Math.floor(Math.random()*99)}:</b> Wow, this scene is crazy! 🔥`;
+                box.appendChild(botMsg);
+                box.scrollTop = box.scrollHeight;
+            }, 2000);
         }
 
         function closePlayer() {
@@ -111,10 +126,7 @@
             document.getElementById('v').pause();
         }
 
-        window.onload = () => {
-            renderMain();
-            renderHistory();
-        };
+        window.onload = render;
     </script>
 </body>
 </html>
