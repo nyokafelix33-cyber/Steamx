@@ -3,60 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StreamX | Watch Movies & Series Online</title>
+    <title>StreamX | Home</title>
     <style>
-        :root { --main: #d3f243; --bg: #050505; --card: #111; --text: #eee; }
-        body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; margin: 0; overflow-x: hidden; }
+        :root { --main: #d3f243; --bg: #080808; --card: #151515; }
+        body { background: var(--bg); color: white; font-family: 'Inter', sans-serif; margin: 0; padding: 0; }
 
-        /* Global Desktop Header */
-        header { background: rgba(0,0,0,0.95); padding: 10px 5%; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 2000; border-bottom: 1px solid #222; }
-        .logo { font-size: 28px; font-weight: 900; color: #ff0000; letter-spacing: -1px; cursor: pointer; }
+        /* Full Website Header */
+        header { background: #000; padding: 15px 5%; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 2000; border-bottom: 1px solid #222; }
+        .logo { font-size: 26px; font-weight: 900; color: #ff0000; text-decoration: none; }
         .logo span { color: white; }
         
-        .nav-links { display: flex; gap: 25px; align-items: center; }
-        .nav-links a { color: #bbb; text-decoration: none; font-weight: 500; font-size: 14px; transition: 0.3s; }
+        .nav-links { display: flex; gap: 30px; }
+        .nav-links a { color: #888; text-decoration: none; font-weight: 600; font-size: 14px; transition: 0.3s; }
         .nav-links a:hover { color: var(--main); }
 
-        .search-container { flex-grow: 0.6; position: relative; }
-        .search-bar { width: 100%; background: #1a1a1a; border: 1px solid #333; padding: 10px 15px; border-radius: 20px; color: white; outline: none; }
+        .search-container { flex-grow: 0.4; }
+        .search-bar { width: 100%; background: #111; border: 1px solid #333; padding: 10px 20px; border-radius: 5px; color: white; outline: none; }
 
-        /* Sidebar Menu */
-        #sidebar { position: fixed; top: 0; right: -300px; width: 300px; height: 100%; background: #0f0f0f; z-index: 5000; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); padding: 30px; border-left: 1px solid #222; }
-        .sidebar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        /* Profile Sidebar */
+        #sidebar { position: fixed; top: 0; right: -320px; width: 320px; height: 100%; background: #0a0a0a; z-index: 5000; transition: 0.4s; padding: 40px 20px; border-left: 1px solid #222; }
         
-        /* Premium Hero Banner */
-        .hero { height: 450px; background: linear-gradient(to right, var(--bg) 10%, transparent), linear-gradient(to top, var(--bg), transparent), url('https://m.media-amazon.com/images/M/MV5BYjhiNjBlODctY2ZiOC00YjVlLWFlNzAtNTVhNzM1YjI1NzMxXkEyXkFqcGdeQXVyMjkwOTAyMDU@._V1_.jpg'); background-size: cover; background-position: center 20%; display: flex; align-items: center; padding: 0 5%; }
-        .hero-content { max-width: 500px; }
-        .hero-content h1 { font-size: 48px; margin: 0; }
-        .play-btn { background: var(--main); color: black; border: none; padding: 15px 35px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 16px; margin-top: 20px; transition: 0.2s; }
-        .play-btn:hover { transform: scale(1.05); background: #e6ff6b; }
+        /* Hero Section (Website Style) */
+        .hero { height: 500px; background: linear-gradient(to right, #080808 20%, transparent), url('https://m.media-amazon.com/images/M/MV5BYjhiNjBlODctY2ZiOC00YjVlLWFlNzAtNTVhNzM1YjI1NzMxXkEyXkFqcGdeQXVyMjkwOTAyMDU@._V1_.jpg'); background-size: cover; background-position: top; display: flex; align-items: center; padding: 0 5%; }
+        .hero-text { max-width: 600px; }
+        .hero-text h1 { font-size: 56px; margin-bottom: 10px; }
+        .play-btn { background: var(--main); color: black; border: none; padding: 15px 40px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 16px; }
 
-        /* Goojara-Style Grid */
-        .container { padding: 40px 5%; }
-        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-left: 4px solid var(--main); padding-left: 15px; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 20px; }
-        .card { background: var(--card); border-radius: 5px; overflow: hidden; transition: 0.3s; cursor: pointer; position: relative; border: 1px solid #222; }
-        .card:hover { transform: translateY(-5px); border-color: var(--main); }
-        .card img { width: 100%; aspect-ratio: 2/3; object-fit: cover; }
-        .card-info { padding: 12px; font-size: 13px; font-weight: 500; text-align: center; }
-        .quality-tag { position: absolute; top: 8px; left: 8px; background: var(--main); color: black; font-size: 10px; font-weight: bold; padding: 2px 6px; border-radius: 3px; }
+        /* Wide Grid System */
+        .content-area { padding: 40px 5%; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 25px; }
+        .movie-card { background: var(--card); border-radius: 8px; overflow: hidden; transition: 0.3s; cursor: pointer; border: 1px solid #222; }
+        .movie-card:hover { transform: translateY(-10px); border-color: var(--main); }
+        .movie-card img { width: 100%; aspect-ratio: 2/3; object-fit: cover; }
+        .movie-title { padding: 15px; font-size: 14px; text-align: center; font-weight: bold; }
 
-        /* Fullscreen Player */
-        #playerOverlay { display: none; position: fixed; inset: 0; background: #000; z-index: 10000; flex-direction: column; }
-        
-        @media (max-width: 768px) {
-            .nav-links, .search-container { display: none; }
-            .hero { height: 300px; }
-            .hero-content h1 { font-size: 28px; }
-        }
+        /* Fullscreen Player Overlay */
+        #player { display: none; position: fixed; inset: 0; background: #000; z-index: 10000; flex-direction: column; }
     </style>
 </head>
 <body>
 
     <div id="sidebar">
-        <div class="sidebar-header">
-            <span style="font-weight: bold;">MY ACCOUNT</span>
-            <span onclick="toggleSidebar()" style="cursor:pointer; color:var(--main);">✕</span>
+        <div onclick="toggleSidebar()" style="cursor:pointer; color:var(--main); text-align:right;">✕ CLOSE</div>
+        <div style="text-align:center; margin-top:40px;">
+            <div style="font-size: 60px;">👤</div>
+            <h2>Felix Nyoka</h2>
+            <p style="color:#666;">Premium Member</p>
         </div>
-        <div style="text-align:center; padding: 20px 0;">
-            <div style="font-si
+        <div style="margin-top: 40px; display:flex; flex-direction:column; gap:20px;">
+            <div style="cursor:pointer;">📺 My Subscriptions</div>
+            <div style="cursor:pointer;">⭐ Favorite Movies</div>
+            <div style="cursor:pointer;">⚙️ Site Settings</div>
+            <div style="cursor:pointer; color:red;">📥 Logout</div>
+        </div>
+    </div>
+
+    <div id="player">
+        <div style="padding: 20px; background: #111; display:flex; justify-content:space-between; align-items:center;">
+            <span id="nowPlaying" style="font-weight:bold; color:var(--main);"></span>
+            <span onclick="closePlayer()" style="cursor:pointer; font-weight:bold;">✕ EXIT</span>
+        </div>
+        <video id="webVideo" controls style="width:100%; height:85vh; background:#000;">
+            <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
+        </video>
+    </div>
