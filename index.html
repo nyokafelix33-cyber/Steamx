@@ -3,37 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StreamX | Premium Hub</title>
+    <title>StreamX | Ratings & Reviews</title>
     <style>
-        :root { --main: #d3f243; --bg: #080808; --card: #121212; }
+        :root { --main: #d3f243; --bg: #080808; --card: #121212; --star: #ffcc00; }
         body { background: var(--bg); color: white; font-family: 'Inter', sans-serif; margin: 0; }
 
-        /* Header & Navigation */
+        /* Navigation */
         header { background: #000; padding: 15px 5%; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 1000; border-bottom: 1px solid #222; }
         .logo { font-size: 26px; font-weight: 900; color: #ff0000; text-decoration: none; }
         .logo span { color: white; }
         
-        /* The Toggle Switch */
+        /* Toggle & Grid */
         .toggle-container { display: flex; justify-content: center; padding: 20px 0; background: #000; gap: 10px; }
-        .toggle-btn { background: #1a1a1a; color: #888; border: 1px solid #333; padding: 10px 30px; border-radius: 30px; cursor: pointer; font-weight: bold; transition: 0.3s; }
-        .toggle-btn.active { background: var(--main); color: #000; border-color: var(--main); }
+        .toggle-btn { background: #1a1a1a; color: #888; border: 1px solid #333; padding: 10px 30px; border-radius: 30px; cursor: pointer; font-weight: bold; }
+        .toggle-btn.active { background: var(--main); color: #000; }
 
-        /* Rows */
         .container { padding: 20px 5%; }
-        .row-title { font-size: 20px; font-weight: bold; margin-bottom: 15px; }
-        .movie-row { display: flex; overflow-x: auto; gap: 20px; padding-bottom: 20px; scrollbar-width: none; }
-        .movie-row::-webkit-scrollbar { display: none; }
+        .movie-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px; }
 
-        .movie-card { min-width: 160px; background: var(--card); border-radius: 10px; overflow: hidden; border: 1px solid #222; transition: 0.3s; cursor: pointer; }
-        .movie-card:hover { transform: scale(1.05); border-color: var(--main); }
+        /* Star Rating UI */
+        .movie-card { background: var(--card); border-radius: 10px; overflow: hidden; border: 1px solid #222; transition: 0.3s; cursor: pointer; position: relative; }
+        .movie-card:hover { transform: translateY(-5px); border-color: var(--main); }
         .movie-card img { width: 100%; aspect-ratio: 2/3; object-fit: cover; }
+        .rating-display { color: var(--star); font-size: 12px; padding: 5px 10px; }
 
-        /* Episode Selector */
-        #episodeBox { margin-top: 15px; display: none; }
-        .ep-btn { background: #222; border: 1px solid #444; color: white; padding: 8px 15px; margin-right: 5px; border-radius: 4px; cursor: pointer; }
-        .ep-btn:hover { background: var(--main); color: black; }
+        /* Rating in Player */
+        .rate-us { margin-top: 20px; background: #111; padding: 15px; border-radius: 8px; border: 1px solid #333; }
+        .star-input { font-size: 24px; color: #444; cursor: pointer; transition: 0.2s; }
+        .star-input:hover, .star-input.active { color: var(--star); }
 
-        /* Player Overlay */
         #player { display: none; position: fixed; inset: 0; background: #000; z-index: 5000; padding: 20px; overflow-y: auto; }
         video { width: 100%; border-radius: 10px; }
     </style>
@@ -42,7 +40,7 @@
 
     <header>
         <a href="#" class="logo">STREAM<span>X</span></a>
-        <div style="font-size: 24px; cursor: pointer;">👤</div>
+        <div style="font-size: 24px;">👤</div>
     </header>
 
     <div class="toggle-container">
@@ -51,37 +49,39 @@
     </div>
 
     <div class="container">
-        <h2 class="row-title" id="displayTitle">Trending Movies</h2>
+        <h2 id="displayTitle" style="margin-bottom:20px;">Trending Movies</h2>
         <div class="movie-row" id="mainGrid"></div>
     </div>
 
     <div id="player">
         <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
-            <div>
-                <h2 id="pTitle" style="color:var(--main); margin:0;"></h2>
-                <div id="episodeBox">
-                    <p style="font-size: 12px; color: #888;">SELECT EPISODE:</p>
-                    <button class="ep-btn" onclick="playEp(1)">EP 1</button>
-                    <button class="ep-btn" onclick="playEp(2)">EP 2</button>
-                    <button class="ep-btn" onclick="playEp(3)">EP 3</button>
-                </div>
-            </div>
-            <button onclick="closePlayer()" style="background:none; border:1px solid #444; color:white; padding:10px 20px; cursor:pointer; height: 40px;">✕ CLOSE</button>
+            <h2 id="pTitle" style="color:var(--main); margin:0;"></h2>
+            <button onclick="closePlayer()" style="background:none; border:1px solid #444; color:white; padding:10px 20px; cursor:pointer;">✕ CLOSE</button>
         </div>
+        
         <video id="v" controls><source src="https://www.w3schools.com/html/mov_bbb.mp4"></video>
+
+        <div class="rate-us">
+            <p style="margin:0 0 10px 0; font-weight:bold;">Rate this title:</p>
+            <span class="star-input" onclick="submitRating(1)">★</span>
+            <span class="star-input" onclick="submitRating(2)">★</span>
+            <span class="star-input" onclick="submitRating(3)">★</span>
+            <span class="star-input" onclick="submitRating(4)">★</span>
+            <span class="star-input" onclick="submitRating(5)">★</span>
+            <p id="ratingFeedback" style="display:none; color:var(--main); font-size:14px; margin-top:10px;">Thank you for rating!</p>
+        </div>
     </div>
 
     <script>
         const movies = [
-            { t: "Greenland 2", i: "https://image.tmdb.org/t/p/w500/69Uqt7vLYv5897o76U9Y939GR95.jpg" },
-            { t: "The Evil Inside", i: "https://image.tmdb.org/t/p/w500/b69m9v5s6Y0B1U7y8vL6bX3Y1.jpg" },
-            { t: "Fast X", i: "https://image.tmdb.org/t/p/w500/fiVW0BtJm7pPStJ9aN0uO7z9Yp7.jpg" }
+            { t: "Greenland 2", i: "https://image.tmdb.org/t/p/w500/69Uqt7vLYv5897o76U9Y939GR95.jpg", r: "4.8" },
+            { t: "The Evil Inside", i: "https://image.tmdb.org/t/p/w500/b69m9v5s6Y0B1U7y8vL6bX3Y1.jpg", r: "4.2" },
+            { t: "Fast X", i: "https://image.tmdb.org/t/p/w500/fiVW0BtJm7pPStJ9aN0uO7z9Yp7.jpg", r: "4.5" }
         ];
 
         const series = [
-            { t: "The Last of Us", i: "https://image.tmdb.org/t/p/w500/uKvH561NE9s9Z9u9uV6hH9u9u9u.jpg" },
-            { t: "Stranger Things", i: "https://image.tmdb.org/t/p/w500/49WpIv1rCfsZfbV9C6qQD9776u6.jpg" },
-            { t: "Reacher", i: "https://image.tmdb.org/t/p/w500/j9mi9v5s6Y0B1U7y8vL6bX3Y1.jpg" }
+            { t: "The Last of Us", i: "https://image.tmdb.org/t/p/w500/uKvH561NE9s9Z9u9uV6hH9u9u9u.jpg", r: "4.9" },
+            { t: "Stranger Things", i: "https://image.tmdb.org/t/p/w500/49WpIv1rCfsZfbV9C6qQD9776u6.jpg", r: "4.7" }
         ];
 
         let currentView = 'movie';
@@ -98,23 +98,31 @@
             const data = currentView === 'movie' ? movies : series;
             const grid = document.getElementById('mainGrid');
             grid.innerHTML = data.map(item => `
-                <div class="movie-card" onclick="openPlayer('${item.t}', '${currentView}')">
+                <div class="movie-card" onclick="openPlayer('${item.t}')">
                     <img src="${item.i}" onerror="this.src='https://via.placeholder.com/500x750?text=${item.t}'">
-                    <div style="padding:10px; text-align:center; font-weight:bold; font-size:14px;">${item.t}</div>
+                    <div style="padding:10px; text-align:center;">
+                        <div style="font-weight:bold; font-size:14px;">${item.t}</div>
+                        <div class="rating-display">⭐ ${item.r}</div>
+                    </div>
                 </div>
             `).join('');
         }
 
-        function openPlayer(title, type) {
+        function openPlayer(title) {
             document.getElementById('pTitle').innerText = title;
             document.getElementById('player').style.display = 'block';
-            document.getElementById('episodeBox').style.display = (type === 'series') ? 'block' : 'none';
             document.getElementById('v').play();
+            document.getElementById('ratingFeedback').style.display = 'none';
         }
 
-        function playEp(num) {
-            alert("Loading Episode " + num + "...");
-            // Here you would change the video source to the specific episode
+        function submitRating(stars) {
+            const feedback = document.getElementById('ratingFeedback');
+            feedback.innerText = `You gave this ${stars} stars!`;
+            feedback.style.display = 'block';
+            
+            // Voice response
+            const msg = new SpeechSynthesisUtterance("Thank you for your " + stars + " star rating.");
+            window.speechSynthesis.speak(msg);
         }
 
         function closePlayer() {
