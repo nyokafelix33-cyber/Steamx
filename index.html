@@ -5,12 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>StreamX Pro</title>
     <style>
-        :root { --main: #d3f243; --bg: #0a0a0a; --card: #1a1a1a; --text: #ffffff; }
+        :root { --main: #d3f243; --bg: #0a0a0a; --card: #1a1a1a; --text: #ffffff; --accent-red: #ff0000; }
         body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; margin: 0; padding-bottom: 80px; overflow-x: hidden; }
 
         /* Header */
         header { display: flex; justify-content: space-between; align-items: center; padding: 20px; position: sticky; top: 0; background: rgba(10,10,10,0.95); z-index: 100; }
-        .logo { color: #ff0000; font-weight: 900; font-size: 24px; }
+        .logo { color: var(--accent-red); font-weight: 900; font-size: 24px; }
         .logo span { color: #fff; }
 
         /* Hero Banner */
@@ -26,40 +26,26 @@
         .card img { width: 100%; aspect-ratio: 2/3; object-fit: cover; display: block; }
         .card-info { padding: 10px; font-size: 12px; text-align: center; color: #bbb; }
 
-        /* Video Player Overlay - Hidden by default */
-        #playerOverlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 2000; flex-direction: column; }
+        /* Video Player Overlay */
+        #playerOverlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 4000; flex-direction: column; }
         #playerOverlay video { width: 100%; aspect-ratio: 16/9; }
         .close-player { padding: 20px; color: var(--main); font-weight: bold; cursor: pointer; text-align: right; }
 
+        /* SETTINGS PAGE OVERLAY */
+        #settingsPage { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0a0a0a; z-index: 3000; overflow-y: auto; padding-bottom: 90px; }
+        .profile-header { padding: 40px 20px; background: #111; text-align: center; position: relative; }
+        .close-settings { position: absolute; top: 20px; right: 20px; font-size: 24px; cursor: pointer; }
+        .avatar { width: 80px; height: 80px; border-radius: 50%; background: var(--main); margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; font-size: 40px; }
+        .menu-group { margin-top: 20px; }
+        .menu-item { display: flex; justify-content: space-between; align-items: center; padding: 18px 20px; border-bottom: 1px solid #1a1a1a; cursor: pointer; }
+        .menu-label { display: flex; align-items: center; gap: 15px; color: #eee; font-size: 16px; }
+        .logout-btn { color: #ff4444; text-align: center; padding: 30px; font-weight: bold; cursor: pointer; margin-top: 20px; }
+
         /* Bottom Nav */
-        nav { position: fixed; bottom: 0; width: 100%; height: 70px; background: #000; display: flex; border-top: 1px solid #222; z-index: 1000; }
+        nav { position: fixed; bottom: 0; width: 100%; height: 70px; background: #000; display: flex; border-top: 1px solid #222; z-index: 5000; }
         .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #666; font-size: 11px; cursor: pointer; }
         .nav-item.active { color: var(--main); }
-        .nav-icon { font-size: 20px; margin-bottom: 4px; }
+        .nav-icon { font-size: 22px; margin-bottom: 4px; }
 
         /* Admin Panel Drawer */
-        #adminDrawer { display: none; position: fixed; bottom: 70px; width: 100%; background: var(--card); padding: 20px; border-radius: 20px 20px 0 0; border-top: 2px solid var(--main); box-sizing: border-box; z-index: 1500; }
-        input { width: 100%; padding: 12px; margin-bottom: 10px; background: #000; color: #fff; border: 1px solid #333; border-radius: 8px; box-sizing: border-box; }
-    </style>
-</head>
-<body>
-
-    <header>
-        <div class="logo">STREAM<span>X</span></div>
-        <div style="font-size: 20px; cursor: pointer;" onclick="toggleAdmin()">⚙️</div>
-    </header>
-
-    <div id="home-content">
-        <div class="hero">
-            <h1>Greenland 2: Migration</h1>
-            <button class="play-btn" onclick="playMovie('https://www.w3schools.com/html/mov_bbb.mp4', 'Greenland 2')">WATCH NOW</button>
-        </div>
-
-        <div class="section-title">Trending Now</div>
-        <div class="grid" id="mainGrid">
-            </div>
-    </div>
-
-    <div id="playerOverlay">
-        <div class="close-player" onclick="closePlayer()">✕ CLOSE PLAYER</div>
-        <video id="videoElement" controls playsinline></video>
+        #adminDrawer { display: none; position: fixed; bottom: 70px; width: 100%; ba
