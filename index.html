@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StreamX | Premium Entertainment</title>
+    <title>StreamX | Live Global Library</title>
     <style>
         :root { --main: #d3f243; --bg: #080808; --card: #121212; --transition: 0.4s ease; }
         body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; overflow-x: hidden; }
@@ -19,7 +19,6 @@
         .login-box input { width: 100%; padding: 12px; margin: 8px 0; background: #000; border: 1px solid #444; color: white; border-radius: 5px; box-sizing: border-box; outline: none; }
         .login-btn { width: 100%; padding: 12px; background: var(--main); color: #000; font-weight: bold; border: none; cursor: pointer; border-radius: 5px; margin-top: 10px; }
         .forgot-link { color: #888; font-size: 12px; margin-top: 15px; cursor: pointer; display: block; text-decoration: none; }
-        .forgot-link:hover { color: var(--main); }
 
         /* --- MAIN INTERFACE --- */
         #mainSite { display: none; }
@@ -29,17 +28,17 @@
         .search-container { position: absolute; left: 50%; transform: translateX(-50%); display: flex; align-items: center; background: #111; border-radius: 30px; padding: 5px 20px; border: 1px solid #333; width: 30%; min-width: 250px; }
         .search-container input { background: none; border: none; color: white; width: 100%; outline: none; text-align: center; }
 
-        /* --- CONTENT DISPLAY --- */
         .hero { height: 55vh; background: linear-gradient(to right, #000 20%, transparent), url('https://images.unsplash.com/photo-1626814026160-2237a95fc5a0?auto=format&fit=crop&w=1200'); background-size: cover; background-position: center; display: flex; align-items: center; padding: 0 5%; }
+        
         .container { padding: 30px 5%; }
         .movie-row { display: flex; overflow-x: auto; gap: 20px; padding-bottom: 20px; scrollbar-width: none; }
-        .movie-card { min-width: 170px; background: var(--card); border-radius: 12px; overflow: hidden; border: 1px solid #222; transition: 0.3s; cursor: pointer; text-align: center; }
-        .movie-card img { width: 100%; aspect-ratio: 2/3; object-fit: cover; background: #222; }
+        .movie-card { min-width: 170px; background: var(--card); border-radius: 12px; overflow: hidden; border: 1px solid #222; transition: 0.3s; cursor: pointer; }
+        .movie-card:hover { transform: scale(1.05); border-color: var(--main); }
+        .movie-card img { width: 100%; aspect-ratio: 2/3; object-fit: cover; }
 
-        /* --- MODALS & SIDEBARS --- */
+        /* --- MODALS --- */
         #settingsMenu { position: fixed; right: -320px; top: 0; width: 300px; height: 100%; background: #111; z-index: 2000; padding: 40px 20px; transition: var(--transition); border-left: 1px solid #333; }
         #settingsMenu.active { right: 0; }
-        
         .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 3000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
         .modal-content { background: #181818; padding: 40px; border-radius: 20px; width: 80%; max-width: 450px; text-align: center; border: 1px solid var(--main); }
     </style>
@@ -52,7 +51,7 @@
             <input type="text" id="username" placeholder="Username">
             <input type="password" id="password" placeholder="Password">
             <button class="login-btn" onclick="handleAuth()">SIGN IN</button>
-            <span class="forgot-link" onclick="openForgot()">Forgot Password?</span>
+            <span class="forgot-link" onclick="openModal('forgotModal')">Forgot Password?</span>
         </div>
     </div>
 
@@ -60,21 +59,21 @@
         <header>
             <a href="#" class="logo" onclick="location.reload()">STREAMX</a>
             <div class="search-container">
-                <input type="text" id="searchBar" placeholder="Search world wide..." onkeyup="doSearch()">
+                <input type="text" id="searchBar" placeholder="Search world wide..." onkeyup="searchAPI()">
                 <span onclick="startVoice()" style="cursor:pointer; color:var(--main);">🎤</span>
             </div>
             <div style="display:flex; gap:20px; align-items:center;">
-                <span onclick="filter('movie')" style="cursor:pointer; font-size:14px;">Movies</span>
-                <span onclick="filter('series')" style="cursor:pointer; font-size:14px;">Series</span>
+                <span onclick="loadCategory('movie')" style="cursor:pointer; font-size:14px;">Movies</span>
+                <span onclick="loadCategory('tv')" style="cursor:pointer; font-size:14px;">Series</span>
                 <span id="displayUser" style="color:var(--main); font-weight:bold; cursor:pointer;" onclick="toggleSettings()">User ⚙️</span>
             </div>
         </header>
 
         <div class="hero">
             <div>
-                <p style="color:var(--main); letter-spacing:4px; font-weight:bold;">NOW STREAMING</p>
-                <h1 style="font-size: clamp(30px, 6vw, 60px);">AVENGERS: ENDGAME</h1>
-                <button style="background:var(--main); border:none; padding:15px 40px; font-weight:bold; border-radius:5px; cursor:pointer;">WATCH NOW</button>
+                <p style="color:var(--main); letter-spacing:4px; font-weight:bold;">API LIVE FEED</p>
+                <h1 style="font-size: clamp(30px, 6vw, 60px);">WORLD WIDE LIBRARY</h1>
+                <button style="background:var(--main); border:none; padding:15px 40px; font-weight:bold; border-radius:5px; cursor:pointer;">BROWSE ALL</button>
             </div>
         </div>
 
@@ -84,7 +83,7 @@
         </div>
 
         <div class="container">
-            <h3 id="rowTitle">🏆 Global Top 10</h3>
+            <h3 id="rowTitle">🔥 Trending Now</h3>
             <div class="movie-row" id="mainGrid"></div>
         </div>
     </div>
@@ -94,14 +93,14 @@
         <div style="width:70px; height:70px; background:var(--main); border-radius:50%; margin: 20px auto; color:black; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:30px;" id="profileInitial">?</div>
         <h2 style="text-align:center; margin:0;" id="profileName">User</h2>
         <hr style="border:0; border-top:1px solid #222; margin:30px 0;">
-        <p onclick="openAbout()" style="cursor:pointer; padding: 10px 0;">About Us</p>
+        <p onclick="openModal('aboutModal')" style="cursor:pointer; padding: 10px 0;">About Us</p>
         <p onclick="location.reload()" style="color:red; cursor:pointer; padding: 10px 0;">Logout</p>
     </div>
 
     <div id="forgotModal" class="modal">
         <div class="modal-content">
             <h2 style="color:var(--main)">Recovery</h2>
-            <p>Enter your username to receive a reset code.</p>
+            <p>Enter username for a reset code.</p>
             <input type="text" id="recoverUser" placeholder="Username" style="width:100%; padding:10px; margin:10px 0; background:#000; border:1px solid #444; color:white;">
             <button onclick="sendRecovery()" style="background:var(--main); border:none; padding:10px 20px; border-radius:5px; width:100%; font-weight:bold; cursor:pointer;">REQUEST CODE</button>
             <button onclick="closeModals()" style="margin-top:10px; background:none; border:none; color:#888; cursor:pointer;">Cancel</button>
@@ -111,86 +110,87 @@
     <div id="aboutModal" class="modal">
         <div class="modal-content">
             <h2 style="color:var(--main)">About StreamX</h2>
-            <p>Designed and Developed by <b>Felix Nyoka</b>.</p>
-            <p style="color:#888;">Follow Creator: <b>@felix_ny10</b></p>
+            <p>Developed by <b>Felix Nyoka</b>.</p>
+            <p style="color:#888;">Live Global Content powered by TMDB API.</p>
             <button onclick="closeModals()" style="margin-top:20px; background:white; border:none; padding:10px 20px; border-radius:5px; cursor:pointer; font-weight:bold;">Close</button>
         </div>
     </div>
 
     <script>
-        // Reliability Image List
-        const movies = [
-            { t: "Avatar 2", i: "https://images.unsplash.com/photo-1594909122845-11baa439b7bf?auto=format&fit=crop&w=400", cat: "movie" },
-            { t: "The Last of Us", i: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=400", cat: "series" },
-            { t: "Spider-Man", i: "https://images.unsplash.com/photo-1635805737707-575885ab0820?auto=format&fit=crop&w=400", cat: "movie" },
-            { t: "Dark Knight", i: "https://images.unsplash.com/photo-1478720568477-152d9b164e26?auto=format&fit=crop&w=400", cat: "movie" }
-        ];
-
-        let history = [];
+        // API CONFIG - This pulls the real movies!
+        const API_KEY = '8093d6645564c71853a8089408018e6e'; // Public Test Key
+        const IMG_URL = 'https://image.tmdb.org/t/p/w500';
+        let watchHistory = [];
 
         function handleAuth() {
             const u = document.getElementById('username').value;
-            const p = document.getElementById('password').value;
-            if(u && p) {
+            if(u) {
                 document.getElementById('loginScreen').style.display = 'none';
                 document.getElementById('mainSite').style.display = 'block';
                 document.getElementById('displayUser').innerText = u + " ⚙️";
                 document.getElementById('profileName').innerText = u;
                 document.getElementById('profileInitial').innerText = u[0].toUpperCase();
-                render(movies);
-            } else { alert("Please login."); }
+                loadTrending();
+            } else { alert("Enter details"); }
         }
 
-        function render(data) {
-            document.getElementById('mainGrid').innerHTML = data.map(m => `
-                <div class="movie-card" onclick="playMovie('${m.t}', '${m.i}')">
-                    <img src="${m.i}" onerror="this.src='https://via.placeholder.com/170x250/111/fff?text=StreamX'">
-                    <div style="padding:10px; font-weight:bold; font-size:13px;">${m.t}</div>
-                </div>
-            `).join('');
+        async function loadTrending() {
+            const res = await fetch(`https://api.themoviedb.org/3/trending/all/week?api_key=${API_KEY}`);
+            const data = await res.json();
+            render(data.results);
         }
 
-        function playMovie(t, img) {
-            alert("Now Streaming: " + t);
-            if(!history.find(x => x.t === t)) {
-                history.unshift({t, i: img});
-                document.getElementById('historySection').style.display = 'block';
-                document.getElementById('historyGrid').innerHTML = history.map(h => `<div class="movie-card" style="min-width:130px;"><img src="${h.i}"></div>`).join('');
+        async function loadCategory(type) {
+            document.getElementById('rowTitle').innerText = type === 'movie' ? "🔥 Popular Movies" : "📺 Popular TV Shows";
+            const res = await fetch(`https://api.themoviedb.org/3/discover/${type}?api_key=${API_KEY}`);
+            const data = await res.json();
+            render(data.results);
+        }
+
+        async function searchAPI() {
+            const q = document.getElementById('searchBar').value;
+            if(q.length > 2) {
+                const res = await fetch(`https://api.themoviedb.org/3/search/multi?api_key=${API_KEY}&query=${q}`);
+                const data = await res.json();
+                render(data.results);
             }
         }
 
-        // FORGOT PASSWORD LOGIC
-        function openForgot() { document.getElementById('forgotModal').style.display = 'flex'; }
-        
-        function sendRecovery() {
-            const user = document.getElementById('recoverUser').value;
-            if(user) {
-                // This opens the user's email app to send YOU a request
-                const email = "YOUR_EMAIL_HERE@gmail.com"; // Replace with your actual email
-                const subject = "StreamX Password Reset Request";
-                const body = `User: ${user} is requesting a password reset code.`;
-                window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
-                alert("Request sent to Felix! Check your email for the code soon.");
-                closeModals();
-            } else { alert("Enter username!"); }
+        function render(items) {
+            document.getElementById('mainGrid').innerHTML = items.map(m => {
+                if(!m.poster_path) return ''; 
+                return `
+                    <div class="movie-card" onclick="playMovie('${m.title || m.name}', '${IMG_URL + m.poster_path}')">
+                        <img src="${IMG_URL + m.poster_path}">
+                        <div style="padding:10px; font-weight:bold; font-size:12px;">${m.title || m.name}</div>
+                    </div>
+                `;
+            }).join('');
         }
 
-        function filter(c) { render(movies.filter(m => m.cat === c)); }
-        function doSearch() {
-            const q = document.getElementById('searchBar').value.toLowerCase();
-            render(movies.filter(m => m.t.toLowerCase().includes(q)));
+        function playMovie(t, img) {
+            alert("Streaming: " + t);
+            if(!watchHistory.find(x => x.t === t)) {
+                watchHistory.unshift({t, i: img});
+                document.getElementById('historySection').style.display = 'block';
+                document.getElementById('historyGrid').innerHTML = watchHistory.map(h => `<div class="movie-card" style="min-width:120px;"><img src="${h.i}"></div>`).join('');
+            }
         }
+
+        // NAVIGATION & MODALS
         function toggleSettings() { document.getElementById('settingsMenu').classList.toggle('active'); }
-        function openAbout() { document.getElementById('aboutModal').style.display = 'flex'; }
+        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
         function closeModals() { 
-            document.getElementById('aboutModal').style.display = 'none'; 
-            document.getElementById('forgotModal').style.display = 'none'; 
+            document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); 
         }
-
+        function sendRecovery() {
+            const email = "felixnyoka@example.com"; // Set your email
+            window.location.href = `mailto:${email}?subject=Reset&body=Code please`;
+            closeModals();
+        }
         function startVoice() {
             const rec = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-            rec.onstart = () => { window.speechSynthesis.speak(new SpeechSynthesisUtterance("Listening")); };
-            rec.onresult = (e) => { document.getElementById('searchBar').value = e.results[0][0].transcript; doSearch(); };
+            rec.onresult = (e) => { document.getElementById('searchBar').value = e.results[0][0].transcript; searchAPI(); };
             rec.start();
         }
     </script>
