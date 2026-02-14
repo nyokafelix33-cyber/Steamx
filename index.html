@@ -3,113 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StreamX | Our Story</title>
+    <title>StreamX | Premium Home</title>
     <style>
         :root { --main: #d3f243; --bg: #080808; --card: #121212; }
-        body { background: var(--bg); color: white; font-family: 'Inter', sans-serif; margin: 0; }
+        body { background: var(--bg); color: white; font-family: 'Inter', sans-serif; margin: 0; overflow-x: hidden; }
 
-        header { background: #000; padding: 15px 5%; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #222; }
+        /* Welcome Cinematic Hero */
+        .welcome-hero {
+            height: 70vh;
+            position: relative;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.1), var(--bg)), 
+                        url('https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&q=80&w=2000');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .welcome-content h1 {
+            font-size: 60px;
+            font-weight: 900;
+            margin: 0;
+            letter-spacing: -2px;
+            text-transform: uppercase;
+        }
+
+        .welcome-content h1 span { color: #ff0000; }
+        .welcome-content p { color: var(--main); font-weight: bold; letter-spacing: 5px; margin-top: 10px; }
+
+        /* Navigation */
+        header { background: rgba(0,0,0,0.9); padding: 15px 5%; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 1000; backdrop-filter: blur(10px); }
         .logo { font-size: 26px; font-weight: 900; color: #ff0000; text-decoration: none; }
-        .nav-links { display: flex; gap: 20px; }
-        .nav-item { color: #888; cursor: pointer; font-size: 14px; text-decoration: none; transition: 0.3s; }
-        .nav-item:hover { color: var(--main); }
+        .logo span { color: white; }
 
+        /* Movie Grid */
         .container { padding: 40px 5%; }
-        .movie-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px; }
-        .movie-card { background: var(--card); border-radius: 10px; overflow: hidden; border: 1px solid #222; cursor: pointer; }
-
-        /* About Us Section Styling */
-        #aboutPage { display: none; position: fixed; inset: 0; background: #000; z-index: 7000; overflow-y: auto; padding: 60px 10%; line-height: 1.6; }
-        .about-header { text-align: center; margin-bottom: 50px; }
-        .about-header h1 { font-size: 48px; margin-bottom: 10px; }
-        .about-header span { color: var(--main); }
-        
-        .about-content { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; }
-        @media (max-width: 800px) { .about-content { grid-template-columns: 1fr; } }
-
-        .stat-box { background: #111; padding: 20px; border-radius: 10px; border-left: 4px solid var(--main); margin-bottom: 20px; }
-        .stat-box h3 { margin: 0; color: var(--main); }
-
-        .close-about { position: fixed; top: 20px; right: 20px; background: var(--main); color: black; border: none; padding: 10px 20px; border-radius: 5px; font-weight: bold; cursor: pointer; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 25px; }
+        .movie-card { background: var(--card); border-radius: 12px; overflow: hidden; border: 1px solid #222; transition: 0.4s; cursor: pointer; }
+        .movie-card:hover { transform: translateY(-10px); border-color: var(--main); box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
+        .movie-card img { width: 100%; aspect-ratio: 2/3; object-fit: cover; }
     </style>
 </head>
 <body>
 
     <header>
         <a href="#" class="logo">STREAM<span>X</span></a>
-        <div class="nav-links">
-            <span class="nav-item" onclick="location.reload()">Home</span>
-            <span class="nav-item" onclick="toggleAbout(true)">About Us</span>
-        </div>
+        <div style="font-size: 14px; color: #888;">THE FUTURE OF CINEMA</div>
     </header>
 
-    <div class="container">
-        <h2 style="color:var(--main);">Library</h2>
-        <div class="movie-grid" id="grid"></div>
+    <div class="welcome-hero">
+        <div class="welcome-content">
+            <p>NOW STREAMING 4K</p>
+            <h1>STREAM<span>X</span></h1>
+            <button onclick="window.scrollTo({top: 600, behavior: 'smooth'})" style="background:var(--main); border:none; padding:15px 40px; border-radius:50px; font-weight:900; cursor:pointer; margin-top:30px;">EXPLORE LIBRARY</button>
+        </div>
     </div>
 
-    <div id="aboutPage">
-        <button class="close-about" onclick="toggleAbout(false)">✕ CLOSE</button>
-        
-        <div class="about-header">
-            <h1>Beyond <span>Streaming.</span></h1>
-            <p style="color:#888; font-size: 18px;">StreamX is a vision created by Felix Nyoka to redefine entertainment in Zambia.</p>
-        </div>
-
-        <div class="about-content">
-            <div>
-                <h2>Our Mission</h2>
-                <p>StreamX was founded with one goal: to provide high-quality, high-speed cinema experiences to everyone, everywhere. We believe that entertainment should be fast, social, and accessible.</p>
-                <p>We started as a small project and have grown into a platform that supports 4K playback, live community interaction, and cross-device syncing.</p>
-            </div>
-            <div>
-                <div class="stat-box">
-                    <h3>5,000+</h3>
-                    <p>Movies & Series available in HD.</p>
-                </div>
-                <div class="stat-box">
-                    <h3>Global Access</h3>
-                    <p>Stream anywhere, anytime on any device.</p>
-                </div>
-                <div class="stat-box">
-                    <h3>Community Driven</h3>
-                    <p>Features built based on your reports and requests.</p>
-                </div>
-            </div>
-        </div>
-
-        <div style="margin-top: 60px; text-align: center; border-top: 1px solid #222; padding-top: 40px;">
-            <h3>Join the Revolution</h3>
-            <p style="color:#888;">Follow us for the latest updates and new movie drops.</p>
-            <p style="color:var(--main); font-weight: bold;">© 2026 StreamX Media Group</p>
-        </div>
+    <div class="container">
+        <h2 style="border-left:5px solid var(--main); padding-left:15px; margin-bottom:30px;">Featured Collections</h2>
+        <div class="grid" id="movieGrid"></div>
     </div>
 
     <script>
         const movies = [
-            { t: "Greenland 2", i: "https://image.tmdb.org/t/p/w500/69Uqt7vLYv5897o76U9Y939GR95.jpg" },
+            { t: "The Evil Inside", i: "https://image.tmdb.org/t/p/w500/b69m9v5s6Y0B1U7y8vL6bX3Y1.jpg" },
             { t: "Fast X", i: "https://image.tmdb.org/t/p/w500/fiVW0BtJm7pPStJ9aN0uO7z9Yp7.jpg" },
-            { t: "The Evil Inside", i: "https://image.tmdb.org/t/p/w500/b69m9v5s6Y0B1U7y8vL6bX3Y1.jpg" }
+            { t: "Cold Storage", i: "https://image.tmdb.org/t/p/w500/96KfTsvY9o6S17s5Y1JqVp6tA8Z.jpg" },
+            { t: "Greenland 2", i: "https://image.tmdb.org/t/p/w500/69Uqt7vLYv5897o76U9Y939GR95.jpg" },
+            { t: "Angel Flight", i: "https://image.tmdb.org/t/p/w500/v9Y69m9v5s6Y0B1U7y8vL6bX3Y1.jpg" }
         ];
 
-        function render() {
-            document.getElementById('grid').innerHTML = movies.map(m => `
+        window.onload = () => {
+            const g = document.getElementById('movieGrid');
+            g.innerHTML = movies.map(m => `
                 <div class="movie-card">
-                    <img src="${m.i}" style="width:100%; aspect-ratio:2/3; object-fit:cover;">
-                    <div style="padding:10px; text-align:center; font-size:12px; font-weight:bold;">${m.t}</div>
+                    <img src="${m.i}">
+                    <div style="padding:15px; text-align:center; font-weight:bold; font-size:14px;">${m.t}</div>
                 </div>
             `).join('');
-        }
 
-        function toggleAbout(show) {
-            const page = document.getElementById('aboutPage');
-            page.style.display = show ? 'block' : 'none';
-            if(show) {
-                window.speechSynthesis.speak(new SpeechSynthesisUtterance("Welcome to the story of Stream X. Created for the fans."));
-            }
-        }
-
-        window.onload = render;
+            // Professional Voice Welcome
+            setTimeout(() => {
+                const welcome = new SpeechSynthesisUtterance("Welcome to Stream X. The ultimate cinema experience awaits you.");
+                window.speechSynthesis.speak(welcome);
+            }, 1000);
+        };
     </script>
 </body>
 </html>
