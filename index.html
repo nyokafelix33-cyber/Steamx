@@ -3,86 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StreamX | Members Area</title>
+    <title>StreamX | Premium</title>
     <style>
-        :root { --main: #d3f243; --bg: #080808; --card: #121212; }
-        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; overflow: hidden; }
+        :root { --main: #d3f243; --bg: #080808; --card: #121212; --gold: #ffd700; }
+        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; overflow-x: hidden; }
 
-        /* Login Overlay */
-        #authOverlay { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 9000; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(10px); }
-        .auth-card { background: #111; padding: 40px; border-radius: 12px; width: 350px; text-align: center; border: 1px solid #222; }
-        .auth-input { width: 100%; padding: 12px; margin: 10px 0; background: #000; border: 1px solid #333; color: white; border-radius: 5px; box-sizing: border-box; }
-        .auth-btn { width: 100%; padding: 12px; background: var(--main); border: none; font-weight: bold; cursor: pointer; border-radius: 5px; margin-top: 10px; }
+        /* Auth & Main Site Toggling */
+        #authOverlay { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 9000; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(10px); }
+        #mainSite { display: none; }
 
-        /* Main Content (Hidden until login) */
-        #mainSite { display: none; height: 100vh; overflow-y: auto; }
-
-        /* Navigation & UI */
+        /* Navigation */
         header { background: #000; padding: 15px 5%; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 1000; border-bottom: 1px solid #222; }
         .logo { font-size: 24px; font-weight: 900; color: red; text-decoration: none; }
-        .logo span { color: white; }
-        .search-bar { flex-grow: 0.5; background: #111; border: 1px solid #333; padding: 10px; border-radius: 5px; color: white; margin: 0 20px; outline: none; }
+        .search-bar { flex-grow: 0.4; background: #111; border: 1px solid #333; padding: 10px; border-radius: 5px; color: white; outline: none; }
+
+        /* Premium Pricing Section */
+        .premium-container { padding: 50px 5%; text-align: center; background: linear-gradient(to bottom, #111, #080808); }
+        .plans { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; margin-top: 30px; }
+        .plan-card { background: #1a1a1a; padding: 30px; border-radius: 15px; width: 250px; border: 1px solid #333; transition: 0.3s; }
+        .plan-card.active { border-color: var(--main); transform: scale(1.05); box-shadow: 0 0 20px rgba(211, 242, 67, 0.2); }
+        .plan-card h3 { color: var(--main); margin-top: 0; }
+        .price { font-size: 32px; font-weight: bold; margin: 15px 0; }
+        .subscribe-btn { width: 100%; padding: 12px; background: var(--main); border: none; font-weight: bold; cursor: pointer; border-radius: 5px; }
 
         /* Movie Grid */
-        .container { padding: 30px 5%; }
+        .container { padding: 40px 5%; }
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 25px; }
         .card { background: var(--card); border-radius: 10px; overflow: hidden; border: 1px solid #222; cursor: pointer; transition: 0.3s; }
-        .card:hover { border-color: var(--main); transform: translateY(-10px); }
         .card img { width: 100%; aspect-ratio: 2/3; object-fit: cover; }
-        .card-title { padding: 12px; text-align: center; font-size: 13px; font-weight: bold; }
 
-        /* Request Form */
-        .request-box { background: #111; padding: 30px; margin: 40px 5%; border-radius: 10px; border: 1px solid #222; }
-        
-        /* Player Overlay */
-        #playerOverlay { display: none; position: fixed; inset: 0; background: #000; z-index: 3000; padding: 20px; overflow-y: auto; }
-        .download-btn { background: #333; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; margin-top: 15px; }
+        /* Sidebar */
+        #sidebar { position: fixed; top: 0; right: -320px; width: 300px; height: 100%; background: #0a0a0a; z-index: 2000; transition: 0.4s; padding: 20px; border-left: 1px solid #222; }
+        .user-badge { background: #333; padding: 5px 10px; border-radius: 4px; font-size: 10px; font-weight: bold; vertical-align: middle; }
     </style>
 </head>
 <body>
 
     <div id="authOverlay">
-        <div class="auth-card">
-            <h1 style="color:red; margin-bottom:5px;">STREAM<span style="color:white;">X</span></h1>
-            <p style="color:#888; margin-bottom:25px;">Sign in to start watching</p>
-            <input type="text" id="loginUser" class="auth-input" placeholder="Username">
-            <input type="password" id="loginPass" class="auth-input" placeholder="Password">
-            <button class="auth-btn" onclick="handleLogin()">SIGN IN</button>
-            <p style="font-size: 12px; color: #555; margin-top: 15px;">New to StreamX? <span style="color:var(--main); cursor:pointer;">Sign up now.</span></p>
+        <div style="background:#111; padding:40px; border-radius:12px; width:320px; text-align:center;">
+            <h1 style="color:red; margin:0;">STREAM<span style="color:white;">X</span></h1>
+            <p style="color:#666; margin-bottom:20px;">The Future of Cinema</p>
+            <input type="text" id="username" style="width:100%; padding:12px; margin-bottom:10px; background:#000; border:1px solid #333; color:white;" placeholder="Enter Name">
+            <button onclick="login()" style="width:100%; padding:12px; background:var(--main); border:none; font-weight:bold; cursor:pointer;">ENTER SITE</button>
         </div>
     </div>
 
     <div id="mainSite">
         <header>
             <a href="#" class="logo">STREAM<span>X</span></a>
-            <input type="text" id="srch" class="search-bar" placeholder="Search movies..." oninput="doSearch()">
-            <div style="cursor:pointer; background: #222; padding: 5px 15px; border-radius: 20px; font-size: 13px;" onclick="location.reload()">LOGOUT</div>
+            <input type="text" class="search-bar" placeholder="Search movies...">
+            <div onclick="toggleSidebar()" style="cursor:pointer; font-size:20px;">👤</div>
         </header>
 
+        <div id="sidebar">
+            <div onclick="toggleSidebar()" style="cursor:pointer; color:var(--main); text-align:right;">✕ CLOSE</div>
+            <div style="text-align:center; margin-top:30px;">
+                <div style="font-size: 50px;">👤</div>
+                <h3 id="sideName">User</h3>
+                <p id="status"><span class="user-badge">FREE PLAN</span></p>
+            </div>
+            <hr style="border:0; border-top:1px solid #222; margin:20px 0;">
+            <button onclick="window.scrollTo(0, document.body.scrollHeight)" style="width:100%; padding:10px; background:var(--main); border:none; font-weight:bold; cursor:pointer;">UPGRADE TO PRO</button>
+        </div>
+
         <div class="container">
-            <h2 style="border-left:5px solid var(--main); padding-left:15px; margin-bottom:30px;">Trending Now</h2>
+            <h2 style="border-left:5px solid var(--main); padding-left:15px; margin-bottom:30px;">Featured Movies</h2>
             <div class="grid" id="movieGrid"></div>
         </div>
 
-        <div class="request-box">
-            <h3>Can't find a movie?</h3>
-            <p style="color:#888;">Request any movie or series and we will upload it for you.</p>
-            <input type="text" id="reqInput" class="auth-input" style="width:70%;" placeholder="Enter movie name...">
-            <button class="auth-btn" style="width:auto; padding: 12px 30px;" onclick="alert('Request sent successfully!')">SUBMIT REQUEST</button>
+        <div class="premium-container">
+            <h1 style="font-size:36px;">Ready for the <span style="color:var(--main);">Full Experience?</span></h1>
+            <p style="color:#888;">Unlock 4K quality, offline downloads, and no advertisements.</p>
+            
+            <div class="plans">
+                <div class="plan-card">
+                    <h3>Basic</h3>
+                    <div class="price">FREE</div>
+                    <p style="color:#666; font-size:14px;">720p Streaming<br>Standard Content<br>Ads Included</p>
+                    <button class="subscribe-btn" style="background:#333; color:white;">CURRENT PLAN</button>
+                </div>
+                <div class="plan-card active">
+                    <h3>Premium Pro</h3>
+                    <div class="price">$9.99<span style="font-size:14px;">/mo</span></div>
+                    <p style="color:#aaa; font-size:14px;">4K Ultra HD<br>Offline Downloads<br>Ad-Free Experience</p>
+                    <button class="subscribe-btn" onclick="upgrade()">SUBSCRIBE NOW</button>
+                </div>
+            </div>
         </div>
-    </div>
-
-    <div id="playerOverlay">
-        <div style="display:flex; justify-content:space-between; margin-bottom:15px;">
-            <h2 id="pTitle" style="color:var(--main); margin:0;"></h2>
-            <button onclick="closePlayer()" style="background:none; border:1px solid #444; color:white; padding:8px 15px; cursor:pointer;">✕ CLOSE</button>
-        </div>
-        <video id="mainVid" controls style="width:100%; border-radius: 8px;"><source src="https://www.w3schools.com/html/mov_bbb.mp4"></video>
-        <button class="download-btn" onclick="triggerDownload()">⬇ DOWNLOAD MOVIE</button>
     </div>
 
     <script>
-        const movieData = [
+        const movies = [
             { t: "The Evil Inside", i: "https://image.tmdb.org/t/p/w500/b69m9v5s6Y0B1U7y8vL6bX3Y1.jpg" },
             { t: "Angel Flight", i: "https://image.tmdb.org/t/p/w500/v9Y69m9v5s6Y0B1U7y8vL6bX3Y1.jpg" },
             { t: "Cold Storage", i: "https://image.tmdb.org/t/p/w500/96KfTsvY9o6S17s5Y1JqVp6tA8Z.jpg" },
@@ -90,56 +101,31 @@
             { t: "Greenland 2", i: "https://image.tmdb.org/t/p/w500/69Uqt7vLYv5897o76U9Y939GR95.jpg" }
         ];
 
-        function handleLogin() {
-            const user = document.getElementById('loginUser').value;
-            if(user.length > 2) {
+        function login() {
+            const name = document.getElementById('username').value;
+            if(name) {
                 document.getElementById('authOverlay').style.display = 'none';
                 document.getElementById('mainSite').style.display = 'block';
-                document.body.style.overflow = 'auto';
-                
-                // Greeting
-                const msg = new SpeechSynthesisUtterance("Welcome to Stream X, " + user);
-                window.speechSynthesis.speak(msg);
-            } else {
-                alert("Please enter a valid username");
+                document.getElementById('sideName').innerText = name;
             }
         }
 
-        function render(list) {
+        function upgrade() {
+            alert("Processing Payment... Success!");
+            document.getElementById('status').innerHTML = '<span class="user-badge" style="background:var(--gold); color:black;">PREMIUM PRO</span>';
+            const speak = new SpeechSynthesisUtterance("Congratulations! You are now a Premium member of Stream X.");
+            window.speechSynthesis.speak(speak);
+        }
+
+        function toggleSidebar() {
+            const s = document.getElementById('sidebar');
+            s.style.right = (s.style.right === '0px') ? '-320px' : '0px';
+        }
+
+        window.onload = () => {
             const g = document.getElementById('movieGrid');
-            g.innerHTML = list.map(m => `
-                <div class="card" onclick="startMovie('${m.t}')">
-                    <img src="${m.i}" onerror="this.src='https://via.placeholder.com/500x750?text=${m.t}'">
-                    <div class="card-title">${m.t}</div>
-                </div>
-            `).join('');
-        }
-
-        function startMovie(t) {
-            document.getElementById('pTitle').innerText = t;
-            document.getElementById('playerOverlay').style.display = 'block';
-            document.getElementById('mainVid').play();
-        }
-
-        function closePlayer() {
-            document.getElementById('playerOverlay').style.display = 'none';
-            document.getElementById('mainVid').pause();
-        }
-
-        function triggerDownload() {
-            const link = document.createElement('a');
-            link.href = "https://www.w3schools.com/html/mov_bbb.mp4";
-            link.download = document.getElementById('pTitle').innerText + ".mp4";
-            link.click();
-            alert("Download starting...");
-        }
-
-        function doSearch() {
-            const q = document.getElementById('srch').value.toLowerCase();
-            render(movieData.filter(m => m.t.toLowerCase().includes(q)));
-        }
-
-        window.onload = () => render(movieData);
+            g.innerHTML = movies.map(m => `<div class="card"><img src="${m.i}"><div style="padding:10px; text-align:center; font-size:13px; font-weight:bold;">${m.t}</div></div>`).join('');
+        };
     </script>
 </body>
 </html>
