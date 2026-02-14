@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StreamX | Premium Playback</title>
+    <title>StreamX | Premium World Wide</title>
     <style>
         :root { --main: #d3f243; --bg: #080808; --card: #121212; --transition: 0.4s ease; }
         body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; overflow-x: hidden; }
@@ -24,25 +24,28 @@
         header { background: #000; padding: 15px 5%; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #222; position: sticky; top: 0; z-index: 1000; }
         .logo { font-weight: 900; color: #ff0000; font-size: 24px; text-decoration: none; }
         
-        .search-container { position: absolute; left: 50%; transform: translateX(-50%); display: flex; align-items: center; background: #111; border-radius: 30px; padding: 5px 20px; border: 1px solid #333; width: 30%; min-width: 250px; }
+        .search-container { position: absolute; left: 50%; transform: translateX(-50%); display: flex; align-items: center; background: #111; border-radius: 30px; padding: 5px 20px; border: 1px solid #333; width: 25%; min-width: 200px; }
         .search-container input { background: none; border: none; color: white; width: 100%; outline: none; text-align: center; }
 
-        .container { padding: 30px 5%; }
+        .container { padding: 20px 5%; }
         .movie-row { display: flex; overflow-x: auto; gap: 20px; padding-bottom: 20px; scrollbar-width: none; }
         .movie-card { min-width: 170px; background: var(--card); border-radius: 12px; overflow: hidden; border: 1px solid #222; transition: 0.3s; cursor: pointer; position: relative; }
         .movie-card:hover { transform: scale(1.05); border-color: var(--main); }
         .movie-card img { width: 100%; aspect-ratio: 2/3; object-fit: cover; }
+        
+        .live-badge { position: absolute; top: 10px; left: 10px; background: red; color: white; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; animation: blink 1.5s infinite; }
+        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
 
-        /* --- CINEMA PLAYER --- */
+        /* --- PLAYER & DOWNLOADS --- */
         #playerModal { position: fixed; inset: 0; background: black; z-index: 5000; display: none; flex-direction: column; }
         #videoFrame { width: 100%; height: 100%; border: none; }
-        .player-controls { position: absolute; top: 20px; left: 20px; z-index: 5001; display: flex; gap: 10px; }
-        .control-btn { background: rgba(0,0,0,0.7); color: white; border: 1px solid var(--main); padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        .player-controls { position: absolute; top: 20px; width: 95%; left: 2.5%; z-index: 5001; display: flex; justify-content: space-between; align-items: center; }
+        .control-btn { background: rgba(0,0,0,0.8); color: white; border: 1px solid var(--main); padding: 10px 18px; border-radius: 5px; cursor: pointer; font-weight: bold; transition: 0.2s; }
+        .control-btn:hover { background: var(--main); color: black; }
 
         /* --- SETTINGS & ABOUT --- */
         #settingsMenu { position: fixed; right: -320px; top: 0; width: 300px; height: 100%; background: #111; z-index: 2000; padding: 40px 20px; transition: var(--transition); border-left: 1px solid #333; }
         #settingsMenu.active { right: 0; }
-        
         .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 4000; display: none; align-items: center; justify-content: center; padding: 20px; }
         .modal-content { background: #1a1a1a; padding: 40px; border-radius: 20px; max-width: 500px; text-align: center; border: 1px solid #333; }
     </style>
@@ -63,30 +66,53 @@
         <header>
             <a href="#" class="logo">STREAMX</a>
             <div class="search-container">
-                <input type="text" id="searchBar" placeholder="Search movies or tv shows..." onkeyup="searchAPI()">
+                <input type="text" id="searchBar" placeholder="Search world wide..." onkeyup="searchAPI()">
                 <span onclick="startVoice()" style="cursor:pointer; color:var(--main);">🎤</span>
             </div>
-            <div style="display:flex; gap:20px; align-items:center;">
-                <span onclick="loadCategory('movie')" style="cursor:pointer; font-size:14px;">Movies</span>
-                <span onclick="loadCategory('tv')" style="cursor:pointer; font-size:14px;">Series</span>
-                <span id="displayUser" style="color:var(--main); font-weight:bold; cursor:pointer;" onclick="toggleSettings()">User ⚙️</span>
+            <div style="display:flex; gap:15px; align-items:center;">
+                <span onclick="loadCategory('movie')" style="cursor:pointer; font-size:13px;">Movies</span>
+                <span onclick="loadCategory('tv')" style="cursor:pointer; font-size:13px;">Series</span>
+                <span onclick="showLiveTV()" style="cursor:pointer; font-size:13px; color:#ff4d4d; font-weight:bold;">● LIVE TV</span>
+                <span id="displayUser" style="color:var(--main); font-weight:bold; cursor:pointer; font-size:13px;" onclick="toggleSettings()">User ⚙️</span>
             </div>
         </header>
 
+        <div class="container" id="liveSection">
+            <h3 style="color:#ff4d4d;">📺 Live World Wide Channels</h3>
+            <div class="movie-row" id="liveGrid">
+                <div class="movie-card" onclick="playLive('https://www.youtube.com/embed/jfKfPfyJRdk?autoplay=1')">
+                    <div class="live-badge">LIVE</div>
+                    <img src="https://images.unsplash.com/photo-1585829365234-781fcd0d4301?auto=format&fit=crop&w=400" alt="News">
+                    <div style="padding:10px; font-weight:bold; font-size:12px; text-align:center;">LBC News HD</div>
+                </div>
+                <div class="movie-card" onclick="playLive('https://www.youtube.com/embed/5_XESl5XrmY?autoplay=1')">
+                    <div class="live-badge">LIVE</div>
+                    <img src="https://images.unsplash.com/photo-1504450758481-7338eba7524a?auto=format&fit=crop&w=400" alt="Sports">
+                    <div style="padding:10px; font-weight:bold; font-size:12px; text-align:center;">Global Sports Live</div>
+                </div>
+                <div class="movie-card" onclick="playLive('https://www.youtube.com/embed/A47vS_UVR38?autoplay=1')">
+                    <div class="live-badge">LIVE</div>
+                    <img src="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=400" alt="Music">
+                    <div style="padding:10px; font-weight:bold; font-size:12px; text-align:center;">Music World TV</div>
+                </div>
+            </div>
+        </div>
+
         <div class="container" id="historySection" style="display:none;">
-            <h3 style="color:var(--main);">🕒 Recently Watched</h3>
+            <h3 style="color:var(--main);">🕒 Recently Viewed</h3>
             <div class="movie-row" id="historyGrid"></div>
         </div>
 
         <div class="container">
-            <h3 id="rowTitle">🔥 Global Trending</h3>
+            <h3 id="rowTitle">🔥 Trending Now</h3>
             <div class="movie-row" id="mainGrid"></div>
         </div>
     </div>
 
     <div id="playerModal">
         <div class="player-controls">
-            <button class="control-btn" onclick="closePlayer()">✕ CLOSE PLAYER</button>
+            <button class="control-btn" onclick="closePlayer()">✕ CLOSE</button>
+            <button class="control-btn" id="dlTrigger" style="border-color:#00ff00; color:#00ff00;">⬇ DOWNLOAD</button>
         </div>
         <iframe id="videoFrame" src="" allowfullscreen></iframe>
     </div>
@@ -103,12 +129,11 @@
     <div id="aboutModal" class="modal">
         <div class="modal-content">
             <h1 style="color:var(--main); font-size:28px;">About StreamX</h1>
-            <p style="color:#aaa;">Empowering global entertainment.</p>
-            <p>StreamX is a premium portal designed by <b>Felix Nyoka</b>. We provide access to a massive library of movies and series using high-speed streaming technology.</p>
-            <div style="margin:20px 0; border:1px solid #333; padding:15px; border-radius:10px; background:#111;">
-                <p><b>Founder:</b> Felix Nyoka</p>
-                <p><b>Official Handle:</b> @felix_ny10</p>
-                <p><b>Status:</b> Online & Verified</p>
+            <p style="color:#aaa;">Premium World Wide Access</p>
+            <p>StreamX is a global cinematic portal founded by <b>Felix Nyoka</b>. We provide high-definition streaming and live broadcast accessibility for our global audience.</p>
+            <div style="margin:20px 0; border:1px solid #333; padding:15px; border-radius:10px; background:#111; font-size: 14px;">
+                <p><b>CEO:</b> Felix Nyoka (@felix_ny10)</p>
+                <p><b>Build:</b> v6.0 Live Enabled</p>
             </div>
             <button onclick="closeModals()" style="background:var(--main); border:none; padding:10px 30px; border-radius:5px; font-weight:bold; cursor:pointer;">CLOSE</button>
         </div>
@@ -117,10 +142,8 @@
     <script>
         const API_KEY = '8093d6645564c71853a8089408018e6e';
         const IMG_URL = 'https://image.tmdb.org/t/p/w500';
-        // These are professional embed providers that host the actual movie files
         const MOVIE_PLAYER = 'https://vidsrc.me/embed/movie?tmdb=';
         const TV_PLAYER = 'https://vidsrc.me/embed/tv?tmdb=';
-        
         let watchHistory = [];
 
         function handleAuth() {
@@ -142,10 +165,16 @@
         }
 
         async function loadCategory(type) {
-            document.getElementById('rowTitle').innerText = type === 'movie' ? "🔥 Top Movies" : "📺 Top Series";
+            document.getElementById('liveSection').style.display = 'none';
+            document.getElementById('rowTitle').innerText = type === 'movie' ? "🔥 Popular Movies" : "📺 Popular TV Shows";
             const res = await fetch(`https://api.themoviedb.org/3/discover/${type}?api_key=${API_KEY}`);
             const data = await res.json();
             render(data.results, type);
+        }
+
+        function showLiveTV() {
+            document.getElementById('liveSection').style.display = 'block';
+            window.scrollTo({top: 0, behavior: 'smooth'});
         }
 
         async function searchAPI() {
@@ -163,7 +192,7 @@
                 const type = forceType || m.media_type || 'movie';
                 return `
                     <div class="movie-card" onclick="openPlayer('${m.id}', '${type}', '${m.title || m.name}', '${IMG_URL+m.poster_path}')">
-                        <img src="${IMG_URL + m.poster_path}">
+                        <img src="${IMG_URL + m.poster_path}" onerror="this.src='https://via.placeholder.com/170x250/111/fff?text=StreamX'">
                         <div style="padding:10px; font-weight:bold; font-size:12px; text-align:center;">${m.title || m.name}</div>
                     </div>
                 `;
@@ -171,17 +200,22 @@
         }
 
         function openPlayer(id, type, title, img) {
-            // Save to History
             if(!watchHistory.find(x => x.t === title)) {
                 watchHistory.unshift({t: title, i: img});
                 document.getElementById('historySection').style.display = 'block';
                 document.getElementById('historyGrid').innerHTML = watchHistory.map(h => `<div class="movie-card" style="min-width:120px;"><img src="${h.i}"></div>`).join('');
             }
-            
-            // Launch Video
             document.getElementById('playerModal').style.display = 'flex';
             const base = (type === 'tv') ? TV_PLAYER : MOVIE_PLAYER;
             document.getElementById('videoFrame').src = base + id;
+            document.getElementById('dlTrigger').style.display = 'block';
+            document.getElementById('dlTrigger').onclick = () => { window.open(`https://yts.mx/browse-movies/${title}`, '_blank'); };
+        }
+
+        function playLive(url) {
+            document.getElementById('playerModal').style.display = 'flex';
+            document.getElementById('videoFrame').src = url;
+            document.getElementById('dlTrigger').style.display = 'none'; // No download for live
         }
 
         function closePlayer() {
@@ -192,13 +226,9 @@
         function toggleSettings() { document.getElementById('settingsMenu').classList.toggle('active'); }
         function openModal(id) { document.getElementById(id).style.display = 'flex'; }
         function closeModals() { document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); }
-        
         function startVoice() {
             const rec = new (window.webkitSpeechRecognition)();
-            rec.onresult = (e) => { 
-                document.getElementById('searchBar').value = e.results[0][0].transcript; 
-                searchAPI(); 
-            };
+            rec.onresult = (e) => { document.getElementById('searchBar').value = e.results[0][0].transcript; searchAPI(); };
             rec.start();
         }
     </script>
