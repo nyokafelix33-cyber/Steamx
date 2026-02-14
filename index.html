@@ -5,50 +5,40 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>StreamX Pro</title>
     <style>
-        :root { --main: #d3f243; --bg: #0a0a0a; --card: #1a1a1a; }
+        :root { --main: #d3f243; --bg: #0a0a0a; }
         body { background: var(--bg); color: white; font-family: sans-serif; margin: 0; padding-bottom: 80px; }
-        
-        /* Header */
         header { padding: 15px; background: #000; border-bottom: 1px solid #222; position: sticky; top: 0; z-index: 100; }
         .logo { color: red; font-weight: 900; font-size: 22px; }
-        .search-bar { width: 100%; background: #1a1a1a; border: 1px solid #333; padding: 10px; border-radius: 8px; color: white; margin-top: 10px; outline: none; }
-
-        /* Hero */
-        .hero { height: 250px; background: linear-gradient(to top, #0a0a0a, transparent), url('https://m.media-amazon.com/images/M/MV5BYjhiNjBlODctY2ZiOC00YjVlLWFlNzAtNTVhNzM1YjI1NzMxXkEyXkFqcGdeQXVyMjkwOTAyMDU@._V1_.jpg'); background-size: cover; background-position: center; display: flex; flex-direction: column; justify-content: flex-end; padding: 20px; }
-        .play-btn { background: var(--main); color: black; border: none; padding: 10px 20px; border-radius: 5px; font-weight: bold; cursor: pointer; width: fit-content; }
-
-        /* Grid */
+        .search-bar { width: 95%; background: #1a1a1a; border: 1px solid #333; padding: 10px; border-radius: 8px; color: white; margin-top: 10px; outline: none; }
+        .hero { height: 250px; background: linear-gradient(to top, #0a0a0a, transparent), url('https://m.media-amazon.com/images/M/MV5BYjhiNjBlODctY2ZiOC00YjVlLWFlNzAtNTVhNzM1YjI1NzMxXkEyXkFqcGdeQXVyMjkwOTAyMDU@._V1_.jpg'); background-size: cover; background-position: center; display: flex; flex-direction: column; justify-content: flex-end; padding: 20px; box-sizing: border-box; }
+        .play-btn { background: var(--main); color: black; border: none; padding: 12px 20px; border-radius: 5px; font-weight: bold; cursor: pointer; width: fit-content; }
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 15px; padding: 20px; }
-        .card { background: var(--card); border-radius: 8px; overflow: hidden; border: 1px solid #222; }
+        .card { background: #1a1a1a; border-radius: 8px; overflow: hidden; border: 1px solid #222; cursor: pointer; }
         .card img { width: 100%; aspect-ratio: 2/3; object-fit: cover; }
         .card-info { padding: 8px; font-size: 12px; text-align: center; }
-
-        /* Player */
-        #videoLayer { display: none; position: fixed; inset: 0; background: #000; z-index: 1000; flex-direction: column; }
-        .close-p { padding: 20px; color: var(--main); cursor: pointer; font-weight: bold; }
-        
+        #player { display: none; position: fixed; inset: 0; background: #000; z-index: 1000; flex-direction: column; }
         nav { position: fixed; bottom: 0; width: 100%; background: #000; display: flex; justify-content: space-around; padding: 15px 0; border-top: 1px solid #222; }
     </style>
 </head>
 <body>
 
-    <div id="videoLayer">
-        <div class="close-p" onclick="closeP()">✕ CLOSE</div>
+    <div id="player">
+        <div onclick="closeP()" style="padding:20px; color:var(--main); cursor:pointer; font-weight:bold;">✕ CLOSE</div>
         <video id="vid" controls style="width:100%;"><source src="https://www.w3schools.com/html/mov_bbb.mp4"></video>
     </div>
 
     <header>
         <div class="logo">STREAMX</div>
-        <input type="text" id="srch" class="search-bar" placeholder="Search..." oninput="doSrch()">
+        <input type="text" id="srch" class="search-bar" placeholder="Search..." oninput="doSearch()">
     </header>
 
     <div id="hero" class="hero">
         <h1>Greenland 2</h1>
-        <button class="play-btn" onclick="openP('Greenland 2')">WATCH NOW</button>
+        <button class="play-btn" onclick="speakAndPlay('Greenland 2')">WATCH NOW</button>
     </div>
 
     <div style="padding: 20px 20px 0; color: var(--main); font-weight: bold;">Trending Now</div>
-    <div class="grid" id="g"></div>
+    <div class="grid" id="movieGrid"></div>
 
     <nav>
         <div style="color:var(--main)">🏠<br>Home</div>
@@ -57,39 +47,30 @@
     </nav>
 
     <script>
-        const data = [
-            { t: "The Evil Inside", i: "https://image.tmdb.org/t/p/w500/b69m9v5s6Y0B1U7y8vL6bX3Y1.jpg" },
-            { t: "Angel Flight", i: "https://image.tmdb.org/t/p/w500/v9Y69m9v5s6Y0B1U7y8vL6bX3Y1.jpg" },
-            { t: "Cold Storage", i: "https://image.tmdb.org/t/p/w500/96KfTsvY9o6S17s5Y1JqVp6tA8Z.jpg" },
-            { t: "Joe's Road Trip", i: "https://image.tmdb.org/t/p/w500/2u7BUzqC0S7Y0XU9sn69v5S6Y0B.jpg" }
+        const movies = [
+            { t: "The Evil Inside", i: "https://image.tmdb.org/p/w500/b69m9v5s6Y0B1U7y8vL6bX3Y1.jpg" },
+            { t: "Angel Flight", i: "https://image.tmdb.org/p/w500/v9Y69m9v5s6Y0B1U7y8vL6bX3Y1.jpg" },
+            { t: "Cold Storage", i: "https://image.tmdb.org/p/w500/96KfTsvY9o6S17s5Y1JqVp6tA8Z.jpg" },
+            { t: "Joe's Road Trip", i: "https://image.tmdb.org/p/w500/2u7BUzqC0S7Y0XU9sn69v5S6Y0B.jpg" }
         ];
 
         function draw(list) {
-            document.getElementById('g').innerHTML = list.map(m => `
-                <div class="card" onclick="openP('${m.t}')">
-                    <img src="${m.i}" onerror="this.src='https://via.placeholder.com/150'">
-                    <div class="card-info">${m.t}</div>
-                </div>
-            `).join('');
+            const grid = document.getElementById('movieGrid');
+            if(grid) {
+                grid.innerHTML = list.map(m => `
+                    <div class="card" onclick="speakAndPlay('${m.t}')">
+                        <img src="${m.i}">
+                        <div class="card-info">${m.t}</div>
+                    </div>
+                `).join('');
+            }
         }
 
-        function doSrch() {
-            const q = document.getElementById('srch').value.toLowerCase();
-            document.getElementById('hero').style.display = q ? 'none' : 'flex';
-            draw(data.filter(m => m.t.toLowerCase().includes(q)));
-        }
-
-        function openP(t) {
-            document.getElementById('videoLayer').style.display = 'flex';
-            document.getElementById('vid').play();
-        }
-
-        function closeP() {
-            document.getElementById('videoLayer').style.display = 'none';
-            document.getElementById('vid').pause();
-        }
-
-        window.onload = () => draw(data);
-    </script>
-</body>
-</html>
+        // VOICE FUNCTION: This reads the title aloud
+        function speakAndPlay(title) {
+            const speech = new SpeechSynthesisUtterance();
+            speech.text = "Now playing " + title;
+            speech.volume = 1;
+            speech.rate = 1;
+            speech.pitch = 1;
+            window.speechSy
