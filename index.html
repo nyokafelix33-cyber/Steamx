@@ -3,173 +3,128 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StreamX | Premium Cinema</title>
+    <title>StreamX | Premium World Wide</title>
     <style>
-        :root { --main: #ff0000; --accent: #d3f243; --bg: #0a0a0a; --surface: #121212; }
-        body { background: var(--bg); color: #fff; font-family: 'Segoe UI', sans-serif; margin: 0; }
+        :root { --main: #ff0000; --accent: #d3f243; --bg: #080808; --card: #1a1a1a; }
+        body { background: var(--bg); color: #fff; font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
-        /* --- MODERN HEADER --- */
         header { 
-            background: linear-gradient(to bottom, rgba(0,0,0,0.9), transparent);
-            padding: 20px 5%; display: flex; align-items: center; justify-content: space-between;
-            position: fixed; top: 0; width: 90%; z-index: 1000; transition: 0.3s;
+            background: #000; padding: 15px 5%; display: flex; align-items: center; justify-content: space-between;
+            position: sticky; top: 0; z-index: 1000; border-bottom: 1px solid #222;
         }
-        .logo { font-size: 28px; font-weight: 900; color: var(--main); text-decoration: none; letter-spacing: -1px; }
-        .nav-links span { margin-left: 25px; cursor: pointer; font-size: 14px; font-weight: 600; text-transform: uppercase; color: #eee; }
-        .nav-links span:hover { color: var(--accent); }
+        .logo { font-size: 22px; font-weight: 900; color: var(--main); letter-spacing: -1px; }
+        .nav-links span { margin-left: 15px; cursor: pointer; font-size: 12px; font-weight: 700; text-transform: uppercase; color: #bbb; }
 
-        /* --- HERO BANNER --- */
         .hero { 
-            height: 70vh; background: linear-gradient(to right, #000, transparent), url('https://images.unsplash.com/photo-1626814026160-2237a95fc5a0?w=1200');
+            height: 40vh; background: linear-gradient(to top, #080808, transparent), url('https://images.unsplash.com/photo-1485846234645-a62644f84728?w=800');
             background-size: cover; background-position: center;
-            display: flex; flex-direction: column; justify-content: center; padding: 0 5%; margin-bottom: 30px;
+            display: flex; flex-direction: column; justify-content: flex-end; padding: 20px 5%;
         }
-        .hero-content h1 { font-size: 50px; margin: 0; color: var(--accent); }
-        .hero-content p { max-width: 500px; font-size: 16px; color: #ccc; margin: 20px 0; }
-        .play-now { background: var(--main); color: #fff; padding: 12px 30px; border: none; border-radius: 5px; font-weight: 900; cursor: pointer; }
+        .hero h1 { font-size: 32px; margin: 0; color: var(--accent); }
 
-        /* --- CONTENT ROWS --- */
-        .container { padding: 0 5%; }
-        .section-title { font-size: 20px; font-weight: 700; margin: 40px 0 20px; display: flex; align-items: center; gap: 10px; }
-        .section-title::before { content: ''; width: 4px; height: 20px; background: var(--main); border-radius: 2px; }
-        
-        .row { display: flex; overflow-x: auto; gap: 20px; padding-bottom: 20px; scrollbar-width: none; }
-        .card { min-width: 180px; background: var(--surface); border-radius: 12px; overflow: hidden; border: 1px solid #222; cursor: pointer; transition: 0.4s; }
-        .card:hover { transform: scale(1.05); border-color: var(--accent); box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
-        .card img { width: 100%; height: 260px; object-fit: cover; }
-        .card p { padding: 10px; margin: 0; font-size: 13px; text-align: center; font-weight: 600; }
+        .container { padding: 10px 5%; }
+        .row-title { font-size: 16px; font-weight: 800; margin: 25px 0 15px; color: var(--main); text-transform: uppercase; }
+        .row { display: flex; overflow-x: auto; gap: 12px; padding-bottom: 15px; scrollbar-width: none; }
+        .row::-webkit-scrollbar { display: none; }
 
-        /* --- SETTINGS MODAL --- */
-        #settingsModal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 2000; display: none; align-items: center; justify-content: center; }
-        .settings-card { background: #111; width: 400px; border-radius: 20px; border: 1px solid #333; padding: 30px; }
-        .menu-btn { width: 100%; padding: 15px; margin-bottom: 10px; background: #222; border: 1px solid #444; color: #fff; border-radius: 10px; text-align: left; cursor: pointer; font-weight: 700; }
-        
-        /* --- PLAYER --- */
+        .card { min-width: 140px; max-width: 140px; background: var(--card); border-radius: 8px; overflow: hidden; border: 1px solid #333; transition: 0.3s; cursor: pointer;}
+        .card img { width: 100%; height: 200px; object-fit: cover; background: #111; }
+        .card p { padding: 8px; margin: 0; font-size: 11px; text-align: center; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        #settingsModal { position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 2000; display: none; align-items: center; justify-content: center; padding: 20px; }
+        .settings-box { background: #111; width: 100%; max-width: 400px; border-radius: 15px; border: 1px solid #333; padding: 25px; box-sizing: border-box; }
+        .menu-item { width: 100%; padding: 15px; margin-bottom: 10px; background: #222; border: 1px solid #444; color: #fff; border-radius: 8px; text-align: left; font-weight: 700; cursor: pointer; }
+
         #player { position: fixed; inset: 0; background: #000; z-index: 5000; display: none; flex-direction: column; }
-        .player-header { padding: 15px; background: #111; display: flex; justify-content: space-between; align-items: center; }
+        .player-bar { padding: 10px 5%; background: #111; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; }
         iframe { width: 100%; height: 100%; border: none; }
     </style>
 </head>
 <body onload="init()">
 
-    <header id="navbar">
-        <a href="#" class="logo">STREAMX</a>
+    <header>
+        <div class="logo">STREAMX</div>
         <div class="nav-links">
-            <span onclick="loadSection('movie')">Movies</span>
-            <span onclick="loadSection('tv')">Series</span>
-            <span onclick="window.scrollTo(0,0)" style="color:var(--main)">● Live TV</span>
+            <span onclick="loadData('movie')">Movies</span>
+            <span onclick="loadData('tv')">Series</span>
             <span onclick="openSettings()">⚙️ MENU</span>
         </div>
     </header>
 
     <div class="hero">
-        <div class="hero-content">
-            <h1>Unlimited World Cinema</h1>
-            <p>Watch thousands of movies and TV shows from around the globe. Pure entertainment, zero limits. No adult content, purely professional.</p>
-            <button class="play-now" onclick="loadSection('movie')">BROWSE NOW</button>
-        </div>
+        <h1>Global Elite Streaming</h1>
+        <p style="font-size: 13px; color: #aaa;">World wide movies and live TV. Fast & Secure.</p>
     </div>
 
     <div class="container">
-        <div class="section-title">LIVE GLOBAL CHANNELS</div>
+        <div class="row-title">📺 Live World Channels</div>
         <div class="row">
-            <div class="card" onclick="playVideo('https://www.youtube.com/embed/jfKfPfyJRdk?autoplay=1')">
-                <img src="https://images.unsplash.com/photo-1504450758481-7338eba7524a?w=400"><p>Sky News Live</p>
-            </div>
-            <div class="card" onclick="playVideo('https://www.youtube.com/embed/9Auq9mYxvEE?autoplay=1')">
+            <div class="card" onclick="play('https://www.youtube.com/embed/9Auq9mYxvEE?autoplay=1')">
                 <img src="https://images.unsplash.com/photo-1585829365234-781fcd0d4301?w=400"><p>LBC News HD</p>
+            </div>
+            <div class="card" onclick="play('https://www.youtube.com/embed/jfKfPfyJRdk?autoplay=1')">
+                <img src="https://images.unsplash.com/photo-1504450758481-7338eba7524a?w=400"><p>Sky News Live</p>
             </div>
         </div>
 
-        <div class="section-title" id="gridTitle">TRENDING MOVIES</div>
-        <div class="row" id="mediaGrid">
-            <p style="color:#666; padding: 20px;">Waking up servers...</p>
-        </div>
+        <div class="row-title" id="gridTitle">🔥 Popular Now</div>
+        <div id="status" style="font-size: 12px; color: #555; margin-bottom: 10px;">Connecting to Felix's Server...</div>
+        <div class="row" id="movieGrid"></div>
     </div>
 
     <div id="settingsModal">
-        <div class="settings-card">
-            <h2 style="color:var(--main); margin-top:0;">Control Center</h2>
-            <button class="menu-btn" onclick="toggleSub('auth')">👤 Profile & Account</button>
-            <div id="auth" style="display:none; padding:10px;">
-                <input type="text" placeholder="Email" style="width:90%; padding:10px; margin-bottom:10px; background:#000; color:#fff; border:1px solid #333; border-radius:5px;">
-                <button style="width:100%; padding:10px; background:var(--accent); border:none; border-radius:5px; font-weight:800;">SAVE PROFILE</button>
+        <div class="settings-box">
+            <h2 style="color:var(--main); margin: 0 0 20px 0; text-align: center;">STREAMX HUB</h2>
+            <button class="menu-item" onclick="toggleSub('acc')">👤 Account & Login</button>
+            <div id="acc" style="display:none; margin-bottom:15px;">
+                <input type="text" placeholder="Username" style="width:100%; padding:12px; background:#000; border:1px solid #333; color:#fff; border-radius:5px; margin-bottom:10px; box-sizing: border-box;">
+                <button style="width:100%; padding:12px; background:var(--accent); border:none; border-radius:5px; font-weight:800;" onclick="alert('Profile Updated!')">LOG IN</button>
             </div>
-
-            <button class="menu-btn" onclick="toggleSub('about')">ℹ️ Corporate About Us</button>
-            <div id="about" style="display:none; padding:10px; font-size:13px; color:#aaa;">
+            <button class="menu-item" onclick="toggleSub('abt')">ℹ️ Professional About Us</button>
+            <div id="abt" style="display:none; padding:10px; font-size:13px; color:#888;">
                 <p><strong>Founder:</strong> Felix Nyoka</p>
-                <p>StreamX is a premium worldwide streaming platform. We specialize in high-speed content delivery of global media, ensuring a clean and safe environment for all viewers.</p>
+                <p>StreamX is a premium media solution. We provide high-quality worldwide content through a professional and secure interface.</p>
             </div>
-
-            <button onclick="closeSettings()" style="width:100%; background:none; border:1px solid #444; color:#fff; padding:12px; border-radius:10px; margin-top:20px; cursor:pointer;">CLOSE</button>
+            <button onclick="closeSettings()" style="width:100%; padding:15px; background:none; border:1px solid #444; color:#fff; border-radius:8px; margin-top:10px; font-weight:bold;">CLOSE</button>
         </div>
     </div>
 
     <div id="player">
-        <div class="player-header">
-            <span style="font-weight:900; color:var(--accent);">STREAMX CINEMA</span>
-            <button onclick="closePlayer()" style="background:var(--main); color:#fff; border:none; padding:8px 15px; border-radius:5px; cursor:pointer;">EXIT X</button>
+        <div class="player-bar">
+            <span style="font-weight:900; color:var(--accent); font-size:12px;">STREAMING MODE</span>
+            <button onclick="closePlayer()" style="background:var(--main); color:#fff; border:none; padding:6px 12px; border-radius:4px; font-weight:bold;">CLOSE X</button>
         </div>
-        <iframe id="mainFrame" allowfullscreen></iframe>
+        <iframe id="video" allowfullscreen></iframe>
     </div>
 
     <script>
-        const TMDB_KEY = '8093d6645564c71853a8089408018e6e';
-        const IMG_URL = 'https://image.tmdb.org/t/p/w500';
-
-        function init() {
-            loadSection('movie');
-            window.onscroll = () => {
-                const nav = document.getElementById('navbar');
-                nav.style.background = window.pageYOffset > 50 ? '#000' : 'linear-gradient(to bottom, rgba(0,0,0,0.9), transparent)';
-            };
-        }
-
-        async function loadSection(type) {
-            const grid = document.getElementById('mediaGrid');
-            document.getElementById('gridTitle').innerText = type === 'movie' ? "TRENDING MOVIES" : "POPULAR SERIES";
-            grid.innerHTML = "<p>Connecting to Global Nodes...</p>";
-
+        const KEY = '8093d6645564c71853a8089408018e6e';
+        const IMG = 'https://image.tmdb.org/t/p/w500';
+        function init() { loadData('movie'); }
+        async function loadData(type) {
+            const grid = document.getElementById('movieGrid');
+            const status = document.getElementById('status');
+            document.getElementById('gridTitle').innerText = type === 'movie' ? "🔥 Trending Movies" : "📺 Popular Series";
             try {
-                // FAIL-SAFE: Using a more robust Discover URL
-                const url = `https://api.themoviedb.org/3/discover/${type}?api_key=${TMDB_KEY}&include_adult=false&sort_by=popularity.desc`;
-                const res = await fetch(url);
+                const res = await fetch(`https://api.themoviedb.org/3/discover/${type}?api_key=${KEY}&sort_by=popularity.desc&include_adult=false`);
                 const data = await res.json();
-                
-                if(!data.results) throw new Error();
-
+                status.style.display = "none";
                 grid.innerHTML = "";
                 data.results.forEach(m => {
                     if(!m.poster_path) return;
-                    const card = document.createElement('div');
-                    card.className = 'card';
-                    card.onclick = () => playVideo(`https://vidsrc.to/embed/${type}/${m.id}`);
-                    card.innerHTML = `<img src="${IMG_URL + m.poster_path}"><p>${m.title || m.name}</p>`;
-                    grid.appendChild(card);
+                    const div = document.createElement('div');
+                    div.className = 'card';
+                    div.onclick = () => play(`https://vidsrc.to/embed/${type}/${m.id}`);
+                    div.innerHTML = `<img src="${IMG + m.poster_path}"><p>${m.title || m.name}</p>`;
+                    grid.appendChild(div);
                 });
-            } catch (e) {
-                grid.innerHTML = "<p style='color:var(--main)'>Server busy. Please click 'Movies' or 'Series' again to retry.</p>";
-            }
+            } catch (e) { status.innerHTML = "⚠️ Connection error. Tap Movies to retry."; }
         }
-
-        function playVideo(url) {
-            document.getElementById('player').style.display = 'flex';
-            document.getElementById('mainFrame').src = url;
-        }
-
-        function closePlayer() {
-            document.getElementById('player').style.display = 'none';
-            document.getElementById('mainFrame').src = "";
-        }
-
+        function play(url) { document.getElementById('player').style.display = 'flex'; document.getElementById('video').src = url; }
+        function closePlayer() { document.getElementById('player').style.display = 'none'; document.getElementById('video').src = ""; }
         function openSettings() { document.getElementById('settingsModal').style.display = 'flex'; }
         function closeSettings() { document.getElementById('settingsModal').style.display = 'none'; }
-        
-        function toggleSub(id) {
-            const el = document.getElementById(id);
-            el.style.display = el.style.display === 'block' ? 'none' : 'block';
-        }
+        function toggleSub(id) { const el = document.getElementById(id); el.style.display = el.style.display === 'block' ? 'none' : 'block'; }
     </script>
 </body>
 </html>
