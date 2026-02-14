@@ -3,107 +3,107 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StreamX | Download & Stream</title>
+    <title>StreamX | Members Area</title>
     <style>
         :root { --main: #d3f243; --bg: #080808; --card: #121212; }
-        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; overflow-x: hidden; }
+        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; overflow: hidden; }
 
-        /* Navigation */
+        /* Login Overlay */
+        #authOverlay { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 9000; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(10px); }
+        .auth-card { background: #111; padding: 40px; border-radius: 12px; width: 350px; text-align: center; border: 1px solid #222; }
+        .auth-input { width: 100%; padding: 12px; margin: 10px 0; background: #000; border: 1px solid #333; color: white; border-radius: 5px; box-sizing: border-box; }
+        .auth-btn { width: 100%; padding: 12px; background: var(--main); border: none; font-weight: bold; cursor: pointer; border-radius: 5px; margin-top: 10px; }
+
+        /* Main Content (Hidden until login) */
+        #mainSite { display: none; height: 100vh; overflow-y: auto; }
+
+        /* Navigation & UI */
         header { background: #000; padding: 15px 5%; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 1000; border-bottom: 1px solid #222; }
         .logo { font-size: 24px; font-weight: 900; color: red; text-decoration: none; }
         .logo span { color: white; }
         .search-bar { flex-grow: 0.5; background: #111; border: 1px solid #333; padding: 10px; border-radius: 5px; color: white; margin: 0 20px; outline: none; }
 
-        /* Genre Pill Navigation */
-        .genre-nav { display: flex; gap: 15px; padding: 20px 5%; overflow-x: auto; scrollbar-width: none; background: #000; border-bottom: 1px solid #111; }
-        .genre-pill { background: #1a1a1a; padding: 8px 20px; border-radius: 20px; font-size: 13px; font-weight: bold; cursor: pointer; white-space: nowrap; border: 1px solid #333; transition: 0.3s; }
-        .genre-pill:hover, .genre-pill.active { background: var(--main); color: black; border-color: var(--main); }
-
-        /* Sidebar */
-        #sidebar { position: fixed; top: 0; right: -320px; width: 300px; height: 100%; background: #0a0a0a; z-index: 2000; transition: 0.4s; padding: 20px; border-left: 1px solid #222; box-sizing: border-box; }
-        
         /* Movie Grid */
         .container { padding: 30px 5%; }
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 25px; }
-        .card { background: var(--card); border-radius: 10px; overflow: hidden; border: 1px solid #222; cursor: pointer; transition: 0.3s; position: relative; }
+        .card { background: var(--card); border-radius: 10px; overflow: hidden; border: 1px solid #222; cursor: pointer; transition: 0.3s; }
         .card:hover { border-color: var(--main); transform: translateY(-10px); }
         .card img { width: 100%; aspect-ratio: 2/3; object-fit: cover; }
-        .card-title { padding: 12px; text-align: center; font-size: 13px; font-weight: bold; color: #ccc; }
+        .card-title { padding: 12px; text-align: center; font-size: 13px; font-weight: bold; }
 
-        /* Player & Download Section */
-        #playerOverlay { display: none; position: fixed; inset: 0; background: #000; z-index: 3000; overflow-y: auto; padding: 20px; }
-        .player-actions { display: flex; gap: 15px; margin-top: 20px; }
-        .btn { border: none; padding: 12px 25px; border-radius: 5px; font-weight: bold; cursor: pointer; transition: 0.3s; display: flex; align-items: center; gap: 8px; }
-        .btn-main { background: var(--main); color: black; }
-        .btn-download { background: #333; color: white; }
-        .btn-download:hover { background: #444; }
-
-        /* Toast Notification */
-        #toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--main); color: black; padding: 12px 30px; border-radius: 50px; font-weight: bold; transition: 0.5s; z-index: 5000; }
+        /* Request Form */
+        .request-box { background: #111; padding: 30px; margin: 40px 5%; border-radius: 10px; border: 1px solid #222; }
+        
+        /* Player Overlay */
+        #playerOverlay { display: none; position: fixed; inset: 0; background: #000; z-index: 3000; padding: 20px; overflow-y: auto; }
+        .download-btn { background: #333; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; margin-top: 15px; }
     </style>
 </head>
 <body>
 
-    <div id="toast">Download Started... 📥</div>
-
-    <div id="sidebar">
-        <div onclick="toggleSidebar()" style="cursor:pointer; color:var(--main); text-align:right;">✕ CLOSE</div>
-        <div style="text-align:center; margin-top:30px;">
-            <div style="font-size: 50px;">👤</div>
-            <h3>Felix Nyoka</h3>
-            <p style="color:#666;">felix@streamx.com</p>
+    <div id="authOverlay">
+        <div class="auth-card">
+            <h1 style="color:red; margin-bottom:5px;">STREAM<span style="color:white;">X</span></h1>
+            <p style="color:#888; margin-bottom:25px;">Sign in to start watching</p>
+            <input type="text" id="loginUser" class="auth-input" placeholder="Username">
+            <input type="password" id="loginPass" class="auth-input" placeholder="Password">
+            <button class="auth-btn" onclick="handleLogin()">SIGN IN</button>
+            <p style="font-size: 12px; color: #555; margin-top: 15px;">New to StreamX? <span style="color:var(--main); cursor:pointer;">Sign up now.</span></p>
         </div>
     </div>
 
-    <header>
-        <a href="#" class="logo">STREAM<span>X</span></a>
-        <input type="text" id="srch" class="search-bar" placeholder="Search movies..." oninput="doSearch()">
-        <div onclick="toggleSidebar()" style="cursor:pointer; font-size:20px; color:white;">👤</div>
-    </header>
+    <div id="mainSite">
+        <header>
+            <a href="#" class="logo">STREAM<span>X</span></a>
+            <input type="text" id="srch" class="search-bar" placeholder="Search movies..." oninput="doSearch()">
+            <div style="cursor:pointer; background: #222; padding: 5px 15px; border-radius: 20px; font-size: 13px;" onclick="location.reload()">LOGOUT</div>
+        </header>
 
-    <div class="genre-nav">
-        <div class="genre-pill active" onclick="filterGenre('All', this)">All</div>
-        <div class="genre-pill" onclick="filterGenre('Action', this)">Action</div>
-        <div class="genre-pill" onclick="filterGenre('Sci-Fi', this)">Sci-Fi</div>
-        <div class="genre-pill" onclick="filterGenre('Horror', this)">Horror</div>
-    </div>
+        <div class="container">
+            <h2 style="border-left:5px solid var(--main); padding-left:15px; margin-bottom:30px;">Trending Now</h2>
+            <div class="grid" id="movieGrid"></div>
+        </div>
 
-    <div class="container">
-        <h2 id="sectionTitle" style="border-left:5px solid var(--main); padding-left:15px; margin-bottom:30px;">Featured for You</h2>
-        <div class="grid" id="movieGrid"></div>
+        <div class="request-box">
+            <h3>Can't find a movie?</h3>
+            <p style="color:#888;">Request any movie or series and we will upload it for you.</p>
+            <input type="text" id="reqInput" class="auth-input" style="width:70%;" placeholder="Enter movie name...">
+            <button class="auth-btn" style="width:auto; padding: 12px 30px;" onclick="alert('Request sent successfully!')">SUBMIT REQUEST</button>
+        </div>
     </div>
 
     <div id="playerOverlay">
         <div style="display:flex; justify-content:space-between; margin-bottom:15px;">
-            <h2 id="pTitle" style="color:var(--main); margin:0;">Movie Title</h2>
+            <h2 id="pTitle" style="color:var(--main); margin:0;"></h2>
             <button onclick="closePlayer()" style="background:none; border:1px solid #444; color:white; padding:8px 15px; cursor:pointer;">✕ CLOSE</button>
         </div>
-        
-        <video id="mainVid" controls style="width:100%; border-radius: 8px; border:1px solid #222;">
-            <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
-        </video>
-
-        <div class="player-actions">
-            <button class="btn btn-main">NEXT EPISODE</button>
-            <button class="btn btn-download" onclick="triggerDownload()">
-                <span>⬇</span> DOWNLOAD TO DEVICE
-            </button>
-        </div>
-
-        <div style="margin-top:30px; background:#111; padding:20px; border-radius:8px; border:1px solid #222;">
-            <h3>Movie Info</h3>
-            <p style="color:#888;">High Quality | 1080p | 5.1 Audio</p>
-        </div>
+        <video id="mainVid" controls style="width:100%; border-radius: 8px;"><source src="https://www.w3schools.com/html/mov_bbb.mp4"></video>
+        <button class="download-btn" onclick="triggerDownload()">⬇ DOWNLOAD MOVIE</button>
     </div>
 
     <script>
         const movieData = [
-            { t: "The Evil Inside", i: "https://image.tmdb.org/t/p/w500/b69m9v5s6Y0B1U7y8vL6bX3Y1.jpg", g: "Horror" },
-            { t: "Angel Flight", i: "https://image.tmdb.org/t/p/w500/v9Y69m9v5s6Y0B1U7y8vL6bX3Y1.jpg", g: "Drama" },
-            { t: "Cold Storage", i: "https://image.tmdb.org/t/p/w500/96KfTsvY9o6S17s5Y1JqVp6tA8Z.jpg", g: "Sci-Fi" },
-            { t: "Joe's Road Trip", i: "https://image.tmdb.org/t/p/w500/2u7BUzqC0S7Y0XU9sn69v5S6Y0B.jpg", g: "Drama" },
-            { t: "Greenland 2", i: "https://image.tmdb.org/t/p/w500/69Uqt7vLYv5897o76U9Y939GR95.jpg", g: "Action" }
+            { t: "The Evil Inside", i: "https://image.tmdb.org/t/p/w500/b69m9v5s6Y0B1U7y8vL6bX3Y1.jpg" },
+            { t: "Angel Flight", i: "https://image.tmdb.org/t/p/w500/v9Y69m9v5s6Y0B1U7y8vL6bX3Y1.jpg" },
+            { t: "Cold Storage", i: "https://image.tmdb.org/t/p/w500/96KfTsvY9o6S17s5Y1JqVp6tA8Z.jpg" },
+            { t: "Joe's Road Trip", i: "https://image.tmdb.org/t/p/w500/2u7BUzqC0S7Y0XU9sn69v5S6Y0B.jpg" },
+            { t: "Greenland 2", i: "https://image.tmdb.org/t/p/w500/69Uqt7vLYv5897o76U9Y939GR95.jpg" }
         ];
+
+        function handleLogin() {
+            const user = document.getElementById('loginUser').value;
+            if(user.length > 2) {
+                document.getElementById('authOverlay').style.display = 'none';
+                document.getElementById('mainSite').style.display = 'block';
+                document.body.style.overflow = 'auto';
+                
+                // Greeting
+                const msg = new SpeechSynthesisUtterance("Welcome to Stream X, " + user);
+                window.speechSynthesis.speak(msg);
+            } else {
+                alert("Please enter a valid username");
+            }
+        }
 
         function render(list) {
             const g = document.getElementById('movieGrid');
@@ -119,7 +119,6 @@
             document.getElementById('pTitle').innerText = t;
             document.getElementById('playerOverlay').style.display = 'block';
             document.getElementById('mainVid').play();
-            window.scrollTo(0,0);
         }
 
         function closePlayer() {
@@ -128,30 +127,16 @@
         }
 
         function triggerDownload() {
-            const toast = document.getElementById('toast');
-            toast.style.transform = "translateX(-50%) translateY(0)";
-            
-            // This triggers the actual file download
             const link = document.createElement('a');
             link.href = "https://www.w3schools.com/html/mov_bbb.mp4";
             link.download = document.getElementById('pTitle').innerText + ".mp4";
             link.click();
-
-            setTimeout(() => {
-                toast.style.transform = "translateX(-50%) translateY(100px)";
-            }, 3000);
+            alert("Download starting...");
         }
 
-        function filterGenre(genre, el) {
-            document.querySelectorAll('.genre-pill').forEach(p => p.classList.remove('active'));
-            el.classList.add('active');
-            const filtered = (genre === 'All') ? movieData : movieData.filter(m => m.g === genre);
-            render(filtered);
-        }
-
-        function toggleSidebar() {
-            const s = document.getElementById('sidebar');
-            s.style.right = (s.style.right === '0px') ? '-320px' : '0px';
+        function doSearch() {
+            const q = document.getElementById('srch').value.toLowerCase();
+            render(movieData.filter(m => m.t.toLowerCase().includes(q)));
         }
 
         window.onload = () => render(movieData);
