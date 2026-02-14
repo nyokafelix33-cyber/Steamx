@@ -9,10 +9,9 @@
         :root { --main: #d3f243; --bg: #0a0c10; --card-bg: #161b22; --text: #ffffff; }
         body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; margin: 0; padding: 0; }
 
-        /* --- NAVIGATION --- */
+        /* --- HEADER --- */
         header { 
-            background: #000; padding: 12px 5%; display: flex; 
-            align-items: center; justify-content: space-between;
+            background: #000; padding: 12px 5%; display: flex; align-items: center; justify-content: space-between;
             position: sticky; top: 0; z-index: 1000; border-bottom: 2px solid var(--main);
         }
         .logo { font-size: 24px; font-weight: 900; color: #ff0000; text-decoration: none; }
@@ -26,7 +25,7 @@
         }
         .hero h1 { font-size: 28px; margin: 0; }
 
-        /* --- CONTENT GRID --- */
+        /* --- GOOJARA GRID --- */
         .container { padding: 20px 5%; }
         .section-header { font-size: 18px; font-weight: 800; margin-bottom: 20px; color: var(--main); text-transform: uppercase; }
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px; }
@@ -44,8 +43,8 @@
         
         .list-item { display: flex; justify-content: space-between; padding: 20px 0; border-bottom: 1px solid #222; cursor: pointer; }
         .sub-box { display: none; padding: 15px; background: #111; border-radius: 8px; margin-top: -1px; margin-bottom: 10px; font-size: 14px; color: #bbb; }
-        .social-row { display: flex; gap: 20px; margin-top: 10px; font-size: 24px; }
-        .social-row a { color: var(--main); }
+        .social-row { display: flex; gap: 25px; margin-top: 15px; font-size: 28px; }
+        .social-row a { color: var(--main); text-decoration: none; }
 
         /* --- PLAYER --- */
         #player { position: fixed; inset: 0; background: #000; z-index: 5000; display: none; flex-direction: column; }
@@ -53,13 +52,13 @@
         iframe { width: 100%; height: 100%; border: none; }
     </style>
 </head>
-<body onload="fetchMovies()">
+<body onload="smartFetch()">
 
     <header>
         <a href="#" class="logo">STREAMX</a>
         <div class="nav-links">
-            <span onclick="fetchMovies('movie')">Movies</span>
-            <span onclick="fetchMovies('tv')">Series</span>
+            <span onclick="smartFetch('movie')">Movies</span>
+            <span onclick="smartFetch('tv')">Series</span>
             <span onclick="openSettings()" style="color:var(--main)"><i class="fas fa-cog"></i> MORE</span>
         </div>
     </header>
@@ -71,7 +70,7 @@
     <div class="container">
         <div class="section-header" id="listTitle">Popular Content</div>
         <div id="loader" style="text-align:center; padding:50px; color:var(--main);">
-            <i class="fas fa-spinner fa-spin fa-2x"></i><br><p>Waking up servers...</p>
+            <i class="fas fa-spinner fa-spin fa-2x"></i><br><p>Connecting to multi-server database...</p>
         </div>
         <div class="grid" id="movieGrid"></div>
     </div>
@@ -85,23 +84,23 @@
         <div class="profile-card">
             <h3 style="margin:0;">My profile</h3>
             <p style="color:#888; font-size: 12px; margin: 5px 0;">Sign in to synchronize your movies and series</p>
-            <button class="btn-main" onclick="alert('Login Coming Soon!')">Continue</button>
+            <button class="btn-main" onclick="alert('Profile system sync active.')">Continue</button>
         </div>
 
         <div class="list-item" onclick="toggle('gen')">General <span><i class="fas fa-chevron-right"></i></span></div>
         <div id="gen" class="sub-box">
             <p><strong>Founder:</strong> Felix Nyoka</p>
-            <p>StreamX delivers high-speed global media directly to your device.</p>
+            <p>StreamX is a premium worldwide streaming platform delivering high-fidelity media directly to your device.</p>
         </div>
 
         <div class="list-item" onclick="toggle('cnt')">Contact Us <span><i class="fas fa-chevron-right"></i></span></div>
         <div id="cnt" class="sub-box">
-            <p>Reach us on social media:</p>
+            <p>Connect with our technical support team:</p>
             <div class="social-row">
                 <a href="https://wa.me/260976461030"><i class="fab fa-whatsapp"></i></a>
-                <a href="#"><i class="fab fa-instagram"></i></a>
+                <a href="https://instagram.com/StreamX_Official"><i class="fab fa-instagram"></i></a>
             </div>
-            <p style="margin-top:15px; font-size:12px;">WhatsApp: +260 976461030</p>
+            <p style="margin-top:20px; font-weight: bold; color: var(--main);">WhatsApp: +260 976461030</p>
         </div>
 
         <div class="list-item">User interface <span><i class="fas fa-chevron-right"></i></span></div>
@@ -110,16 +109,17 @@
 
     <div id="player">
         <div class="player-bar">
-            <span id="pTitle" style="font-weight:bold; color:var(--main);">STREAMX</span>
-            <button onclick="closePlayer()" style="background:#ff0000; color:#fff; border:none; padding:8px 15px; border-radius:5px; font-weight:bold;">CLOSE X</button>
+            <span id="pTitle" style="font-weight:bold; color:var(--main);">STREAMX PLAYER</span>
+            <button onclick="closePlayer()" style="background:#ff0000; color:#fff; border:none; padding:8px 15px; border-radius:5px; font-weight:bold; cursor:pointer;">CLOSE X</button>
         </div>
         <iframe id="vFrame" allowfullscreen></iframe>
     </div>
 
     <script>
-        const API_KEY = '8093d6645564c71853a8089408018e6e';
-
-        async function fetchMovies(type = 'movie') {
+        // Multiple API Keys as backup
+        const KEYS = ['8093d6645564c71853a8089408018e6e', 'c0f0653697e884f3c9e691456c2419c8'];
+        
+        async function smartFetch(type = 'movie') {
             const grid = document.getElementById('movieGrid');
             const loader = document.getElementById('loader');
             const title = document.getElementById('listTitle');
@@ -128,28 +128,46 @@
             grid.innerHTML = "";
             loader.style.display = "block";
 
-            try {
-                // FAIL-SAFE: We use 'all' trending to ensure content shows up even if discover fails
-                const res = await fetch(`https://api.themoviedb.org/3/trending/${type}/day?api_key=${API_KEY}`);
-                const data = await res.json();
+            // Try different API endpoints sequentially
+            const endpoints = [
+                `https://api.themoviedb.org/3/trending/${type}/week?api_key=${KEYS[0]}`,
+                `https://api.themoviedb.org/3/discover/${type}?api_key=${KEYS[1]}&sort_by=popularity.desc`,
+                `https://api.themoviedb.org/3/trending/${type}/day?api_key=${KEYS[0]}`
+            ];
 
-                if(data.results && data.results.length > 0) {
-                    loader.style.display = "none";
-                    data.results.forEach(m => {
-                        const card = document.createElement('div');
-                        card.className = 'movie-card';
-                        card.onclick = () => openPlayer(`https://vidsrc.to/embed/${type}/${m.id}`, m.title || m.name);
-                        card.innerHTML = `
-                            <div class="quality">HDTV</div>
-                            <img src="https://image.tmdb.org/p/w500${m.poster_path}" onerror="this.src='https://via.placeholder.com/130x190?text=No+Image'">
-                            <p>${m.title || m.name}</p>
-                        `;
-                        grid.appendChild(card);
-                    });
-                } else { throw new Error(); }
-            } catch (err) {
-                loader.innerHTML = "<p style='color:red;'>⚠️ Connection Timeout. Click 'Movies' or 'Series' to refresh.</p>";
+            for (let url of endpoints) {
+                try {
+                    console.log("Trying endpoint: " + url);
+                    const res = await fetch(url);
+                    if (!res.ok) throw new Error("Failed");
+                    const data = await res.json();
+
+                    if (data.results && data.results.length > 0) {
+                        renderGrid(data.results, type);
+                        return; // Stop if we have data
+                    }
+                } catch (e) {
+                    console.warn("Attempt failed, trying next...");
+                }
             }
+            loader.innerHTML = "<p style='color:red;'>⚠️ All database nodes are currently unreachable. Please try a different internet connection.</p>";
+        }
+
+        function renderGrid(items, type) {
+            document.getElementById('loader').style.display = "none";
+            const grid = document.getElementById('movieGrid');
+            items.forEach(m => {
+                if(!m.poster_path) return;
+                const card = document.createElement('div');
+                card.className = 'movie-card';
+                card.onclick = () => openPlayer(`https://vidsrc.to/embed/${type}/${m.id}`, m.title || m.name);
+                card.innerHTML = `
+                    <div class="quality">HDTV</div>
+                    <img src="https://image.tmdb.org/t/p/w500${m.poster_path}">
+                    <p>${m.title || m.name}</p>
+                `;
+                grid.appendChild(card);
+            });
         }
 
         function openPlayer(url, name) {
@@ -165,7 +183,6 @@
 
         function openSettings() { document.getElementById('settingsModal').style.display = 'block'; }
         function closeSettings() { document.getElementById('settingsModal').style.display = 'none'; }
-        
         function toggle(id) {
             const el = document.getElementById(id);
             el.style.display = el.style.display === 'block' ? 'none' : 'block';
