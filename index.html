@@ -5,69 +5,48 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>StreamX Pro</title>
     <style>
-        :root { --main: #d3f243; --bg: #0a0a0a; --card: #1a1a1a; --red: #ff0000; }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { background: var(--bg); color: white; font-family: sans-serif; margin: 0; padding-bottom: 90px; }
-
-        /* Header */
-        header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; background: #000; position: sticky; top: 0; z-index: 1000; border-bottom: 1px solid #222; }
-        .logo { color: var(--red); font-weight: 900; font-size: 24px; }
-        .logo span { color: white; }
-
-        /* Hero Banner */
-        .hero { height: 350px; background: linear-gradient(to top, var(--bg), transparent), url('https://m.media-amazon.com/images/M/MV5BYjhiNjBlODctY2ZiOC00YjVlLWFlNzAtNTVhNzM1YjI1NzMxXkEyXkFqcGdeQXVyMjkwOTAyMDU@._V1_.jpg'); background-size: cover; background-position: center; display: flex; flex-direction: column; justify-content: flex-end; padding: 25px; }
-        .play-btn { background: var(--main); color: black; border: none; padding: 12px 25px; border-radius: 8px; font-weight: bold; cursor: pointer; width: fit-content; margin-top: 10px; font-size: 14px; }
-
-        /* Movie Grid */
-        .section-title { padding: 20px; font-size: 18px; font-weight: bold; color: var(--main); }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; padding: 0 20px; }
-        .card { background: var(--card); border-radius: 12px; overflow: hidden; border: 1px solid #222; text-align: center; }
-        .card img { width: 100%; aspect-ratio: 2/3; object-fit: cover; display: block; }
-        .card-info { padding: 10px; font-size: 12px; font-weight: bold; }
-
-        /* Bottom Nav */
-        nav { position: fixed; bottom: 0; width: 100%; height: 75px; background: #000; display: flex; border-top: 1px solid #222; z-index: 4000; }
-        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #666; font-size: 11px; cursor: pointer; }
-        .nav-item.active { color: var(--main); }
-        .nav-icon { font-size: 20px; margin-bottom: 5px; }
-
-        /* Settings (Hidden) */
-        #settingsUI { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 5000; padding: 20px; }
+        :root { --main: #d3f243; --bg: #0a0a0a; --card: #1a1a1a; }
+        body { background: var(--bg); color: white; font-family: sans-serif; margin: 0; padding-bottom: 80px; }
+        header { padding: 20px; display: flex; justify-content: space-between; align-items: center; background: #000; }
+        .logo { color: red; font-weight: bold; font-size: 24px; }
+        .hero { padding: 40px 20px; background: linear-gradient(to bottom, #222, var(--bg)); }
+        .watch-btn { background: var(--main); color: #000; border: none; padding: 12px 24px; border-radius: 5px; font-weight: bold; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; padding: 20px; }
+        .card { background: var(--card); border-radius: 8px; overflow: hidden; border: 1px solid #333; }
+        .card img { width: 100%; aspect-ratio: 2/3; object-fit: cover; }
+        .card-info { padding: 10px; font-size: 13px; text-align: center; }
+        nav { position: fixed; bottom: 0; width: 100%; background: #000; display: flex; justify-content: space-around; padding: 15px; border-top: 1px solid #222; }
     </style>
 </head>
 <body>
-
-    <header>
-        <div class="logo">STREAM<span>X</span></div>
-        <div style="font-size: 24px;" onclick="toggleSettings()">👤</div>
-    </header>
-
-    <div id="main-content">
-        <div class="hero">
-            <h1 style="margin:0;">Greenland 2: Migration</h1>
-            <p style="margin:5px 0; color:#ccc;">Action • Sci-Fi • 2025</p>
-            <button class="play-btn" onclick="alert('Playing Movie...')">WATCH NOW</button>
-        </div>
-
-        <div class="section-title">Trending Now</div>
-        <div class="grid" id="movieGrid">
-            </div>
+    <header><div class="logo">STREAMX</div></header>
+    <div class="hero">
+        <h1>The Wrecking Crew:</h1>
+        <button class="watch-btn">WATCH NOW</button>
     </div>
-
-    <div id="settingsUI">
-        <div style="text-align: right; font-size: 30px;" onclick="toggleSettings()">✕</div>
-        <div style="text-align:center;">
-            <div style="width:70px; height:70px; background:var(--main); border-radius:50%; margin:20px auto; display:flex; align-items:center; justify-content:center; color:black; font-size:30px; font-weight:bold;">F</div>
-            <h2>Felix Nyoka</h2>
-            <p style="color:#666;">nyokafelix33@gmail.com</p>
-        </div>
-        <div style="margin-top:40px;">
-            <div style="padding:15px; border-bottom:1px solid #222;">⚙️ General Settings</div>
-            <div style="padding:15px; border-bottom:1px solid #222;">🎨 User Interface</div>
-            <div style="padding:15px; color:red; font-weight:bold;" onclick="location.reload()">Log Out</div>
-        </div>
-    </div>
-
+    <div style="padding: 20px 20px 0; color: var(--main); font-weight: bold;">Trending Now</div>
+    <div class="grid" id="movieGrid"></div>
     <nav>
-        <div class="nav-item active">
-            <span class="nav-icon">🏠</span><spa
+        <span>🏠 Home</span>
+        <span>🎬 Movies</span>
+        <span>👤 Profile</span>
+    </nav>
+
+    <script>
+        // THIS IS THE ENGINE THAT WAS MISSING
+        const movies = [
+            { title: "Love Me Love Me", img: "https://m.media-amazon.com/images/M/MV5BMDhjZGI2NTctN2I3Yy00ZjE4LWEyMDYtZDA1Y2I4NWZlZGY1XkEyXkFqcGdeQXVyMTUzMTg2ODkz._V1_.jpg" },
+            { title: "The Art of Sarah", img: "https://m.media-amazon.com/images/M/MV5BMjMwMDU5OTk0OV5BMl5BanBnXkFtZTgwNjM3OTM2NDM@._V1_.jpg" },
+            { title: "Joe's Road Trip", img: "https://m.media-amazon.com/images/M/MV5BMjA5OTY1MjI3OV5BMl5BanBnXkFtZTcwMTAwNzc3OQ@@._V1_.jpg" }
+        ];
+
+        const grid = document.getElementById('movieGrid');
+        grid.innerHTML = movies.map(m => `
+            <div class="card">
+                <img src="${m.img}">
+                <div class="card-info">${m.title}</div>
+            </div>
+        `).join('');
+    </script>
+</body>
+</html>
