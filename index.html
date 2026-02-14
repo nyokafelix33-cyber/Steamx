@@ -3,79 +3,81 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StreamX - Home</title>
+    <title>StreamX Pro</title>
     <style>
-        :root { --main: #d3f243; --bg: #0d0d0d; --surf: #1a1a1a; --text: #ffffff; }
-        body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; margin: 0; padding-bottom: 90px; }
+        :root { --main: #d3f243; --bg: #0d0d0d; --surf: #1a1a1a; --text: #fff; }
+        body { background: var(--bg); color: var(--text); font-family: sans-serif; margin: 0; padding-bottom: 80px; overflow-x: hidden; }
         
-        /* Header Style */
-        header { display: flex; justify-content: space-between; align-items: center; padding: 20px; position: sticky; top: 0; background: rgba(13,13,13,0.9); z-index: 100; }
-        .logo { display: flex; align-items: center; gap: 8px; font-weight: bold; font-size: 22px; }
-        .logo span { color: var(--main); }
+        /* Layout Fixes */
+        header { padding: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .logo { color: var(--main); font-size: 24px; font-weight: bold; }
 
-        /* Search Header */
-        .search-row { padding: 0 20px; margin-bottom: 20px; }
-        .search-bar { width: 100%; background: #222; border: none; padding: 12px; border-radius: 10px; color: white; outline: none; }
+        /* The Full-Screen Player (Hidden by default) */
+        #playerPage {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #000; z-index: 2000; flex-direction: column;
+        }
+        .close-player { padding: 15px; color: var(--main); font-weight: bold; cursor: pointer; text-align: right; }
+        video { width: 100%; aspect-ratio: 16/9; background: #000; }
 
-        /* Category Labels */
-        .tabs { display: flex; gap: 20px; padding: 0 20px 20px; color: #888; font-weight: 600; }
-        .tab.active { color: white; border-bottom: 2px solid var(--main); padding-bottom: 5px; }
+        /* Content Rows */
+        .section { padding: 20px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; }
+        .card { background: var(--surf); border-radius: 12px; overflow: hidden; cursor: pointer; border: 1px solid #222; }
+        .card img { width: 100%; aspect-ratio: 2/3; object-fit: cover; }
+        .card-info { padding: 10px; font-size: 13px; text-align: center; }
 
-        /* Row Layout */
-        .section { margin-bottom: 30px; }
-        .section-header { display: flex; justify-content: space-between; padding: 0 20px; margin-bottom: 15px; }
-        .section-header h3 { margin: 0; font-size: 18px; }
-        .view-all { color: var(--main); font-size: 14px; text-decoration: none; }
-
-        /* The OnStream Grid */
-        .movie-scroll { display: flex; gap: 15px; overflow-x: auto; padding: 0 20px; scrollbar-width: none; }
-        .movie-scroll::-webkit-scrollbar { display: none; }
-        
-        .movie-card { min-width: 140px; position: relative; }
-        .poster { width: 140px; height: 200px; background: #222; border-radius: 12px; object-fit: cover; }
-        .hd-tag { position: absolute; top: 8px; left: 8px; background: rgba(0,0,0,0.6); padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; }
-        .movie-title { font-size: 13px; margin-top: 8px; color: #ccc; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; }
-
-        /* Bottom Navigation */
-        nav { position: fixed; bottom: 0; width: 100%; height: 75px; background: #000; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #222; }
-        .nav-item { display: flex; flex-direction: column; align-items: center; font-size: 11px; color: #666; cursor: pointer; }
+        /* Bottom Nav */
+        nav { position: fixed; bottom: 0; width: 100%; height: 70px; background: #050505; display: flex; border-top: 1px solid #222; z-index: 1000; }
+        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #666; font-size: 11px; }
         .nav-item.active { color: var(--main); }
-        .nav-icon { font-size: 24px; margin-bottom: 4px; }
+
+        /* Admin Panel */
+        #adminPanel { display: none; background: var(--surf); padding: 20px; border-top: 2px solid var(--main); position: fixed; bottom: 70px; width: 100%; box-sizing: border-box; z-index: 1500; }
+        input { width: 100%; padding: 12px; margin-bottom: 10px; background: #000; color: #fff; border: 1px solid #333; border-radius: 8px; box-sizing: border-box; }
     </style>
 </head>
 <body>
 
     <header>
-        <div class="logo"><span>⚡</span> OnStream</div>
-        <div style="font-size: 20px;">🔍 👤</div>
+        <div class="logo">ONSTREAM</div>
+        <div onclick="toggleAdmin()" style="cursor:pointer">⚙️</div>
     </header>
 
-    <div class="tabs">
-        <div class="tab active">Trending</div>
-        <div class="tab">Popular</div>
+    <div id="homePage" class="section">
+        <h3 style="border-left: 4px solid var(--main); padding-left: 10px;">Trending Now</h3>
+        <div class="grid" id="movieGrid">
+            </div>
     </div>
 
-    <div class="section">
-        <div class="section-header">
-            <h3>Trending</h3>
-            <a href="#" class="view-all">View all</a>
-        </div>
-        <div class="movie-scroll" id="trending-row">
-            <div class="movie-card">
-                <div class="hd-tag">HD</div>
-                <img class="poster" src="https://m.media-amazon.com/images/M/MV5BMDhjZGI2NTctN2I3Yy00ZjE4LWEyMDYtZDA1Y2I4NWZlZGY1XkEyXkFqcGdeQXVyMTUzMTg2ODkz._V1_.jpg" alt="The Flash">
-                <div class="movie-title">The Flash</div>
-            </div>
-            <div class="movie-card">
-                <div class="hd-tag">HD</div>
-                <img class="poster" src="https://m.media-amazon.com/images/M/MV5BMjMwMDU5OTk0OV5BMl5BanBnXkFtZTgwNjM3OTM2NDM@._V1_.jpg" alt="Sarah">
-                <div class="movie-title">The Art of Sarah</div>
-            </div>
+    <div id="playerPage">
+        <div class="close-player" onclick="closeVideo()">✕ Close Player</div>
+        <video id="mainVideo" controls playsinline></video>
+        <div style="padding: 20px;">
+            <h2 id="playingTitle">Movie Title</h2>
+            <p style="color: #888;">Now Streaming in HD</p>
         </div>
     </div>
 
-    <div class="section">
-        <div class="section-header">
-            <h3>Popular</h3>
-            <div style="display: flex; gap: 10px;">
-                <span style="color:var(--main); font-size:14px;">Movie</span>
+    <div id="adminPanel">
+        <h3>Add Movie</h3>
+        <input type="text" id="mTitle" placeholder="Movie Name">
+        <input type="text" id="mUrl" placeholder="Direct Video Link (MP4)">
+        <input type="text" id="mImg" placeholder="Poster Image URL">
+        <button onclick="saveMovie()" style="width:100%; padding:15px; background:var(--main); border:none; border-radius:8px; font-weight:bold; cursor:pointer;">PUBLISH</button>
+    </div>
+
+    <nav>
+        <div class="nav-item active"><span>🏠</span>Home</div>
+        <div class="nav-item"><span>🎬</span>Movies</div>
+        <div class="nav-item"><span>📺</span>Series</div>
+        <div class="nav-item" onclick="toggleAdmin()"><span>➕</span>Add</div>
+    </nav>
+
+    <script>
+        // Use an array to store movies
+        let movies = JSON.parse(localStorage.getItem('onstream_db')) || [
+            { title: "The Flash", url: "https://www.w3schools.com/html/mov_bbb.mp4", img: "https://m.media-amazon.com/images/M/MV5BMDhjZGI2NTctN2I3Yy00ZjE4LWEyMDYtZDA1Y2I4NWZlZGY1XkEyXkFqcGdeQXVyMTUzMTg2ODkz._V1_.jpg" }
+        ];
+
+        function renderMovi
