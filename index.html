@@ -6,21 +6,22 @@
     <title>StreamX | Premium Entertainment</title>
     <style>
         :root { --main: #d3f243; --bg: #080808; --card: #121212; --transition: 0.4s ease; }
-        body { background: var(--bg); color: white; font-family: 'Segoe UI', Roboto, sans-serif; margin: 0; overflow-x: hidden; }
+        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; overflow-x: hidden; }
 
         /* --- AUTH SCREEN --- */
         #loginScreen {
             position: fixed; inset: 0; z-index: 10000; display: flex; align-items: center; justify-content: center;
-            background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), url('https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=1925&auto=format&fit=crop');
+            background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), url('https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=1000');
             background-size: cover; background-position: center; backdrop-filter: blur(10px);
         }
         .login-box { background: rgba(15,15,15,0.95); padding: 40px; border-radius: 15px; width: 340px; text-align: center; border: 1px solid #333; }
         .login-box h2 { color: #ff0000; font-weight: 900; font-size: 32px; margin: 0 0 20px 0; }
-        .login-box input { width: 100%; padding: 12px; margin: 8px 0; background: #000; border: 1px solid #444; color: white; border-radius: 5px; box-sizing: border-box; }
-        .login-btn { width: 100%; padding: 12px; background: var(--main); color: #000; font-weight: bold; border: none; cursor: pointer; border-radius: 5px; margin-top: 10px; transition: 0.3s; }
-        .login-btn:hover { filter: brightness(1.2); }
+        .login-box input { width: 100%; padding: 12px; margin: 8px 0; background: #000; border: 1px solid #444; color: white; border-radius: 5px; box-sizing: border-box; outline: none; }
+        .login-btn { width: 100%; padding: 12px; background: var(--main); color: #000; font-weight: bold; border: none; cursor: pointer; border-radius: 5px; margin-top: 10px; }
+        .forgot-link { color: #888; font-size: 12px; margin-top: 15px; cursor: pointer; display: block; text-decoration: none; }
+        .forgot-link:hover { color: var(--main); }
 
-        /* --- HEADER & NAVIGATION --- */
+        /* --- MAIN INTERFACE --- */
         #mainSite { display: none; }
         header { background: #000; padding: 15px 5%; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #222; position: sticky; top: 0; z-index: 1000; }
         .logo { font-weight: 900; color: #ff0000; font-size: 24px; text-decoration: none; }
@@ -28,26 +29,19 @@
         .search-container { position: absolute; left: 50%; transform: translateX(-50%); display: flex; align-items: center; background: #111; border-radius: 30px; padding: 5px 20px; border: 1px solid #333; width: 30%; min-width: 250px; }
         .search-container input { background: none; border: none; color: white; width: 100%; outline: none; text-align: center; }
 
-        /* --- HERO BANNER --- */
-        .hero { height: 60vh; background: linear-gradient(to right, #000 20%, transparent), url('https://images.unsplash.com/photo-1626814026160-2237a95fc5a0?q=80&w=2070&auto=format&fit=crop'); background-size: cover; background-position: center top; display: flex; align-items: center; padding: 0 5%; }
-        .hero h1 { font-size: clamp(30px, 5vw, 50px); margin: 10px 0; font-weight: 900; }
-
-        /* --- MOVIE GRID --- */
+        /* --- CONTENT DISPLAY --- */
+        .hero { height: 55vh; background: linear-gradient(to right, #000 20%, transparent), url('https://images.unsplash.com/photo-1626814026160-2237a95fc5a0?auto=format&fit=crop&w=1200'); background-size: cover; background-position: center; display: flex; align-items: center; padding: 0 5%; }
         .container { padding: 30px 5%; }
         .movie-row { display: flex; overflow-x: auto; gap: 20px; padding-bottom: 20px; scrollbar-width: none; }
-        .movie-card { min-width: 170px; background: var(--card); border-radius: 12px; overflow: hidden; border: 1px solid #222; position: relative; transition: 0.3s; cursor: pointer; }
-        .movie-card:hover { transform: scale(1.05); border-color: var(--main); }
-        .movie-card img { width: 100%; aspect-ratio: 2/3; object-fit: cover; pointer-events: none; }
+        .movie-card { min-width: 170px; background: var(--card); border-radius: 12px; overflow: hidden; border: 1px solid #222; transition: 0.3s; cursor: pointer; text-align: center; }
+        .movie-card img { width: 100%; aspect-ratio: 2/3; object-fit: cover; background: #222; }
 
-        /* --- SIDEBAR & MODALS --- */
+        /* --- MODALS & SIDEBARS --- */
         #settingsMenu { position: fixed; right: -320px; top: 0; width: 300px; height: 100%; background: #111; z-index: 2000; padding: 40px 20px; transition: var(--transition); border-left: 1px solid #333; }
         #settingsMenu.active { right: 0; }
         
-        #aboutModal { 
-            position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 3000; 
-            display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px);
-        }
-        .modal-content { background: #181818; padding: 40px; border-radius: 20px; width: 80%; max-width: 500px; text-align: center; border: 1px solid var(--main); }
+        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 3000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+        .modal-content { background: #181818; padding: 40px; border-radius: 20px; width: 80%; max-width: 450px; text-align: center; border: 1px solid var(--main); }
     </style>
 </head>
 <body>
@@ -55,32 +49,32 @@
     <div id="loginScreen">
         <div class="login-box">
             <h2>STREAM<span>X</span></h2>
-            <p style="color:#888; margin-bottom: 15px;">Enter your details to start streaming</p>
-            <input type="text" id="username" placeholder="Choose Username">
-            <input type="password" id="password" placeholder="Choose Password">
-            <button class="login-btn" onclick="handleAuth()">ENTER WORLD WIDE</button>
+            <input type="text" id="username" placeholder="Username">
+            <input type="password" id="password" placeholder="Password">
+            <button class="login-btn" onclick="handleAuth()">SIGN IN</button>
+            <span class="forgot-link" onclick="openForgot()">Forgot Password?</span>
         </div>
     </div>
 
     <div id="mainSite">
         <header>
-            <a href="#" class="logo">STREAMX</a>
+            <a href="#" class="logo" onclick="location.reload()">STREAMX</a>
             <div class="search-container">
-                <input type="text" id="searchBar" placeholder="Search movies..." onkeyup="doSearch()">
-                <span onclick="startVoice()" style="cursor:pointer;">🎤</span>
+                <input type="text" id="searchBar" placeholder="Search world wide..." onkeyup="doSearch()">
+                <span onclick="startVoice()" style="cursor:pointer; color:var(--main);">🎤</span>
             </div>
             <div style="display:flex; gap:20px; align-items:center;">
-                <span onclick="filter('movie')" style="cursor:pointer; font-size: 14px;">Movies</span>
-                <span onclick="filter('series')" style="cursor:pointer; font-size: 14px;">Series</span>
+                <span onclick="filter('movie')" style="cursor:pointer; font-size:14px;">Movies</span>
+                <span onclick="filter('series')" style="cursor:pointer; font-size:14px;">Series</span>
                 <span id="displayUser" style="color:var(--main); font-weight:bold; cursor:pointer;" onclick="toggleSettings()">User ⚙️</span>
             </div>
         </header>
 
         <div class="hero">
             <div>
-                <p style="color:var(--main); letter-spacing:4px; font-weight:bold;">PREMIUM FEATURE</p>
-                <h1>AVENGERS: ENDGAME</h1>
-                <button style="background:var(--main); border:none; padding:12px 35px; font-weight:bold; border-radius:5px; cursor:pointer;">PLAY NOW</button>
+                <p style="color:var(--main); letter-spacing:4px; font-weight:bold;">NOW STREAMING</p>
+                <h1 style="font-size: clamp(30px, 6vw, 60px);">AVENGERS: ENDGAME</h1>
+                <button style="background:var(--main); border:none; padding:15px 40px; font-weight:bold; border-radius:5px; cursor:pointer;">WATCH NOW</button>
             </div>
         </div>
 
@@ -97,33 +91,39 @@
 
     <div id="settingsMenu">
         <div onclick="toggleSettings()" style="text-align:right; cursor:pointer; font-size:24px;">✕</div>
-        <div style="width:70px; height:70px; background:var(--main); border-radius:50%; margin: 20px auto; color:black; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:30px;" id="profileInitial">U</div>
+        <div style="width:70px; height:70px; background:var(--main); border-radius:50%; margin: 20px auto; color:black; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:30px;" id="profileInitial">?</div>
         <h2 style="text-align:center; margin:0;" id="profileName">User</h2>
-        <hr style="border:0; border-top:1px solid #333; margin:30px 0;">
-        <p onclick="openAbout()" style="cursor:pointer; padding: 10px 0; border-bottom: 1px solid #222;">About Us</p>
+        <hr style="border:0; border-top:1px solid #222; margin:30px 0;">
+        <p onclick="openAbout()" style="cursor:pointer; padding: 10px 0;">About Us</p>
         <p onclick="location.reload()" style="color:red; cursor:pointer; padding: 10px 0;">Logout</p>
     </div>
 
-    <div id="aboutModal">
+    <div id="forgotModal" class="modal">
+        <div class="modal-content">
+            <h2 style="color:var(--main)">Recovery</h2>
+            <p>Enter your username to receive a reset code.</p>
+            <input type="text" id="recoverUser" placeholder="Username" style="width:100%; padding:10px; margin:10px 0; background:#000; border:1px solid #444; color:white;">
+            <button onclick="sendRecovery()" style="background:var(--main); border:none; padding:10px 20px; border-radius:5px; width:100%; font-weight:bold; cursor:pointer;">REQUEST CODE</button>
+            <button onclick="closeModals()" style="margin-top:10px; background:none; border:none; color:#888; cursor:pointer;">Cancel</button>
+        </div>
+    </div>
+
+    <div id="aboutModal" class="modal">
         <div class="modal-content">
             <h2 style="color:var(--main)">About StreamX</h2>
-            <p>Welcome to <b>StreamX World Wide</b>, your premium portal for cinematic excellence.</p>
-            <p style="color:#888; font-size:14px;">Designed and Developed by <b>Felix Nyoka</b>. Our mission is to provide high-quality streaming access to global users.</p>
-            <div style="margin-top: 20px;">
-                <p>Follow Creator: <br> <span style="color:var(--main)">@felix_ny10</span></p>
-            </div>
-            <button onclick="closeAbout()" style="margin-top:20px; background:white; border:none; padding:10px 20px; border-radius:5px; cursor:pointer; font-weight:bold;">Close</button>
+            <p>Designed and Developed by <b>Felix Nyoka</b>.</p>
+            <p style="color:#888;">Follow Creator: <b>@felix_ny10</b></p>
+            <button onclick="closeModals()" style="margin-top:20px; background:white; border:none; padding:10px 20px; border-radius:5px; cursor:pointer; font-weight:bold;">Close</button>
         </div>
     </div>
 
     <script>
-        // High-Reliability Images from Unsplash
+        // Reliability Image List
         const movies = [
-            { t: "Avatar: The Way of Water", i: "https://images.unsplash.com/photo-1594909122845-11baa439b7bf?q=80&w=2070&auto=format&fit=crop", type: "movie" },
-            { t: "The Last of Us", i: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1974&auto=format&fit=crop", type: "series" },
-            { t: "Spider-Man", i: "https://images.unsplash.com/photo-1635805737707-575885ab0820?q=80&w=1974&auto=format&fit=crop", type: "movie" },
-            { t: "Interstellar", i: "https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?q=80&w=2072&auto=format&fit=crop", type: "movie" },
-            { t: "The Dark Knight", i: "https://images.unsplash.com/photo-1478720568477-152d9b164e26?q=80&w=2070&auto=format&fit=crop", type: "movie" }
+            { t: "Avatar 2", i: "https://images.unsplash.com/photo-1594909122845-11baa439b7bf?auto=format&fit=crop&w=400", cat: "movie" },
+            { t: "The Last of Us", i: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=400", cat: "series" },
+            { t: "Spider-Man", i: "https://images.unsplash.com/photo-1635805737707-575885ab0820?auto=format&fit=crop&w=400", cat: "movie" },
+            { t: "Dark Knight", i: "https://images.unsplash.com/photo-1478720568477-152d9b164e26?auto=format&fit=crop&w=400", cat: "movie" }
         ];
 
         let history = [];
@@ -138,46 +138,59 @@
                 document.getElementById('profileName').innerText = u;
                 document.getElementById('profileInitial').innerText = u[0].toUpperCase();
                 render(movies);
-            } else { alert("Please enter a username and password!"); }
+            } else { alert("Please login."); }
         }
 
         function render(data) {
             document.getElementById('mainGrid').innerHTML = data.map(m => `
                 <div class="movie-card" onclick="playMovie('${m.t}', '${m.i}')">
-                    <img src="${m.i}" alt="poster">
-                    <div style="padding:10px; text-align:center; font-weight:bold; font-size:13px;">${m.t}</div>
+                    <img src="${m.i}" onerror="this.src='https://via.placeholder.com/170x250/111/fff?text=StreamX'">
+                    <div style="padding:10px; font-weight:bold; font-size:13px;">${m.t}</div>
                 </div>
             `).join('');
         }
 
         function playMovie(t, img) {
-            alert("Streaming: " + t);
+            alert("Now Streaming: " + t);
             if(!history.find(x => x.t === t)) {
                 history.unshift({t, i: img});
                 document.getElementById('historySection').style.display = 'block';
-                document.getElementById('historyGrid').innerHTML = history.map(h => `
-                    <div class="movie-card" style="min-width:130px;"><img src="${h.i}"></div>
-                `).join('');
+                document.getElementById('historyGrid').innerHTML = history.map(h => `<div class="movie-card" style="min-width:130px;"><img src="${h.i}"></div>`).join('');
             }
         }
 
-        function filter(cat) { render(movies.filter(m => m.type === cat)); }
+        // FORGOT PASSWORD LOGIC
+        function openForgot() { document.getElementById('forgotModal').style.display = 'flex'; }
+        
+        function sendRecovery() {
+            const user = document.getElementById('recoverUser').value;
+            if(user) {
+                // This opens the user's email app to send YOU a request
+                const email = "YOUR_EMAIL_HERE@gmail.com"; // Replace with your actual email
+                const subject = "StreamX Password Reset Request";
+                const body = `User: ${user} is requesting a password reset code.`;
+                window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
+                alert("Request sent to Felix! Check your email for the code soon.");
+                closeModals();
+            } else { alert("Enter username!"); }
+        }
+
+        function filter(c) { render(movies.filter(m => m.cat === c)); }
         function doSearch() {
             const q = document.getElementById('searchBar').value.toLowerCase();
             render(movies.filter(m => m.t.toLowerCase().includes(q)));
         }
-
         function toggleSettings() { document.getElementById('settingsMenu').classList.toggle('active'); }
         function openAbout() { document.getElementById('aboutModal').style.display = 'flex'; }
-        function closeAbout() { document.getElementById('aboutModal').style.display = 'none'; }
+        function closeModals() { 
+            document.getElementById('aboutModal').style.display = 'none'; 
+            document.getElementById('forgotModal').style.display = 'none'; 
+        }
 
         function startVoice() {
             const rec = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
             rec.onstart = () => { window.speechSynthesis.speak(new SpeechSynthesisUtterance("Listening")); };
-            rec.onresult = (e) => { 
-                document.getElementById('searchBar').value = e.results[0][0].transcript; 
-                doSearch(); 
-            };
+            rec.onresult = (e) => { document.getElementById('searchBar').value = e.results[0][0].transcript; doSearch(); };
             rec.start();
         }
     </script>
