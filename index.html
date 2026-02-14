@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StreamX | Home</title>
+    <title>StreamX | Premium Streaming</title>
     <style>
         :root { --main: #d3f243; --bg: #080808; --card: #151515; }
         body { background: var(--bg); color: white; font-family: 'Inter', sans-serif; margin: 0; padding: 0; }
@@ -13,57 +13,47 @@
         .logo { font-size: 26px; font-weight: 900; color: #ff0000; text-decoration: none; }
         .logo span { color: white; }
         
-        .nav-links { display: flex; gap: 30px; }
-        .nav-links a { color: #888; text-decoration: none; font-weight: 600; font-size: 14px; transition: 0.3s; }
-        .nav-links a:hover { color: var(--main); }
-
         .search-container { flex-grow: 0.4; }
         .search-bar { width: 100%; background: #111; border: 1px solid #333; padding: 10px 20px; border-radius: 5px; color: white; outline: none; }
 
+        .nav-links { display: flex; gap: 30px; align-items: center; }
+        .nav-links a { color: #888; text-decoration: none; font-weight: 600; font-size: 14px; transition: 0.3s; }
+        .nav-links a:hover { color: var(--main); }
+
         /* Profile Sidebar */
-        #sidebar { position: fixed; top: 0; right: -320px; width: 320px; height: 100%; background: #0a0a0a; z-index: 5000; transition: 0.4s; padding: 40px 20px; border-left: 1px solid #222; }
+        #sidebar { position: fixed; top: 0; right: -320px; width: 320px; height: 100%; background: #0a0a0a; z-index: 11000; transition: 0.4s; padding: 40px 20px; border-left: 1px solid #222; box-sizing: border-box; }
         
-        /* Hero Section (Website Style) */
+        /* Hero Section */
         .hero { height: 500px; background: linear-gradient(to right, #080808 20%, transparent), url('https://m.media-amazon.com/images/M/MV5BYjhiNjBlODctY2ZiOC00YjVlLWFlNzAtNTVhNzM1YjI1NzMxXkEyXkFqcGdeQXVyMjkwOTAyMDU@._V1_.jpg'); background-size: cover; background-position: top; display: flex; align-items: center; padding: 0 5%; }
         .hero-text { max-width: 600px; }
-        .hero-text h1 { font-size: 56px; margin-bottom: 10px; }
-        .play-btn { background: var(--main); color: black; border: none; padding: 15px 40px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 16px; }
+        .hero-text h1 { font-size: 56px; margin: 10px 0; }
+        .play-btn { background: var(--main); color: black; border: none; padding: 15px 40px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 16px; transition: 0.3s; }
+        .play-btn:hover { background: white; transform: scale(1.05); }
 
-        /* Wide Grid System */
+        /* Grid System */
         .content-area { padding: 40px 5%; }
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 25px; }
-        .movie-card { background: var(--card); border-radius: 8px; overflow: hidden; transition: 0.3s; cursor: pointer; border: 1px solid #222; }
+        .movie-card { background: var(--card); border-radius: 8px; overflow: hidden; transition: 0.3s; cursor: pointer; border: 1px solid #222; position: relative; }
         .movie-card:hover { transform: translateY(-10px); border-color: var(--main); }
         .movie-card img { width: 100%; aspect-ratio: 2/3; object-fit: cover; }
         .movie-title { padding: 15px; font-size: 14px; text-align: center; font-weight: bold; }
 
-        /* Fullscreen Player Overlay */
-        #player { display: none; position: fixed; inset: 0; background: #000; z-index: 10000; flex-direction: column; }
+        /* Website Video Player & Comments */
+        #player { display: none; position: fixed; inset: 0; background: #000; z-index: 10000; overflow-y: auto; }
+        .player-container { display: flex; flex-direction: column; width: 100%; max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .video-wrapper { width: 100%; background: #000; border-radius: 8px; overflow: hidden; }
+        
+        /* Comments Box */
+        .comment-section { margin-top: 30px; background: #111; padding: 20px; border-radius: 8px; border: 1px solid #222; }
+        #commentList { list-style: none; padding: 0; max-height: 200px; overflow-y: auto; margin-bottom: 15px; }
+        .comment-item { padding: 10px; border-bottom: 1px solid #222; font-size: 14px; }
+        .comment-item span { color: var(--main); font-weight: bold; margin-right: 10px; }
+        .comment-input-area { display: flex; gap: 10px; }
+        .comment-input { flex-grow: 1; background: #050505; border: 1px solid #333; padding: 10px; color: white; border-radius: 4px; }
+        .send-btn { background: var(--main); border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-weight: bold; }
     </style>
 </head>
 <body>
 
     <div id="sidebar">
-        <div onclick="toggleSidebar()" style="cursor:pointer; color:var(--main); text-align:right;">✕ CLOSE</div>
-        <div style="text-align:center; margin-top:40px;">
-            <div style="font-size: 60px;">👤</div>
-            <h2>Felix Nyoka</h2>
-            <p style="color:#666;">Premium Member</p>
-        </div>
-        <div style="margin-top: 40px; display:flex; flex-direction:column; gap:20px;">
-            <div style="cursor:pointer;">📺 My Subscriptions</div>
-            <div style="cursor:pointer;">⭐ Favorite Movies</div>
-            <div style="cursor:pointer;">⚙️ Site Settings</div>
-            <div style="cursor:pointer; color:red;">📥 Logout</div>
-        </div>
-    </div>
-
-    <div id="player">
-        <div style="padding: 20px; background: #111; display:flex; justify-content:space-between; align-items:center;">
-            <span id="nowPlaying" style="font-weight:bold; color:var(--main);"></span>
-            <span onclick="closePlayer()" style="cursor:pointer; font-weight:bold;">✕ EXIT</span>
-        </div>
-        <video id="webVideo" controls style="width:100%; height:85vh; background:#000;">
-            <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
-        </video>
-    </div>
+        <div onclick="toggleSidebar()" style="cursor:pointer; color:var(--main); text-align:right; font-weight:bold;"
