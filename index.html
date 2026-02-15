@@ -6,117 +6,124 @@
     <title>Feng | World Tool</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --main: #d3f243; --bg: #0b0e14; --card: #1c1f26; --text: #eeeeee; --header: #000; --input: #1a1a1a; }
-        [data-theme="light"] { --bg: #f5f7fa; --card: #ffffff; --text: #1a1a1a; --header: #ffffff; --input: #e2e8f0; }
-        body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; margin: 0; padding: 0; transition: 0.3s; }
+        :root { --main: #d3f243; --bg: #0b0e14; --card: #1c1f26; --text: #eeeeee; }
+        [data-theme="light"] { --bg: #f5f7fa; --card: #ffffff; --text: #1a1a1a; }
+        body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; margin: 0; transition: 0.3s; }
         
-        /* CAROUSEL */
-        .carousel { width: 100%; height: 200px; overflow: hidden; position: relative; background: #000; }
-        .track { display: flex; transition: 0.5s; height: 100%; }
-        .slide { min-width: 100%; position: relative; }
-        .slide img { width: 100%; height: 100%; object-fit: cover; opacity: 0.6; }
-        .cap { position: absolute; bottom: 20px; left: 20px; }
+        /* COUNTDOWN BANNER */
+        .countdown-box { background: linear-gradient(90deg, #600, #000); padding: 15px; text-align: center; border-bottom: 2px solid var(--main); }
+        #timer { font-weight: 900; font-size: 20px; color: var(--main); letter-spacing: 2px; }
 
-        /* TRENDING HORIZONTAL SCROLL */
-        .trending-row { display: flex; overflow-x: auto; gap: 15px; padding: 10px 5%; scrollbar-width: none; }
-        .t-card { min-width: 110px; height: 160px; border-radius: 10px; overflow: hidden; border: 1px solid var(--main); flex-shrink: 0; }
-        .t-card img { width: 100%; height: 100%; object-fit: cover; }
-
-        header { background: var(--header); padding: 15px 5%; border-bottom: 2px solid var(--main); position: sticky; top: 0; z-index: 1000; }
-        .container { padding: 20px 5% 100px 5%; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; }
-        .card { background: var(--card); border-radius: 12px; overflow: hidden; border: 1px solid #33333333; }
-        .card img { width: 100%; height: 180px; object-fit: cover; display: block; } /* Fixed Image Display */
-
-        /* SETTINGS (V30 VERSION) */
+        header { background: #000; padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; padding: 20px 5%; }
+        .card { background: var(--card); border-radius: 12px; overflow: hidden; border: 1px solid #333; cursor: pointer; transition: 0.3s; }
+        .card:hover { border-color: var(--main); transform: translateY(-5px); }
+        .card img { width: 100%; height: 220px; object-fit: cover; pointer-events: none; }
+        
+        /* PLAYER SCREEN */
+        #player { position: fixed; inset: 0; background: #000; z-index: 10000; display: none; flex-direction: column; }
+        
+        /* SETTINGS */
         #setModal { position: fixed; inset: 0; background: var(--bg); z-index: 9999; display: none; padding: 25px; overflow-y: auto; }
-        .auth-box { background: var(--card); padding: 15px; border-radius: 12px; margin-bottom: 15px; border: 1px solid #333; }
-        .menu-item { background: var(--card); padding: 15px; border-radius: 10px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; cursor: pointer; }
-        .vision-text { font-size: 11px; color: #777; line-height: 1.6; padding: 20px 0; text-align: center; border-top: 1px solid #333; margin-top: 20px; }
+        .menu-item { background: var(--card); padding: 18px; border-radius: 12px; margin-bottom: 10px; display: flex; align-items: center; gap: 15px; cursor: pointer; border: 1px solid #333; }
+        .vision { margin-top: 30px; text-align: center; font-size: 12px; opacity: 0.6; line-height: 1.6; border-top: 1px solid #333; padding-top: 20px; }
 
-        footer { position: fixed; bottom: 0; width: 100%; background: var(--header); display: flex; justify-content: space-around; padding: 15px 0; border-top: 1px solid #333; }
+        footer { position: fixed; bottom: 0; width: 100%; background: #000; display: flex; justify-content: space-around; padding: 15px 0; border-top: 1px solid #333; }
     </style>
 </head>
-<body onload="startCarousel(); render()">
+<body onload="updateTimer(); render()">
 
-    <header>
-        <div style="font-weight:900; font-size:22px;">FE<span>NG</span></div>
-    </header>
-
-    <div class="carousel">
-        <div class="track" id="track">
-            <div class="slide"><img src="https://image.tmdb.org/t/p/original/or06vSqzWBFscv1qCG76uC1fsR6.jpg"><div class="cap"><h2>AVENGERS</h2></div></div>
-            <div class="slide"><img src="https://image.tmdb.org/t/p/original/6968y.jpg"><div class="cap"><h2>SCREAM 7</h2></div></div>
-        </div>
+    <div class="countdown-box">
+        <div style="font-size: 10px; text-transform: uppercase;">Avengers: Doomsday Countdown</div>
+        <div id="timer">00d 00h 00m 00s</div>
     </div>
 
-    <div class="container">
-        <h4 style="color:var(--main); margin:0 0 10px 0;">🔥 TRENDING NOW</h4>
-        <div class="trending-row" id="trendingGrid"></div>
+    <header>
+        <div style="font-weight:900; font-size:24px;">FE<span>NG</span></div>
+        <i class="fas fa-search" style="color:var(--main)"></i>
+    </header>
 
-        <h4 style="color:var(--main); margin:25px 0 10px 0;">RECENTLY ADDED (BATCH 10)</h4>
-        <div class="grid" id="mainGrid"></div>
+    <div class="grid" id="mainGrid"></div>
+
+    <div id="player">
+        <div style="padding:15px; background: #111; display:flex; justify-content:space-between;">
+            <span id="pT" style="color:var(--main); font-weight:bold;">Loading...</span>
+            <button onclick="closeP()" style="background:red; color:white; border:none; border-radius:5px; padding:5px 15px;">CLOSE</button>
+        </div>
+        <iframe id="vF" style="flex-grow:1; border:none;" allowfullscreen></iframe>
     </div>
 
     <div id="setModal">
-        <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
-            <h3>Menu & Account</h3><i class="fas fa-times fa-lg" onclick="closeSets()"></i>
+        <div style="display:flex; justify-content:space-between; margin-bottom:30px;">
+            <h2>Settings</h2><i class="fas fa-times fa-2x" onclick="closeSets()"></i>
         </div>
-        <div class="auth-box">
-            <div style="font-size:12px; margin-bottom:10px; color:var(--main);">LOGIN / REGISTER</div>
-            <input type="email" placeholder="Email" style="width:100%; padding:10px; margin-bottom:8px; background:#000; border:1px solid #333; color:#fff;">
-            <button style="width:100%; padding:10px; background:var(--main); border:none; font-weight:bold;">CONTINUE</button>
+        
+        <div class="menu-item" onclick="toggleTheme()"><i class="fas fa-moon"></i> Dark / Light Mode</div>
+        <div class="menu-item" onclick="alert('Report to: +260770605003')"><i class="fas fa-bug"></i> Report an Issue</div>
+        <div class="menu-item" onclick="alert('Feng World Tool v32.0. Built for seamless entertainment.')"><i class="fas fa-info-circle"></i> About Us</div>
+
+        <div class="vision">
+            <b>THE VISION</b><br>
+            To become the premier global hub for cinematic accessibility, bridging the gap between world-class entertainment and users in Zambia and beyond.
         </div>
-        <div class="menu-item" onclick="toggleTheme()"><span><i class="fas fa-adjust"></i> Theme</span></div>
-        <div class="menu-item" onclick="requestMovie()" style="background:var(--main); color:#000; font-weight:bold;">
-            <span><i class="fas fa-plus-circle"></i> REQUEST MOVIE</span>
-        </div>
-        <div class="menu-item" onclick="alert('Policy: Version 31.0')"><span><i class="fas fa-user-shield"></i> About Us / Policy</span></div>
-        <div class="menu-item" onclick="alert('Report to: +260770605003')"><span><i class="fas fa-exclamation-triangle"></i> Report an Issue</span></div>
-        <div style="display:flex; gap:10px; margin-top:15px;">
-            <a href="https://wa.me/260770605003" style="flex:1; background:#25D366; color:white; padding:15px; border-radius:12px; text-align:center;"><i class="fab fa-whatsapp"></i></a>
-            <a href="https://instagram.com/felix_nyoka" target="_blank" style="flex:1; background:#E1306C; color:white; padding:15px; border-radius:12px; text-align:center;"><i class="fab fa-instagram"></i></a>
-        </div>
-        <div class="vision-text"><b>THE VISION OF FENG</b><br>To become the premier global hub for cinematic accessibility in Zambia and beyond.</div>
     </div>
 
     <footer>
         <div onclick="closeSets()"><i class="fas fa-home"></i><br>Home</div>
-        <div onclick="openSets()"><i class="fas fa-user-circle"></i><br>Account</div>
+        <div onclick="openSets()"><i class="fas fa-cog"></i><br>Settings</div>
     </footer>
 
     <script>
+        // BATCH 11 + FIXED IMAGES
         const movieDB = [
-            // Batch 10 (2026 Hits)
-            {title: "Crime 101", year: 2026, img: "https://image.tmdb.org/t/p/w500/m0S.jpg"},
-            {title: "Wuthering Heights", year: 2026, img: "https://image.tmdb.org/t/p/w500/78R9.jpg"},
-            {title: "GOAT (Animated)", year: 2026, img: "https://image.tmdb.org/t/p/w500/6968y.jpg"},
-            {title: "Scream 7", year: 2026, img: "https://image.tmdb.org/t/p/w500/fT0X.jpg"}
-        ];
-
-        const trendingDB = [
-            {img: "https://image.tmdb.org/t/p/w500/or06vSqzWBFscv1qCG76uC1fsR6.jpg"},
-            {img: "https://image.tmdb.org/t/p/w500/lC9ih_S.jpg"},
-            {img: "https://image.tmdb.org/t/p/w500/8cdclPkS1fSgtHd96YvFhX7U93v.jpg"},
-            {img: "https://image.tmdb.org/t/p/w500/7I90.jpg"},
-            {img: "https://image.tmdb.org/t/p/w500/vZloY0Cc8pPTMvS3v1wZ94Ydn94.jpg"}
+            {id: 299534, title: "Avengers: Doomsday", year: 2026, type: "movie", img: "https://www.themoviedb.org/t/p/w500/or06vSqzWBFscv1qCG76uC1fsR6.jpg"},
+            {id: 933260, title: "The Substance", year: 2024, type: "movie", img: "https://www.themoviedb.org/t/p/w500/78R9.jpg"},
+            {id: 420634, title: "Scream 7", year: 2026, type: "movie", img: "https://www.themoviedb.org/t/p/w500/fT0X.jpg"},
+            {id: 115508, title: "The Penguin", year: 2024, type: "tv", img: "https://www.themoviedb.org/t/p/w500/689V8.jpg"},
+            {id: 533535, title: "Deadpool & Wolverine", year: 2024, type: "movie", img: "https://www.themoviedb.org/t/p/w500/8cdclPkS1fSgtHd96YvFhX7U93v.jpg"},
+            {id: 804616, title: "Jurassic World: Rebirth", year: 2025, type: "movie", img: "https://www.themoviedb.org/t/p/w500/yK9I.jpg"}
         ];
 
         function render() {
-            const grid = document.getElementById('mainGrid'); grid.innerHTML = '';
-            movieDB.forEach(m => {
-                grid.innerHTML += `<div class="card"><img src="${m.img}"><div style="padding:10px; font-size:11px;">${m.title} (${m.year})</div></div>`;
-            });
-            const tGrid = document.getElementById('trendingGrid'); tGrid.innerHTML = '';
-            trendingDB.forEach(t => {
-                tGrid.innerHTML += `<div class="t-card"><img src="${t.img}"></div>`;
-            });
+            const grid = document.getElementById('mainGrid');
+            grid.innerHTML = movieDB.map(m => `
+                <div class="card" onclick="play('${m.type}', '${m.id}', '${m.title}')">
+                    <img src="${m.img}" onerror="this.src='https://via.placeholder.com/500x750?text=No+Image'">
+                    <div style="padding:12px;">
+                        <div style="font-size:9px; color:var(--main); font-weight:bold;">${m.year}</div>
+                        <div style="font-size:11px; font-weight:bold; margin-top:4px;">${m.title}</div>
+                    </div>
+                </div>
+            `).join('');
         }
 
-        let s = 0;
-        function startCarousel() { setInterval(() => { s = (s + 1) % 2; document.getElementById('track').style.transform = `translateX(-${s * 100}%)`; }, 4000); }
-        function toggleTheme() { const h = document.documentElement; h.setAttribute('data-theme', h.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'); }
-        function requestMovie() { const m = prompt("Movie Name?"); if(m) window.location.href = `https://wa.me/260770605003?text=Request:%20${m}`; }
+        function play(type, id, title) {
+            const p = document.getElementById('player');
+            const f = document.getElementById('vF');
+            document.getElementById('pT').innerText = title;
+            p.style.display = 'flex';
+            f.src = `https://vidsrc.xyz/embed/${type}/${id}`;
+        }
+
+        function updateTimer() {
+            const end = new Date("Dec 18, 2026 00:00:00").getTime();
+            setInterval(() => {
+                const now = new Date().getTime();
+                const d = end - now;
+                const days = Math.floor(d / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((d % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((d % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((d % (1000 * 60)) / 1000);
+                document.getElementById('timer').innerHTML = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+            }, 1000);
+        }
+
+        function toggleTheme() {
+            const h = document.documentElement;
+            h.setAttribute('data-theme', h.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+        }
+
+        function closeP() { document.getElementById('player').style.display = 'none'; document.getElementById('vF').src = ''; }
         function openSets() { document.getElementById('setModal').style.display = 'block'; }
         function closeSets() { document.getElementById('setModal').style.display = 'none'; }
     </script>
