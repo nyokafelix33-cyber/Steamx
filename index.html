@@ -3,129 +3,139 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Feng | World Tool</title>
+    <title>Feng | The World Tool</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --main: #d3f243; --bg: #0b0e14; --card: #1c1f26; --text: #eeeeee; }
-        [data-theme="light"] { --bg: #f5f7fa; --card: #ffffff; --text: #1a1a1a; }
-        body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; margin: 0; transition: 0.3s; }
+        :root { --main: #d3f243; --bg: #0b0e14; --card: #1c1f26; --text: #eeeeee; --header: #000; }
+        [data-theme="light"] { --bg: #f5f7fa; --card: #ffffff; --text: #1a1a1a; --header: #ffffff; }
+        body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; margin: 0; padding: 0; transition: 0.3s; }
         
-        /* COUNTDOWN BANNER */
-        .countdown-box { background: linear-gradient(90deg, #600, #000); padding: 15px; text-align: center; border-bottom: 2px solid var(--main); }
-        #timer { font-weight: 900; font-size: 20px; color: var(--main); letter-spacing: 2px; }
+        /* SEARCH BAR FIX */
+        .search-container { padding: 10px 5%; background: var(--header); position: sticky; top: 0; z-index: 1000; border-bottom: 2px solid var(--main); }
+        .search-box { background: #1a1a1a; border-radius: 8px; display: flex; padding: 10px; border: 1px solid #333; }
+        .search-box input { background: transparent; border: none; color: white; width: 100%; outline: none; }
 
-        header { background: #000; padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; padding: 20px 5%; }
-        .card { background: var(--card); border-radius: 12px; overflow: hidden; border: 1px solid #333; cursor: pointer; transition: 0.3s; }
-        .card:hover { border-color: var(--main); transform: translateY(-5px); }
-        .card img { width: 100%; height: 220px; object-fit: cover; pointer-events: none; }
+        /* COUNTDOWN */
+        .banner { background: linear-gradient(to right, #600, #000); padding: 12px; text-align: center; border-bottom: 1px solid var(--main); font-size: 14px; }
+        #timer { font-weight: 900; color: var(--main); letter-spacing: 1px; }
+
+        .container { padding: 20px 5% 100px 5%; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; }
+        .card { background: var(--card); border-radius: 12px; overflow: hidden; border: 1px solid #333; cursor: pointer; }
+        .card img { width: 100%; height: 200px; object-fit: cover; border-bottom: 1px solid #333; }
         
-        /* PLAYER SCREEN */
+        /* PLAYER MODAL */
         #player { position: fixed; inset: 0; background: #000; z-index: 10000; display: none; flex-direction: column; }
         
-        /* SETTINGS */
+        /* SETTINGS (AS REQUESTED) */
         #setModal { position: fixed; inset: 0; background: var(--bg); z-index: 9999; display: none; padding: 25px; overflow-y: auto; }
-        .menu-item { background: var(--card); padding: 18px; border-radius: 12px; margin-bottom: 10px; display: flex; align-items: center; gap: 15px; cursor: pointer; border: 1px solid #333; }
-        .vision { margin-top: 30px; text-align: center; font-size: 12px; opacity: 0.6; line-height: 1.6; border-top: 1px solid #333; padding-top: 20px; }
+        .menu-row { background: var(--card); padding: 18px; border-radius: 10px; margin-bottom: 10px; display: flex; align-items: center; gap: 15px; border: 1px solid #333; cursor: pointer; }
+        .vision-box { margin-top: 40px; text-align: center; font-size: 11px; opacity: 0.7; line-height: 1.8; border-top: 1px solid #333; padding-top: 20px; }
 
-        footer { position: fixed; bottom: 0; width: 100%; background: #000; display: flex; justify-content: space-around; padding: 15px 0; border-top: 1px solid #333; }
+        footer { position: fixed; bottom: 0; width: 100%; background: #000; display: flex; justify-content: space-around; padding: 15px 0; border-top: 1px solid #333; z-index: 1000; }
+        footer div { text-align: center; font-size: 10px; color: #555; }
     </style>
 </head>
-<body onload="updateTimer(); render()">
+<body onload="startClock(); render(movieDB)">
 
-    <div class="countdown-box">
-        <div style="font-size: 10px; text-transform: uppercase;">Avengers: Doomsday Countdown</div>
-        <div id="timer">00d 00h 00m 00s</div>
+    <div class="banner">
+        Avengers: Doomsday Countdown — <span id="timer">00:00:00:00</span>
     </div>
 
-    <header>
-        <div style="font-weight:900; font-size:24px;">FE<span>NG</span></div>
-        <i class="fas fa-search" style="color:var(--main)"></i>
-    </header>
+    <div class="search-container">
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Search movies or series..." onkeyup="doSearch()">
+            <i class="fas fa-search" style="color:var(--main)"></i>
+        </div>
+    </div>
 
-    <div class="grid" id="mainGrid"></div>
+    <div class="container">
+        <h4 style="color:var(--main); margin-bottom:15px;">BATCH #11 SELECTIONS</h4>
+        <div class="grid" id="mainGrid"></div>
+    </div>
 
     <div id="player">
-        <div style="padding:15px; background: #111; display:flex; justify-content:space-between;">
-            <span id="pT" style="color:var(--main); font-weight:bold;">Loading...</span>
-            <button onclick="closeP()" style="background:red; color:white; border:none; border-radius:5px; padding:5px 15px;">CLOSE</button>
+        <div style="padding:15px; background:#111; display:flex; justify-content:space-between; align-items:center;">
+            <b id="playTitle" style="color:var(--main)">Loading...</b>
+            <button onclick="closePlayer()" style="background:red; color:white; border:none; padding:8px 15px; border-radius:5px; font-weight:bold;">CLOSE</button>
         </div>
-        <iframe id="vF" style="flex-grow:1; border:none;" allowfullscreen></iframe>
+        <iframe id="videoFrame" style="flex-grow:1; border:none;" allowfullscreen></iframe>
     </div>
 
     <div id="setModal">
-        <div style="display:flex; justify-content:space-between; margin-bottom:30px;">
-            <h2>Settings</h2><i class="fas fa-times fa-2x" onclick="closeSets()"></i>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
+            <h2 style="margin:0">Settings</h2><i class="fas fa-times fa-2x" onclick="closeSettings()"></i>
         </div>
+        <div class="menu-row" onclick="toggleMode()"><i class="fas fa-adjust"></i> Theme (Dark / Light)</div>
+        <div class="menu-row" onclick="alert('Report Issues to: +260770605003')"><i class="fas fa-bug"></i> Report an Issue</div>
+        <div class="menu-row" onclick="alert('Feng Tool v33.0: Zambia Entertainment Hub.')"><i class="fas fa-info-circle"></i> About Us</div>
         
-        <div class="menu-item" onclick="toggleTheme()"><i class="fas fa-moon"></i> Dark / Light Mode</div>
-        <div class="menu-item" onclick="alert('Report to: +260770605003')"><i class="fas fa-bug"></i> Report an Issue</div>
-        <div class="menu-item" onclick="alert('Feng World Tool v32.0. Built for seamless entertainment.')"><i class="fas fa-info-circle"></i> About Us</div>
-
-        <div class="vision">
-            <b>THE VISION</b><br>
+        <div class="vision-box">
+            <b>THE VISION OF FENG (V33.0 Update)</b><br>
             To become the premier global hub for cinematic accessibility, bridging the gap between world-class entertainment and users in Zambia and beyond.
         </div>
     </div>
 
     <footer>
-        <div onclick="closeSets()"><i class="fas fa-home"></i><br>Home</div>
-        <div onclick="openSets()"><i class="fas fa-cog"></i><br>Settings</div>
+        <div onclick="closeSettings()"><i class="fas fa-home"></i><br>Home</div>
+        <div onclick="openSettings()"><i class="fas fa-cog"></i><br>Settings</div>
     </footer>
 
     <script>
-        // BATCH 11 + FIXED IMAGES
         const movieDB = [
-            {id: 299534, title: "Avengers: Doomsday", year: 2026, type: "movie", img: "https://www.themoviedb.org/t/p/w500/or06vSqzWBFscv1qCG76uC1fsR6.jpg"},
-            {id: 933260, title: "The Substance", year: 2024, type: "movie", img: "https://www.themoviedb.org/t/p/w500/78R9.jpg"},
-            {id: 420634, title: "Scream 7", year: 2026, type: "movie", img: "https://www.themoviedb.org/t/p/w500/fT0X.jpg"},
-            {id: 115508, title: "The Penguin", year: 2024, type: "tv", img: "https://www.themoviedb.org/t/p/w500/689V8.jpg"},
-            {id: 533535, title: "Deadpool & Wolverine", year: 2024, type: "movie", img: "https://www.themoviedb.org/t/p/w500/8cdclPkS1fSgtHd96YvFhX7U93v.jpg"},
-            {id: 804616, title: "Jurassic World: Rebirth", year: 2025, type: "movie", img: "https://www.themoviedb.org/t/p/w500/yK9I.jpg"}
+            {id: 299534, title: "Avengers: Doomsday", year: 2026, type: "movie", img: "https://image.tmdb.org/t/p/w500/or06vSqzWBFscv1qCG76uC1fsR6.jpg"},
+            {id: 420634, title: "Scream 7", year: 2026, type: "movie", img: "https://image.tmdb.org/t/p/w500/fT0X.jpg"},
+            {id: 933260, title: "The Substance", year: 2024, type: "movie", img: "https://image.tmdb.org/t/p/w500/78R9.jpg"},
+            {id: 115508, title: "The Penguin", year: 2024, type: "tv", img: "https://image.tmdb.org/t/p/w500/689V8.jpg"},
+            {id: 533535, title: "Deadpool & Wolverine", year: 2024, type: "movie", img: "https://image.tmdb.org/t/p/w500/8cdclPkS1fSgtHd96YvFhX7U93v.jpg"}
         ];
 
-        function render() {
+        function render(data) {
             const grid = document.getElementById('mainGrid');
-            grid.innerHTML = movieDB.map(m => `
-                <div class="card" onclick="play('${m.type}', '${m.id}', '${m.title}')">
-                    <img src="${m.img}" onerror="this.src='https://via.placeholder.com/500x750?text=No+Image'">
-                    <div style="padding:12px;">
-                        <div style="font-size:9px; color:var(--main); font-weight:bold;">${m.year}</div>
-                        <div style="font-size:11px; font-weight:bold; margin-top:4px;">${m.title}</div>
+            grid.innerHTML = data.map(m => `
+                <div class="card" onclick="openPlayer('${m.type}', '${m.id}', '${m.title}')">
+                    <img src="${m.img}" onerror="this.src='https://via.placeholder.com/200x300?text=No+Poster'">
+                    <div style="padding:10px;">
+                        <span style="font-size:11px; font-weight:bold;">${m.title}</span><br>
+                        <span style="font-size:9px; color:var(--main);">${m.year}</span>
                     </div>
                 </div>
             `).join('');
         }
 
-        function play(type, id, title) {
-            const p = document.getElementById('player');
-            const f = document.getElementById('vF');
-            document.getElementById('pT').innerText = title;
-            p.style.display = 'flex';
-            f.src = `https://vidsrc.xyz/embed/${type}/${id}`;
+        function openPlayer(type, id, title) {
+            document.getElementById('playTitle').innerText = title;
+            document.getElementById('player').style.display = 'flex';
+            document.getElementById('videoFrame').src = `https://vidsrc.to/embed/${type}/${id}`;
         }
 
-        function updateTimer() {
-            const end = new Date("Dec 18, 2026 00:00:00").getTime();
+        function doSearch() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = movieDB.filter(m => m.title.toLowerCase().includes(query));
+            render(filtered);
+        }
+
+        function startClock() {
+            const end = new Date("December 18, 2026 00:00:00").getTime();
             setInterval(() => {
                 const now = new Date().getTime();
-                const d = end - now;
-                const days = Math.floor(d / (1000 * 60 * 60 * 24));
-                const hours = Math.floor((d % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                const minutes = Math.floor((d % (1000 * 60 * 60)) / (1000 * 60));
-                const seconds = Math.floor((d % (1000 * 60)) / 1000);
-                document.getElementById('timer').innerHTML = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+                const dist = end - now;
+                const d = Math.floor(dist / (1000*60*60*24));
+                const h = Math.floor((dist % (1000*60*60*24)) / (1000*60*60));
+                const m = Math.floor((dist % (1000*60*60)) / (1000*60));
+                const s = Math.floor((dist % (1000*60)) / 1000);
+                document.getElementById('timer').innerText = `${d}d ${h}h ${m}m ${s}s`;
             }, 1000);
         }
 
-        function toggleTheme() {
-            const h = document.documentElement;
-            h.setAttribute('data-theme', h.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+        function toggleMode() {
+            const html = document.documentElement;
+            html.setAttribute('data-theme', html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
         }
 
-        function closeP() { document.getElementById('player').style.display = 'none'; document.getElementById('vF').src = ''; }
-        function openSets() { document.getElementById('setModal').style.display = 'block'; }
-        function closeSets() { document.getElementById('setModal').style.display = 'none'; }
+        function closePlayer() { document.getElementById('player').style.display = 'none'; document.getElementById('videoFrame').src = ''; }
+        function openSettings() { document.getElementById('setModal').style.display = 'block'; }
+        function closeSettings() { document.getElementById('setModal').style.display = 'none'; }
     </script>
 </body>
 </html>
