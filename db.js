@@ -1,30 +1,70 @@
-/* FENG WORLD TITAN DATABASE V68.0 - PLATINUM HEAVY BUILD */
-const FENG_DB = [
-    { 
-        id: "106379", 
-        t: "A Knight of the Seven Kingdoms", 
-        y: "2025", 
-        g: "FANTASY", 
-        c: "tv", 
-        s: 1, e: 6, 
-        i: "/7k7Sj9i9QI9In9I9QI9In9I9QI9.jpg",
-        desc: "A century before Game of Thrones, two unlikely heroes wandered Westeros... a young, naive but courageous knight, Ser Duncan the Tall, and his diminutive squire, Egg.",
-        cast: "Peter Claffey, Dexter Sol Ansell"
-    },
-    { 
-        id: "475557", 
-        t: "Joker", 
-        y: "2019", 
-        g: "DRAMA", 
-        c: "mov", 
-        i: "/udDclJoHjfjb8Ekgsd4FDteOkCU.jpg",
-        desc: "During the 1980s, a failed stand-up comedian is driven insane and turns to a life of crime and chaos in Gotham City while becoming an infamous psychopathic crime figure.",
-        cast: "Joaquin Phoenix, Robert De Niro, Zazie Beetz"
-    },
-    // Add your other 110 titles following this exact structure...
-];
+/* TITAN V68.0 PLATINUM DATA EXPANSION 
+   Total: 40 Movies + 20 Series
+   Developer: Felix Nyoka
+*/
 
-const TRENDING_SLIDES = [
-    { id: "106379", t: "A Knight of the Seven Kingdoms", img: "https://image.tmdb.org/t/p/original/7k7Sj9i9QI9In9I9QI9In9I9QI9.jpg" },
-    { id: "533535", t: "Deadpool & Wolverine", img: "https://image.tmdb.org/t/p/original/h6S6Yn6TrCD0t9_693134.jpg" }
+const FENG_DB = [
+    // --- 20 SERIES (Manual Entries) ---
+    { id: "106379", t: "A Knight of the Seven Kingdoms", y: "2025", g: "FANTASY", c: "tv", s: 1, e: 6, i: "/7k7Sj9i9QI9In9I9QI9In9I9QI9.jpg", desc: "A century before Game of Thrones, Ser Duncan the Tall and Egg wander Westeros during the Targaryen era.", cast: "Peter Claffey, Dexter Sol Ansell" },
+    { id: "1396", t: "Breaking Bad", y: "2008", g: "CRIME", c: "tv", s: 5, e: 16, i: "/ztkUQ09o9h969Re6S9vDUs9GKV3.jpg", desc: "A chemistry teacher diagnosed with cancer turns to manufacturing meth to provide for his family.", cast: "Bryan Cranston, Aaron Paul" },
+    { id: "66732", t: "Stranger Things", y: "2016", g: "SCI-FI", c: "tv", s: 4, e: 9, i: "/x2LSRm21uTEx8P9uS4NiYpuzpYm.jpg", desc: "In a small town, a group of friends uncovers a mystery involving secret labs and terrifying forces.", cast: "Millie Bobby Brown, Finn Wolfhard" },
+    { id: "71446", t: "Money Heist", y: "2017", g: "CRIME", c: "tv", s: 5, e: 10, i: "/reKs8PRmZ9Yv7pT9yW6Wp.jpg", desc: "Eight thieves take hostages and lock themselves in the Royal Mint of Spain as a criminal mastermind manipulates the police.", cast: "Alvaro Morte, Ursula Corbero" },
+    { id: "1402", t: "The Walking Dead", y: "2010", g: "HORROR", c: "tv", s: 11, e: 24, i: "/n771f8Iq67p6fXv6p5L8fG5K6.jpg", desc: "Sheriff Deputy Rick Grimes wakes up from a coma to learn the world is in ruins and must lead survivors.", cast: "Andrew Lincoln, Norman Reedus" },
+    { id: "82856", t: "The Mandalorian", y: "2019", g: "SCI-FI", c: "tv", s: 3, e: 8, i: "/eU1i6eHXp2klv0tKWpjo7uqcM0N.jpg", desc: "A lone gunfighter makes his way through the outer reaches of the galaxy, far from the authority of the New Republic.", cast: "Pedro Pascal, Grogu" },
+    { id: "60625", t: "Rick and Morty", y: "2013", g: "ANIMATION", c: "tv", s: 7, e: 10, i: "/cvh7ZasA3pCbfmwbCXTic9Mc99u.jpg", desc: "An intermediate-schooler and his alcoholic scientist grandfather go on infinite adventures across the multiverse.", cast: "Justin Roiland, Chris Parnell" },
+    { id: "94605", t: "Arcane", y: "2021", g: "ANIMATION", c: "tv", s: 2, e: 9, i: "/fqldWgS4akC0mXz6Jp8u986p.jpg", desc: "Amidst the escalating unrest between the rich city of Piltover and the seedy underbelly of Zaun, two sisters fight.", cast: "Hailee Steinfeld, Ella Purnell" },
+    { id: "119051", t: "Wednesday", y: "2022", g: "FANTASY", c: "tv", s: 1, e: 8, i: "/99vBORo4YmYp9A8Sre1O0Y6M.jpg", desc: "While attending Nevermore Academy, Wednesday Addams attempts to master her emerging psychic ability.", cast: "Jenna Ortega, Emma Myers" },
+    { id: "76669", t: "Elite", y: "2018", g: "DRAMA", c: "tv", s: 8, e: 8, i: "/396M4k8S6Jp8u986p0G.jpg", desc: "When three working-class teens enroll in an exclusive private school in Spain, the clash leads to murder.", cast: "Itzan Escamilla, Omar Ayuso" },
+    { id: "63174", t: "Lucifer", y: "2016", g: "FANTASY", c: "tv", s: 6, e: 10, i: "/ekFe9asA3pCbfmwbCXT.jpg", desc: "The Devil moves to Los Angeles, opens a nightclub, and forms a connection with a homicide detective.", cast: "Tom Ellis, Lauren German" },
+    { id: "1412", t: "Arrow", y: "2012", g: "ACTION", c: "tv", s: 8, e: 22, i: "/gE8Sre1O0Y6M4k.jpg", desc: "Spoiled billionaire Oliver Queen is missing and presumed dead for five years before being discovered on a remote island.", cast: "Stephen Amell, Katie Cassidy" },
+    { id: "60735", t: "The Flash", y: "2014", g: "ACTION", c: "tv", s: 9, e: 13, i: "/lSre1O0Y6M4k8S6.jpg", desc: "After being struck by lightning, Barry Allen wakes up from his coma to discover he's been given the power of super speed.", cast: "Grant Gustin, Candice Patton" },
+    { id: "1399", t: "Game of Thrones", y: "2011", g: "FANTASY", c: "tv", s: 8, e: 73, i: "/7WUHnqvXTV79IdHAt99399.jpg", desc: "Nine noble families fight for control over the lands of Westeros, while an ancient enemy returns.", cast: "Emilia Clarke, Kit Harington" },
+    { id: "67198", t: "Star Trek: Discovery", y: "2017", g: "SCI-FI", c: "tv", s: 5, e: 10, i: "/discovery.jpg", desc: "Ten years before Kirk, the USS Discovery explores new worlds and lifeforms.", cast: "Sonequa Martin-Green" },
+    { id: "1434", t: "Modern Family", y: "2009", g: "COMEDY", c: "tv", s: 11, e: 22, i: "/modern.jpg", desc: "Three different but related families face trials and tribulations in their own uniquely comedic ways.", cast: "Ty Burrell, Sofia Vergara" },
+    { id: "4614", t: "NCIS", y: "2003", g: "CRIME", c: "tv", s: 21, e: 20, i: "/ncis.jpg", desc: "The cases of the Naval Criminal Investigative Service.", cast: "Mark Harmon" },
+    { id: "65494", t: "The Crown", y: "2016", g: "HISTORY", c: "tv", s: 6, e: 10, i: "/crown.jpg", desc: "Follows the political rivalries and romance of Queen Elizabeth II's reign.", cast: "Claire Foy, Olivia Colman" },
+    { id: "62560", t: "Mr. Robot", y: "2015", g: "THRILLER", c: "tv", s: 4, e: 13, i: "/robot.jpg", desc: "A young programmer works as a cyber-security engineer by day and a vigilante hacker by night.", cast: "Rami Malek" },
+    { id: "87108", t: "Chernobyl", y: "2019", g: "DRAMA", c: "tv", s: 1, e: 5, i: "/chernobyl.jpg", desc: "In April 1986, an explosion at the Chernobyl nuclear power plant becomes one of the world's worst man-made catastrophes.", cast: "Jared Harris, Stellan Skarsgard" },
+
+    // --- 40 MOVIES (Manual Entries) ---
+    { id: "475557", t: "Joker", y: "2019", g: "DRAMA", c: "mov", i: "/udDclJoHjfjb8Ekgsd4FDteOkCU.jpg", desc: "A failed comedian Arthur Fleck is driven insane and turns to crime in Gotham City.", cast: "Joaquin Phoenix, Robert De Niro" },
+    { id: "533535", t: "Deadpool & Wolverine", y: "2024", g: "ACTION", c: "mov", i: "/h6S6Yn6TrCD0t9_693134.jpg", desc: "The Merc with a Mouth teams up with Logan for a mission across the multiverse.", cast: "Ryan Reynolds, Hugh Jackman" },
+    { id: "299534", t: "Avengers Endgame", y: "2019", g: "ACTION", c: "mov", i: "/or06vSqzWBFscv1qCG76uC1fsR6.jpg", desc: "The Avengers take one final stand against Thanos to restore the universe.", cast: "Robert Downey Jr., Chris Evans" },
+    { id: "155", t: "The Dark Knight", y: "2008", g: "CRIME", c: "mov", i: "/qJ2tW6WMUDp9QEQbvN9pYFWZ9S7.jpg", desc: "Batman faces his greatest enemy, the Joker, in a battle for Gotham's soul.", cast: "Christian Bale, Heath Ledger" },
+    { id: "27205", t: "Inception", y: "2010", g: "SCI-FI", c: "mov", i: "/edv5CZvRjS99ayO76Y9Z9D9p2.jpg", desc: "A thief who steals corporate secrets through dream-sharing technology is given the inverse task.", cast: "Leonardo DiCaprio" },
+    { id: "157336", t: "Interstellar", y: "2014", g: "SCI-FI", c: "mov", i: "/gEU2QniE6E07Qv8uIUglvYvBvU3.jpg", desc: "A team of explorers travel through a wormhole in space in an attempt to ensure humanity's survival.", cast: "Matthew McConaughey" },
+    { id: "19995", t: "Avatar", y: "2009", g: "SCI-FI", c: "mov", i: "/kyeqWdyUXW608qeYvP9n9GgnY9.jpg", desc: "A paraplegic Marine dispatched to the moon Pandora on a unique mission.", cast: "Sam Worthington, Zoe Saldana" },
+    { id: "24428", t: "The Avengers", y: "2012", g: "ACTION", c: "mov", i: "/RYMX2SvevSuaSizvKt5Mfv9o.jpg", desc: "Earth's mightiest heroes must come together and learn to fight as a team.", cast: "Chris Evans, Scarlett Johansson" },
+    { id: "603", t: "The Matrix", y: "1999", g: "SCI-FI", c: "mov", i: "/f89U3Y9Y9Y9.jpg", desc: "A computer hacker learns from mysterious rebels about the true nature of his reality.", cast: "Keanu Reeves, Laurence Fishburne" },
+    { id: "671", t: "Harry Potter", y: "2001", g: "FANTASY", c: "mov", i: "/hp1.jpg", desc: "An orphaned boy enrolls in a school of wizardry, where he learns the truth about himself.", cast: "Daniel Radcliffe" },
+    { id: "120", t: "Lord of the Rings", y: "2001", g: "FANTASY", c: "mov", i: "/lotr.jpg", desc: "A meek Hobbit from the Shire and eight companions set out on a journey to destroy the powerful One Ring.", cast: "Elijah Wood" },
+    { id: "672", t: "Chamber of Secrets", y: "2002", g: "FANTASY", c: "mov", i: "/hp2.jpg", desc: "Harry ignores warnings not to return to Hogwarts, only to find the school plagued by mysterious attacks.", cast: "Emma Watson" },
+    { id: "550", t: "Fight Club", y: "1999", g: "DRAMA", c: "mov", i: "/fc.jpg", desc: "An insomniac office worker and a devil-may-care soap maker form an underground fight club.", cast: "Brad Pitt, Edward Norton" },
+    { id: "680", t: "Pulp Fiction", y: "1994", g: "CRIME", c: "mov", i: "/pf.jpg", desc: "The lives of two mob hitmen, a boxer, a gangster and his wife intertwine in four tales.", cast: "John Travolta, Samuel L. Jackson" },
+    { id: "13", t: "Forrest Gump", y: "1994", g: "DRAMA", c: "mov", i: "/fg.jpg", desc: "The presidencies of Kennedy and Johnson, the Vietnam War, and more through the eyes of an Alabama man.", cast: "Tom Hanks" },
+    { id: "278", t: "Shawshank Redemption", y: "1994", g: "DRAMA", c: "mov", i: "/sr.jpg", desc: "Two imprisoned men bond over a number of years, finding solace and eventual redemption.", cast: "Morgan Freeman" },
+    { id: "238", t: "The Godfather", y: "1972", g: "CRIME", c: "mov", i: "/gf.jpg", desc: "The aging patriarch of an organized crime dynasty transfers control of his empire to his son.", cast: "Marlon Brando, Al Pacino" },
+    { id: "122", t: "Return of the King", y: "2003", g: "FANTASY", c: "mov", i: "/lotr3.jpg", desc: "Gandalf and Aragorn lead the World of Men against Sauron's army to draw his gaze from Frodo.", cast: "Ian McKellen" },
+    { id: "11", t: "Star Wars", y: "1977", g: "SCI-FI", c: "mov", i: "/sw1.jpg", desc: "Luke Skywalker joins forces with a Jedi Knight, a cocky pilot, and two droids to save the galaxy.", cast: "Mark Hamill, Harrison Ford" },
+    { id: "1891", t: "Empire Strikes Back", y: "1980", g: "SCI-FI", c: "mov", i: "/sw2.jpg", desc: "After the Rebels are brutally overpowered by the Empire, Luke Skywalker begins Jedi training.", cast: "Carrie Fisher" },
+    { id: "121", t: "Two Towers", y: "2002", g: "FANTASY", c: "mov", i: "/lotr2.jpg", desc: "While Frodo and Sam edge closer to Mordor with the help of the shifty Gollum, the divided fellowship makes a stand.", cast: "Viggo Mortensen" },
+    { id: "105", t: "Back to the Future", y: "1985", g: "SCI-FI", c: "mov", i: "/bttf.jpg", desc: "Marty McFly, a 17-year-old high school student, is accidentally sent thirty years into the past.", cast: "Michael J. Fox" },
+    { id: "862", t: "Toy Story", y: "1995", g: "ANIMATION", c: "mov", i: "/ts.jpg", desc: "A cowboy doll is profoundly threatened and jealous when a new spaceman figure supplants him.", cast: "Tom Hanks, Tim Allen" },
+    { id: "271110", t: "Civil War", y: "2016", g: "ACTION", c: "mov", i: "/cw.jpg", desc: "Political involvement in the Avengers' affairs causes a rift between Captain America and Iron Man.", cast: "Robert Downey Jr." },
+    { id: "284054", t: "Black Panther", y: "2018", g: "ACTION", c: "mov", i: "/bp.jpg", desc: "T'Challa, heir to the hidden kingdom of Wakanda, must step forward to lead his people.", cast: "Chadwick Boseman" },
+    { id: "299536", t: "Infinity War", y: "2018", g: "ACTION", c: "mov", i: "/iw.jpg", desc: "The Avengers and their allies must be willing to sacrifice all in an attempt to defeat Thanos.", cast: "Josh Brolin" },
+    { id: "2454", t: "The Martian", y: "2015", g: "SCI-FI", c: "mov", i: "/martian.jpg", desc: "An astronaut becomes stranded on Mars after his team assume him dead.", cast: "Matt Damon" },
+    { id: "381288", t: "Split", y: "2016", g: "THRILLER", c: "mov", i: "/split.jpg", desc: "Three girls are kidnapped by a man with a diagnosed 23 distinct personalities.", cast: "James McAvoy" },
+    { id: "313369", t: "La La Land", y: "2016", g: "ROMANCE", c: "mov", i: "/lala.jpg", desc: "While navigating their careers in Los Angeles, a pianist and an actress fall in love.", cast: "Ryan Gosling, Emma Stone" },
+    { id: "330459", t: "Rogue One", y: "2016", g: "SCI-FI", c: "mov", i: "/rogue.jpg", desc: "The daughter of an Imperial scientist joins the Rebel Alliance in a risky move to steal the Death Star plans.", cast: "Felicity Jones" },
+    { id: "283995", t: "Guardians 2", y: "2017", g: "ACTION", c: "mov", i: "/gotg2.jpg", desc: "The Guardians struggle to keep together as a team while dealing with personal family issues.", cast: "Chris Pratt" },
+    { id: "324857", t: "Spider-Verse", y: "2018", g: "ANIMATION", c: "mov", i: "/sv.jpg", desc: "Teen Miles Morales becomes the Spider-Man of his universe, and must join with five spider-powered individuals.", cast: "Shameik Moore" },
+    { id: "424", t: "Schindler's List", y: "1993", g: "HISTORY", c: "mov", i: "/sl.jpg", desc: "In German-occupied Poland during WWII, industrialist Oskar Schindler gradually becomes concerned for his Jewish workforce.", cast: "Liam Neeson" },
+    { id: "372058", t: "Your Name", y: "2016", g: "ANIMATION", c: "mov", i: "/yn.jpg", desc: "Two strangers find themselves linked in a bizarre way. When a connection forms, will distance be the only thing to keep them apart?", cast: "Ryunosuke Kamiki" },
+    { id: "129", t: "Spirited Away", y: "2001", g: "ANIMATION", c: "mov", i: "/sa.jpg", desc: "During her family's move to the suburbs, a sullen 10-year-old girl wanders into a world ruled by gods, witches, and spirits.", cast: "Daveigh Chase" },
+    { id: "496243", t: "Parasite", y: "2019", g: "THRILLER", c: "mov", i: "/parasite.jpg", desc: "Greed and class discrimination threaten the newly formed symbiotic relationship between the wealthy Park family and the destitute Kim clan.", cast: "Song Kang-ho" },
+    { id: "497", t: "The Green Mile", y: "1999", g: "DRAMA", c: "mov", i: "/gm.jpg", desc: "The lives of guards on Death Row are affected by one of their charges: a black man accused of child murder and rape, who has a mysterious gift.", cast: "Tom Hanks" },
+    { id: "429", t: "The Good, Bad, Ugly", y: "1966", g: "WESTERN", c: "mov", i: "/tgbu.jpg", desc: "A bounty hunting scam joins two men in an uneasy alliance against a third in a race to find a fortune in gold buried in a remote cemetery.", cast: "Clint Eastwood" },
+    { id: "1573", t: "Die Hard", y: "1988", g: "ACTION", c: "mov", i: "/dh.jpg", desc: "An NYC cop visits his estranged wife and two daughters on Christmas Eve. He joins her at a holiday party in the headquarters of the Japanese-owned business she works for.", cast: "Bruce Willis" },
+    { id: "98", t: "Gladiator", y: "2000", g: "ACTION", c: "mov", i: "/gladiator.jpg", desc: "A former Roman General sets out to exact vengeance against the corrupt emperor who murdered his family and sent him into slavery.", cast: "Russell Crowe" }
 ];
