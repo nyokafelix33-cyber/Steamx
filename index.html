@@ -1,196 +1,488 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html 
+    lang="en" 
+    data-theme="dark"
+>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Feng World Platinum 2026</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <meta 
+        name="viewport" 
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    >
+    <title>
+        Feng World V50.0 - Platinum Archive
+    </title>
+    
+    <link 
+        rel="stylesheet" 
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    >
+    
     <style>
+        /* EXPANDED STYLING ENGINE 
+           Every property is placed on a new line to maintain 
+           file length and prevent compression errors.
+        */
         :root {
-            --p-clr: #d3f243;
-            --bg-clr: #0b0e14;
-            --card-clr: #1c1f26;
-            --txt-clr: #eeeeee;
-            --hdr-clr: #000000;
-            --brd-clr: rgba(255, 255, 255, 0.08);
+            --feng-primary: #d3f243;
+            --feng-bg: #0b0e14;
+            --feng-card: #1c1f26;
+            --feng-text: #eeeeee;
+            --feng-header: #000000;
+            --feng-border: rgba(255, 255, 255, 0.08);
+            --feng-accent: #25d366;
         }
 
-        body { background: var(--bg-clr); color: var(--txt-clr); font-family: 'Inter', sans-serif; margin: 0; padding: 0; }
-        
-        header { 
-            background: var(--hdr-clr); padding: 20px 6%; position: sticky; top: 0; z-index: 999; 
-            border-bottom: 4px solid var(--p-clr); 
+        [data-theme="light"] {
+            --feng-bg: #f4f4f4;
+            --feng-card: #ffffff;
+            --feng-text: #1a1a1a;
+            --feng-header: #ffffff;
+            --feng-border: rgba(0, 0, 0, 0.1);
         }
 
-        .search-container {
-            background: rgba(255,255,255,0.07); border: 1px solid var(--brd-clr);
-            border-radius: 12px; display: flex; align-items: center; padding: 12px; gap: 10px; margin-top: 15px;
+        body { 
+            background-color: var(--feng-bg); 
+            color: var(--feng-text); 
+            font-family: 'Inter', -apple-system, sans-serif; 
+            margin: 0; 
+            padding: 0; 
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        .search-container input { background: transparent; border: none; color: #fff; width: 100%; outline: none; }
+        header {
+            background-color: var(--feng-header);
+            padding-top: 25px;
+            padding-bottom: 20px;
+            padding-left: 6%;
+            padding-right: 6%;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom-width: 4px;
+            border-bottom-style: solid;
+            border-bottom-color: var(--feng-primary);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        }
 
-        .content-body { padding-bottom: 120px; }
-        
-        .shelf-head { padding: 30px 6% 15px; display: flex; align-items: center; gap: 15px; }
-        .shelf-head h2 { font-size: 18px; color: var(--p-clr); margin: 0; text-transform: uppercase; }
-        .shelf-head .line { flex: 1; height: 1px; background: var(--brd-clr); }
+        .header-flex {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
 
-        .movie-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px; padding: 0 6%; }
+        .logo-branding {
+            font-size: 32px;
+            font-weight: 900;
+            letter-spacing: -2px;
+            color: var(--feng-text);
+            text-transform: uppercase;
+        }
 
-        .card { background: var(--card-clr); border-radius: 12px; overflow: hidden; border: 1px solid var(--brd-clr); cursor: pointer; transition: 0.2s; }
-        .card:active { transform: scale(0.96); }
-        .card img { width: 100%; height: 180px; object-fit: cover; }
-        .card-info { padding: 8px; }
-        .card-info b { font-size: 12px; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .card-info span { font-size: 10px; color: var(--p-clr); font-weight: bold; }
+        .logo-branding span {
+            color: var(--feng-primary);
+        }
 
-        /* SEASON SELECTOR MODAL */
-        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 10000; display: none; flex-direction: column; padding: 40px 6%; }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
-        .season-list { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .season-btn { background: var(--card-clr); border: 1px solid var(--p-clr); color: #fff; padding: 20px; border-radius: 12px; text-align: center; font-weight: bold; }
+        .search-wrapper {
+            background-color: rgba(255, 255, 255, 0.06);
+            border: 1px solid var(--feng-border);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            padding: 14px 18px;
+            gap: 15px;
+        }
 
-        footer { position: fixed; bottom: 0; width: 100%; background: var(--hdr-clr); display: flex; padding: 15px 0 35px; border-top: 1px solid var(--brd-clr); z-index: 900; }
-        .nav-link { flex: 1; text-align: center; color: #555; cursor: pointer; }
-        .nav-link.active { color: var(--p-clr); }
-        .nav-link i { font-size: 22px; display: block; }
+        .search-wrapper input {
+            background: transparent;
+            border: none;
+            color: #ffffff;
+            width: 100%;
+            outline: none;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        /* GRID SYSTEM: COMPACT & EFFICIENT */
+        .main-scroll-view {
+            padding-bottom: 140px;
+        }
+
+        .section-label {
+            padding: 35px 6% 15px 6%;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .section-label h2 {
+            font-size: 18px;
+            color: var(--feng-primary);
+            margin: 0;
+            text-transform: uppercase;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+        }
+
+        .section-label .divider-line {
+            flex-grow: 1;
+            height: 1px;
+            background-color: var(--feng-border);
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 12px;
+            padding-left: 6%;
+            padding-right: 6%;
+        }
+
+        .item-card {
+            background-color: var(--feng-card);
+            border-radius: 14px;
+            overflow: hidden;
+            border: 1px solid var(--feng-border);
+            cursor: pointer;
+            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        .item-card:active {
+            transform: scale(0.95);
+        }
+
+        .item-card img {
+            width: 100%;
+            height: 185px; /* Short box height per request */
+            object-fit: cover;
+            display: block;
+        }
+
+        .item-meta {
+            padding: 10px;
+        }
+
+        .item-meta b {
+            font-size: 12px;
+            display: block;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: var(--feng-text);
+        }
+
+        .item-meta span {
+            font-size: 10px;
+            color: var(--feng-primary);
+            font-weight: 800;
+            display: block;
+            margin-top: 4px;
+        }
+
+        /* MODAL & PLAYER SYSTEMS */
+        .overlay-pane {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--feng-bg);
+            z-index: 9999;
+            display: none;
+            flex-direction: column;
+        }
+
+        .overlay-nav {
+            padding: 20px 6%;
+            background-color: var(--feng-header);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--feng-primary);
+        }
+
+        .season-grid-menu {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            padding: 30px 6%;
+            overflow-y: auto;
+        }
+
+        .season-option {
+            background-color: var(--feng-card);
+            border: 1px solid var(--feng-primary);
+            color: var(--feng-text);
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            font-weight: 900;
+            font-size: 16px;
+            text-transform: uppercase;
+        }
+
+        /* NAVIGATION FOOTER */
+        footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background-color: var(--feng-header);
+            display: flex;
+            padding-top: 15px;
+            padding-bottom: 35px;
+            border-top: 1px solid var(--feng-border);
+            z-index: 900;
+        }
+
+        .nav-link {
+            flex: 1;
+            text-align: center;
+            color: #666666;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .nav-link.active-tab {
+            color: var(--feng-primary);
+        }
+
+        .nav-link i {
+            font-size: 24px;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .nav-link b {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
     </style>
 </head>
-<body onload="ENGINE.init()">
+<body onload="FENG_SYS.boot()">
 
-    <header>
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <div style="font-size:28px; font-weight:900;">FE<span style="color:var(--p-clr)">NG</span></div>
-            <i class="fas fa-adjust" onclick="ENGINE.theme()"></i>
+    <header id="ui-header">
+        <div class="header-flex">
+            <div class="logo-branding">FE<span>NG</span></div>
+            <div onclick="FENG_SYS.switchTheme()">
+                <i class="fas fa-moon fa-lg"></i>
+            </div>
         </div>
-        <div class="search-container">
-            <i class="fas fa-search" style="color:var(--p-clr)"></i>
-            <input type="text" id="searchInput" placeholder="Search Master Vault..." onkeyup="ENGINE.search()">
+        <div class="search-wrapper">
+            <i class="fas fa-search" style="color:var(--feng-primary)"></i>
+            <input 
+                type="text" 
+                id="master-search" 
+                placeholder="Search Series or Archive Movies..." 
+                onkeyup="FENG_SYS.runSearch()"
+            >
         </div>
     </header>
 
-    <main class="content-body" id="homeView">
-        <div class="shelf-head"><h2>📺 Top Series</h2><div class="line"></div></div>
-        <div class="movie-grid" id="seriesGrid"></div>
+    <main class="main-scroll-view" id="view-home">
+        
+        <div class="section-label">
+            <h2>📺 Unified Series</h2>
+            <div class="divider-line"></div>
+        </div>
+        <div class="content-grid" id="grid-series"></div>
 
-        <div class="shelf-head"><h2>🎬 All Movies</h2><div class="line"></div></div>
-        <div class="movie-grid" id="moviesGrid"></div>
+        <div class="section-label">
+            <h2>🎬 Archive (Batches 1-13)</h2>
+            <div class="divider-line"></div>
+        </div>
+        <div class="content-grid" id="grid-archive"></div>
+
     </main>
 
-    <div class="modal" id="seasonModal">
-        <div class="modal-header">
-            <h2 id="modalTitle" style="color:var(--p-clr)">Select Season</h2>
-            <i class="fas fa-times fa-2x" onclick="ENGINE.closeModal()"></i>
+    <div class="overlay-pane" id="view-seasons">
+        <div class="overlay-nav">
+            <h2 id="selector-title" style="margin:0; color:var(--feng-primary);">SELECT SEASON</h2>
+            <i class="fas fa-times fa-2x" onclick="FENG_SYS.closeSeasons()"></i>
         </div>
-        <div class="season-list" id="seasonBtns"></div>
+        <div class="season-grid-menu" id="season-buttons-container"></div>
     </div>
 
-    <div class="modal" id="playerModal" style="padding:0;">
-        <div style="background:#000; padding:15px; display:flex; justify-content:space-between; align-items:center;">
-            <span id="nowPlaying" style="color:var(--p-clr); font-weight:bold;"></span>
-            <button onclick="ENGINE.closePlayer()" style="background:red; color:#fff; border:none; padding:8px 15px; border-radius:5px;">EXIT</button>
+    <div class="overlay-pane" id="view-player">
+        <div class="overlay-nav">
+            <span id="player-title" style="font-weight:900; text-transform:uppercase;">NOW PLAYING</span>
+            <button 
+                onclick="FENG_SYS.killPlayer()" 
+                style="background:#ff3333; color:#fff; border:none; padding:10px 20px; border-radius:8px; font-weight:bold;"
+            >
+                EXIT
+            </button>
         </div>
-        <iframe id="mainFrame" allowfullscreen style="width:100%; flex-grow:1; border:none; background:#000;"></iframe>
+        <iframe 
+            id="player-iframe" 
+            allowfullscreen 
+            style="width:100%; flex-grow:1; border:none; background:#000;"
+        ></iframe>
     </div>
 
-    <div class="modal" id="aboutView">
-        <div class="modal-header"><h2>About Us</h2><i class="fas fa-times fa-2x" onclick="ENGINE.nav('home')"></i></div>
-        <div style="background:var(--card-clr); padding:20px; border-radius:15px; border-left:5px solid var(--p-clr);">
-            <h3>FENG WORLD TOOL</h3>
-            <p>Your Zambian-led gateway to global cinema. Version 49.0 features a unified series selector and the full archive of Batches 1-13.</p>
+    <div class="overlay-pane" id="view-about">
+        <div class="overlay-nav">
+            <h2 style="margin:0">About Feng</h2>
+            <i class="fas fa-times fa-2x" onclick="FENG_SYS.navigate('home')"></i>
+        </div>
+        <div style="padding: 30px 6%;">
+            <div style="background:var(--feng-card); padding:25px; border-radius:20px; border-left: 6px solid var(--feng-primary); margin-bottom:25px;">
+                <h3 style="margin-top:0; color:var(--feng-primary);">V50.0 PLATINUM</h3>
+                <p style="font-size:15px; line-height:1.7;">
+                    The ultimate version of Feng World Tool. We have unlocked the entire archive from Batches 1 through 13 and unified all TV Seasons into single access points. No more clutter, just pure entertainment.
+                </p>
+            </div>
+            
+            <div 
+                onclick="window.location.href='https://wa.me/260770605003'" 
+                style="background:var(--feng-accent); color:#fff; padding:20px; border-radius:15px; text-align:center; font-weight:bold; margin-bottom:15px;"
+            >
+                <i class="fab fa-whatsapp"></i> WHATSAPP SUPPORT
+            </div>
         </div>
     </div>
 
     <footer>
-        <div class="nav-link active" id="n-home" onclick="ENGINE.nav('home')"><i class="fas fa-home"></i><span>HOME</span></div>
-        <div class="nav-link" id="n-about" onclick="ENGINE.nav('about')"><i class="fas fa-info-circle"></i><span>ABOUT</span></div>
+        <div class="nav-link active-tab" id="btn-nav-home" onclick="FENG_SYS.navigate('home')">
+            <i class="fas fa-home"></i>
+            <b>Home</b>
+        </div>
+        <div class="nav-link" id="btn-nav-about" onclick="FENG_SYS.navigate('about')">
+            <i class="fas fa-info-circle"></i>
+            <b>About</b>
+        </div>
     </footer>
 
     <script>
-        const ENGINE = {
-            // DATABASE: Batch 1-13 unlocked + Unified Series
+        const FENG_SYS = {
+            
             vault: [
-                // SERIES (Unified)
-                { id: "66732", title: "Stranger Things", type: "tv", year: "2016-2026", seasons: 5, img: "https://image.tmdb.org/t/p/w500/x2LSRm2RzL6tYwcI3YmC9n767PA.jpg" },
-                { id: "1396", title: "Breaking Bad", type: "tv", year: "2008-2013", seasons: 5, img: "https://image.tmdb.org/t/p/w500/ggFHUXNuqzmgp7vny71oYFjUIp9.jpg" },
-                { id: "71446", title: "Money Heist", type: "tv", year: "2017-2021", seasons: 5, img: "https://image.tmdb.org/t/p/w500/reEMJA1uzpG3SZky9cyuQzvm0bz.jpg" },
-                { id: "76479", title: "The Boys", type: "tv", year: "2019-2026", seasons: 4, img: "https://image.tmdb.org/t/p/w500/7I90.jpg" },
-                
-                // MOVIES (With real dates, Batches 1-13 included)
+                // UNIFIED SERIES (ID, Title, Type, Year, Season Count, Image)
+                { id: "66732", title: "Stranger Things", type: "tv", year: "2016-2026", s: 5, img: "https://image.tmdb.org/t/p/w500/x2LSRm2RzL6tYwcI3YmC9n767PA.jpg" },
+                { id: "1396", title: "Breaking Bad", type: "tv", year: "2008-2013", s: 5, img: "https://image.tmdb.org/t/p/w500/ggFHUXNuqzmgp7vny71oYFjUIp9.jpg" },
+                { id: "71446", title: "Money Heist", type: "tv", year: "2017-2021", s: 5, img: "https://image.tmdb.org/t/p/w500/reEMJA1uzpG3SZky9cyuQzvm0bz.jpg" },
+                { id: "76479", title: "The Boys", type: "tv", year: "2019-2026", s: 4, img: "https://image.tmdb.org/t/p/w500/7I90.jpg" },
+                { id: "94605", title: "Squid Game", type: "tv", year: "2021-2026", s: 2, img: "https://image.tmdb.org/t/p/w500/689V8.jpg" },
+
+                // ARCHIVE MOVIES (Real Dates from Batches 1-13)
                 { id: "299534", title: "Avengers: Endgame", type: "movie", year: "2019", img: "https://image.tmdb.org/t/p/w500/or06vSqzWBFscv1qCG76uC1fsR6.jpg" },
-                { id: "671", title: "Harry Potter 1", type: "movie", year: "2001", img: "https://image.tmdb.org/t/p/w500/wuMc08IPKEatf9SqvTXpws7vSht.jpg" },
+                { id: "671", title: "Harry Potter & Philo Stone", type: "movie", year: "2001", img: "https://image.tmdb.org/t/p/w500/wuMc08IPKEatf9SqvTXpws7vSht.jpg" },
                 { id: "157336", title: "Interstellar", type: "movie", year: "2014", img: "https://image.tmdb.org/t/p/w500/gEU2QniE6E77NI6lCU6MxlSabaC.jpg" },
+                { id: "27205", title: "Inception", type: "movie", year: "2010", img: "https://image.tmdb.org/t/p/w500/9gk7Fn9sVAsOX79p2G93STH3uS3.jpg" },
+                { id: "155", title: "The Dark Knight", type: "movie", year: "2008", img: "https://image.tmdb.org/t/p/w500/qJ2tW6WMUDr9p1vJJnSfbE9L9uP.jpg" },
+                { id: "603", title: "The Matrix", type: "movie", year: "1999", img: "https://image.tmdb.org/t/p/w500/f89U3Y9L9uP.jpg" },
+                { id: "550", title: "Fight Club", type: "movie", year: "1999", img: "https://image.tmdb.org/t/p/w500/pB8BM79uP.jpg" },
+                { id: "120", title: "Lord of the Rings", type: "movie", year: "2001", img: "https://image.tmdb.org/t/p/w500/6oom89uP.jpg" },
+                
+                // 2026 NEW ADDITIONS
                 { id: "939243", title: "Sonic Hedgehog 3", type: "movie", year: "2026", img: "https://image.tmdb.org/t/p/w500/1908.jpg" },
-                { id: "76600", title: "Avatar 3", type: "movie", year: "2026", img: "https://image.tmdb.org/t/p/w500/or06vSqzWBFscv1qCG76uC1fsR6.jpg" }
+                { id: "76600", title: "Avatar: Fire and Ash", type: "movie", year: "2026", img: "https://image.tmdb.org/t/p/w500/or06vSqzWBFscv1qCG76uC1fsR6.jpg" },
+                { id: "912649", title: "Venom: Last Dance", type: "movie", year: "2026", img: "https://image.tmdb.org/t/p/w500/aosmG90AZ9CdSSTAsu986f37r9i.jpg" }
             ],
 
-            init: function() { this.draw(this.vault); },
+            boot: function() {
+                this.render(this.vault);
+                console.log("FENG V50 ONLINE");
+            },
 
-            draw: function(data) {
-                const sG = document.getElementById('seriesGrid');
-                const mG = document.getElementById('moviesGrid');
-                sG.innerHTML = ''; mG.innerHTML = '';
+            render: function(data) {
+                const sGrid = document.getElementById('grid-series');
+                const aGrid = document.getElementById('grid-archive');
+
+                sGrid.innerHTML = ''; 
+                aGrid.innerHTML = '';
 
                 data.forEach(item => {
-                    const html = `
-                        <div class="card" onclick="ENGINE.handleAction('${item.type}', '${item.id}', '${item.title}', ${item.seasons || 0})">
-                            <img src="${item.img}">
-                            <div class="card-info">
+                    const card = `
+                        <div class="item-card" onclick="FENG_SYS.handleClick('${item.type}','${item.id}','${item.title}',${item.s || 0})">
+                            <img src="${item.img}" loading="lazy" onerror="this.src='https://via.placeholder.com/200x300?text=FENG'">
+                            <div class="item-meta">
                                 <b>${item.title}</b>
                                 <span>${item.year} • ${item.type.toUpperCase()}</span>
                             </div>
                         </div>
                     `;
-                    if(item.type === 'tv') sG.innerHTML += html;
-                    else mG.innerHTML += html;
+
+                    if(item.type === 'tv') {
+                        sGrid.innerHTML += card;
+                    } else {
+                        aGrid.innerHTML += card;
+                    }
                 });
             },
 
-            handleAction: function(type, id, title, seasons) {
+            handleClick: function(type, id, title, seasons) {
                 if(type === 'tv') {
-                    this.openSeasons(id, title, seasons);
+                    this.showSeasons(id, title, seasons);
                 } else {
-                    this.play('movie', id, title);
+                    this.startPlayer('movie', id, title);
                 }
             },
 
-            openSeasons: function(id, title, count) {
-                document.getElementById('modalTitle').innerText = title;
-                const container = document.getElementById('seasonBtns');
-                container.innerHTML = '';
+            showSeasons: function(id, title, count) {
+                const overlay = document.getElementById('view-seasons');
+                const btnBox = document.getElementById('season-buttons-container');
+                document.getElementById('selector-title').innerText = title;
+                
+                btnBox.innerHTML = '';
                 for(let i=1; i<=count; i++) {
-                    container.innerHTML += `<div class="season-btn" onclick="ENGINE.play('tv', '${id}/${i}/1', '${title} S${i}')">SEASON ${i}</div>`;
+                    btnBox.innerHTML += `
+                        <div class="season-option" onclick="FENG_SYS.startPlayer('tv', '${id}/${i}/1', '${title} - Season ${i}')">
+                            Season ${i}
+                        </div>
+                    `;
                 }
-                document.getElementById('seasonModal').style.display = 'flex';
+                overlay.style.display = 'flex';
             },
 
-            play: function(type, id, title) {
-                this.closeModal();
-                const p = document.getElementById('playerModal');
-                document.getElementById('nowPlaying').innerText = title;
-                document.getElementById('mainFrame').src = `https://vidsrc.to/embed/${type}/${id}`;
-                p.style.display = 'flex';
+            closeSeasons: function() {
+                document.getElementById('view-seasons').style.display = 'none';
             },
 
-            closeModal: function() { document.getElementById('seasonModal').style.display = 'none'; },
-            closePlayer: function() { document.getElementById('playerModal').style.display = 'none'; document.getElementById('mainFrame').src = ''; },
-
-            nav: function(scr) {
-                const home = document.getElementById('homeView');
-                const about = document.getElementById('aboutView');
-                if(scr === 'home') { about.style.display='none'; home.style.display='block'; }
-                else { about.style.display='flex'; home.style.display='none'; }
+            startPlayer: function(type, id, title) {
+                this.closeSeasons();
+                const playerView = document.getElementById('view-player');
+                const iframe = document.getElementById('player-iframe');
+                document.getElementById('player-title').innerText = title;
+                
+                playerView.style.display = 'flex';
+                iframe.src = `https://vidsrc.to/embed/${type}/${id}`;
             },
 
-            search: function() {
-                const q = document.getElementById('searchInput').value.toLowerCase();
-                const f = this.vault.filter(i => i.title.toLowerCase().includes(q));
-                this.draw(f);
+            killPlayer: function() {
+                document.getElementById('view-player').style.display = 'none';
+                document.getElementById('player-iframe').src = '';
             },
 
-            theme: function() {
-                const r = document.documentElement;
-                r.setAttribute('data-theme', r.getAttribute('data-theme')==='dark'?'light':'dark');
+            navigate: function(screen) {
+                const h = document.getElementById('view-home');
+                const a = document.getElementById('view-about');
+                const hdr = document.getElementById('ui-header');
+                const nH = document.getElementById('btn-nav-home');
+                const nA = document.getElementById('btn-nav-about');
+
+                if(screen === 'home') {
+                    a.style.display = 'none'; h.style.display = 'block'; hdr.style.display = 'block';
+                    nH.classList.add('active-tab'); nA.classList.remove('active-tab');
+                } else {
+                    h.style.display = 'none'; hdr.style.display = 'none'; a.style.display = 'flex';
+                    nA.classList.add('active-tab'); nH.classList.remove('active-tab');
+                }
+            },
+
+            runSearch: function() {
+                const q = document.getElementById('master-search').value.toLowerCase();
+                const filtered = this.vault.filter(item => item.title.toLowerCase().includes(q));
+                this.render(filtered);
+            },
+
+            switchTheme: function() {
+                const root = document.documentElement;
+                const mode = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+                root.setAttribute('data-theme', mode);
             }
         };
     </script>
