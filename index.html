@@ -2,155 +2,414 @@
 <html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Feng | World Tool</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Feng | The World Tool</title>
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
     <style>
-        :root { --main: #d3f243; --bg: #0b0e14; --card: #1c1f26; --text: #eeeeee; --header: #000; }
-        [data-theme="light"] { --bg: #f5f7fa; --card: #ffffff; --text: #1a1a1a; --header: #ffffff; }
-        body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; margin: 0; padding: 0; transition: 0.3s; }
-        
-        /* HEADER */
-        header { background: var(--header); padding: 15px 5%; position: sticky; top: 0; z-index: 1000; border-bottom: 2px solid var(--main); box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-        .logo { font-weight: 900; font-size: 26px; letter-spacing: -1px; }
+        /* 1. CORE VARIABLES */
+        :root {
+            --main: #d3f243;
+            --bg: #0b0e14;
+            --card: #1c1f26;
+            --text: #eeeeee;
+            --header: #000000;
+            --accent: #25d366;
+            --danger: #ff4444;
+            --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        [data-theme="light"] {
+            --bg: #f0f2f5;
+            --card: #ffffff;
+            --text: #121212;
+            --header: #ffffff;
+        }
+
+        /* 2. BASE STYLES */
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { 
+            background: var(--bg); 
+            color: var(--text); 
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+            margin: 0; 
+            padding: 0; 
+            transition: var(--transition);
+            overflow-x: hidden;
+        }
+
+        /* 3. HEADER & SEARCH ENGINE */
+        header {
+            background: var(--header);
+            padding: 15px 5%;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 2px solid var(--main);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+        }
+
+        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .logo { font-size: 28px; font-weight: 900; letter-spacing: -1.5px; text-transform: uppercase; }
         .logo span { color: var(--main); }
+
+        .search-wrapper {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid #333;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            gap: 10px;
+            transition: var(--transition);
+        }
+        .search-wrapper:focus-within { border-color: var(--main); background: rgba(255,255,255,0.1); }
+        .search-wrapper input {
+            background: transparent;
+            border: none;
+            color: #fff;
+            width: 100%;
+            outline: none;
+            font-size: 16px;
+        }
+
+        /* 4. GENRE & CATEGORY SYSTEM */
+        .category-nav {
+            display: flex;
+            overflow-x: auto;
+            padding: 15px 5%;
+            gap: 12px;
+            scrollbar-width: none;
+        }
+        .category-nav::-webkit-scrollbar { display: none; }
+        .cat-item {
+            background: var(--card);
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: 600;
+            white-space: nowrap;
+            border: 1px solid #333;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .cat-item.active { background: var(--main); color: #000; border-color: var(--main); }
+
+        /* 5. MAIN CONTENT GRID */
+        .content-area { padding: 0 5% 120px 5%; min-height: 80vh; }
+        .grid-layout {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 20px;
+            animation: fadeIn 0.5s ease;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .movie-card {
+            background: var(--card);
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.05);
+            position: relative;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .movie-card:active { transform: scale(0.95); }
+        .movie-card img {
+            width: 100%;
+            height: 230px;
+            object-fit: cover;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .card-body { padding: 12px; }
+        .m-title { font-size: 14px; font-weight: 700; margin-bottom: 4px; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .m-meta { font-size: 11px; color: var(--main); font-weight: 600; opacity: 0.9; }
+
+        /* 6. MODALS & SCREENS */
+        .full-screen {
+            position: fixed;
+            inset: 0;
+            background: var(--bg);
+            z-index: 2000;
+            display: none;
+            flex-direction: column;
+            padding: 25px;
+            overflow-y: auto;
+        }
+
+        .screen-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        /* 7. SETTINGS SPECIFIC */
+        .settings-group { margin-bottom: 25px; }
+        .group-label { font-size: 12px; color: #777; margin-bottom: 10px; display: block; letter-spacing: 1px; font-weight: bold; }
         
-        /* SEARCH & GENRE */
-        .search-box { background: #1a1a1a; border-radius: 12px; display: flex; padding: 12px; border: 1px solid #333; margin-top: 15px; }
-        .search-box input { background: transparent; border: none; color: white; width: 100%; outline: none; }
-        .genre-bar { display: flex; overflow-x: auto; gap: 10px; padding: 15px 5%; scrollbar-width: none; }
-        .genre-pill { background: var(--card); padding: 8px 18px; border-radius: 25px; font-size: 12px; border: 1px solid #444; cursor: pointer; white-space: nowrap; transition: 0.2s; }
-        .genre-pill.active { background: var(--main); color: #000; font-weight: bold; border-color: var(--main); }
+        .option-tile {
+            background: var(--card);
+            padding: 18px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 10px;
+            border: 1px solid rgba(255,255,255,0.05);
+            cursor: pointer;
+        }
+        .option-tile i { width: 24px; text-align: center; color: var(--main); font-size: 18px; }
 
-        /* GRID SYSTEM */
-        .container { padding: 10px 5% 120px 5%; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 20px; }
-        .card { background: var(--card); border-radius: 15px; overflow: hidden; border: 1px solid #333; cursor: pointer; transition: 0.3s; position: relative; }
-        .card:hover { border-color: var(--main); transform: translateY(-5px); }
-        .card img { width: 100%; height: 230px; object-fit: cover; display: block; }
-        .card-meta { padding: 12px; }
-        .card-title { font-size: 13px; font-weight: bold; margin-bottom: 5px; display: block; height: 16px; overflow: hidden; }
-        
-        /* PLAYER MODAL */
-        #player { position: fixed; inset: 0; background: #000; z-index: 10000; display: none; flex-direction: column; }
-        iframe { flex-grow: 1; border: none; width: 100%; height: 100%; }
+        .social-row { display: flex; gap: 12px; margin-top: 10px; }
+        .social-btn {
+            flex: 1;
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+            color: #fff;
+            font-size: 20px;
+            text-decoration: none;
+            transition: 0.2s;
+        }
+        .wa { background: #25D366; }
+        .ig { background: #E1306C; }
 
-        /* SETTINGS (ALL FEATURES PRESERVED) */
-        #setModal { position: fixed; inset: 0; background: var(--bg); z-index: 9999; display: none; padding: 25px; overflow-y: auto; }
-        .menu-row { background: var(--card); padding: 20px; border-radius: 15px; margin-bottom: 12px; display: flex; align-items: center; gap: 15px; border: 1px solid #333; cursor: pointer; }
-        .vision-text { margin-top: 40px; text-align: center; font-size: 12px; opacity: 0.6; line-height: 1.8; padding: 20px; border-top: 1px solid #333; }
+        .vision-section {
+            background: linear-gradient(rgba(211,242,67,0.05), transparent);
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            margin-top: 20px;
+            border: 1px solid rgba(255,255,255,0.03);
+        }
 
-        footer { position: fixed; bottom: 0; width: 100%; background: #000; display: flex; justify-content: space-around; padding: 18px 0; border-top: 1px solid #222; z-index: 1001; }
-        footer div { text-align: center; font-size: 10px; color: #666; cursor: pointer; }
+        /* 8. VIDEO PLAYER */
+        #playerScreen { background: #000; padding: 0; overflow: hidden; }
+        .player-controls { background: #111; padding: 15px; display: flex; justify-content: space-between; align-items: center; }
+        iframe { width: 100%; height: 100%; border: none; flex-grow: 1; }
+
+        /* 9. BOTTOM NAV */
+        footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background: var(--header);
+            display: flex;
+            justify-content: space-around;
+            padding: 15px 0 25px 0;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
+            z-index: 1500;
+        }
+        .nav-item { text-align: center; font-size: 11px; color: #666; cursor: pointer; transition: 0.3s; flex: 1; }
+        .nav-item i { font-size: 20px; margin-bottom: 5px; }
+        .nav-item.active { color: var(--main); }
     </style>
 </head>
-<body onload="render(movieDB)">
+<body>
 
-    <header>
-        <div class="logo">FE<span>NG</span></div>
-        <div class="search-box">
-            <input type="text" id="searchInput" placeholder="Search the 2026 library..." onkeyup="doSearch()">
-            <i class="fas fa-search" style="color:var(--main)"></i>
+    <header id="appHeader">
+        <div class="header-top">
+            <div class="logo">FE<span>NG</span></div>
+            <i class="fas fa-bell" style="opacity: 0.5;"></i>
+        </div>
+        <div class="search-wrapper">
+            <i class="fas fa-search" style="color: var(--main)"></i>
+            <input type="text" id="mainSearch" placeholder="Search movies, series, stars..." onkeyup="fengEngine.filter()">
         </div>
     </header>
 
-    <div class="genre-bar">
-        <div class="genre-pill active" onclick="setG('All', this)">All</div>
-        <div class="genre-pill" onclick="setG('Movie', this)">Movies</div>
-        <div class="genre-pill" onclick="setG('Series', this)">Series</div>
-        <div class="genre-pill" onclick="setG('Action', this)">Action</div>
-        <div class="genre-pill" onclick="setG('Horror', this)">Horror</div>
+    <nav class="category-nav" id="catNav">
+        <div class="cat-item active" onclick="fengEngine.setCategory('All', this)">All</div>
+        <div class="cat-item" onclick="fengEngine.setCategory('Movie', this)">Movies</div>
+        <div class="cat-item" onclick="fengEngine.setCategory('Series', this)">Series</div>
+        <div class="cat-item" onclick="fengEngine.setCategory('Sci-Fi', this)">Sci-Fi</div>
+        <div class="cat-item" onclick="fengEngine.setCategory('Horror', this)">Horror</div>
+    </nav>
+
+    <main class="content-area" id="homeView">
+        <div class="grid-layout" id="movieGrid">
+            </div>
+    </main>
+
+    <div id="settingsScreen" class="full-screen">
+        <div class="screen-header">
+            <h2 style="margin:0">Settings</h2>
+            <i class="fas fa-times fa-2x" onclick="fengEngine.switchView('home')"></i>
+        </div>
+
+        <div class="settings-group">
+            <span class="group-label">PREFERENCES</span>
+            <div class="option-tile" onclick="fengEngine.toggleTheme()">
+                <i class="fas fa-moon"></i>
+                <span>Dark / Light Mode</span>
+            </div>
+        </div>
+
+        <div class="settings-group">
+            <span class="group-label">SUPPORT & FEEDBACK</span>
+            <div class="option-tile" onclick="alert('Report line: +260770605003')">
+                <i class="fas fa-bug"></i>
+                <span>Report an Issue</span>
+            </div>
+            <div class="option-tile" onclick="alert('Feng World Tool v37.0 - Platinum Edition')">
+                <i class="fas fa-info-circle"></i>
+                <span>About Us</span>
+            </div>
+        </div>
+
+        <div class="settings-group">
+            <span class="group-label">JOIN OUR COMMUNITY</span>
+            <div class="social-row">
+                <a href="https://wa.me/260770605003" class="social-btn wa"><i class="fab fa-whatsapp"></i></a>
+                <a href="https://instagram.com/felix_nyoka" target="_blank" class="social-btn ig"><i class="fab fa-instagram"></i></a>
+            </div>
+        </div>
+
+        <div class="vision-section">
+            <h4 style="margin:0 0 10px 0; color:var(--main);">OUR VISION</h4>
+            <p style="margin:0; font-size:12px; line-height:1.6; opacity:0.8;">
+                To become the premier global hub for cinematic accessibility, bridging the gap between world-class entertainment and users in Zambia and beyond.
+            </p>
+        </div>
     </div>
 
-    <div class="container">
-        <div class="grid" id="mainGrid"></div>
-    </div>
-
-    <div id="player">
-        <div style="padding:15px; background:#111; display:flex; justify-content:space-between; align-items:center;">
-            <b id="pTitle" style="color:var(--main)">Feng Player</b>
-            <button onclick="closeP()" style="background:#ff4444; color:white; border:none; padding:8px 20px; border-radius:8px; font-weight:bold;">EXIT</button>
+    <div id="playerScreen" class="full-screen">
+        <div class="player-controls">
+            <b id="activeTitle" style="color:var(--main); font-size:14px;">Streaming...</b>
+            <button onclick="fengEngine.closePlayer()" style="background:var(--danger); border:none; color:#fff; padding:8px 18px; border-radius:8px; font-weight:bold;">EXIT</button>
         </div>
-        <iframe id="vFrame" allowfullscreen></iframe>
-    </div>
-
-    <div id="setModal">
-        <div style="display:flex; justify-content:space-between; margin-bottom:30px;">
-            <h2 style="margin:0">Account & Settings</h2><i class="fas fa-times fa-2x" onclick="closeSets()"></i>
-        </div>
-        <div class="menu-row" onclick="toggleT()"><i class="fas fa-adjust"></i> Appearance (Dark/Light)</div>
-        <div class="menu-row" onclick="alert('Support: +260770605003')"><i class="fas fa-bug"></i> Report an Issue</div>
-        <div class="menu-row" onclick="alert('Feng World Tool v35.0 Platinum')"><i class="fas fa-info-circle"></i> About Us</div>
-        <div style="display:flex; gap:10px; margin-top:20px;">
-            <a href="https://wa.me/260770605003" style="flex:1; background:#25D366; color:white; padding:15px; border-radius:12px; text-align:center; text-decoration:none;"><i class="fab fa-whatsapp"></i></a>
-            <a href="https://instagram.com/felix_nyoka" target="_blank" style="flex:1; background:#E1306C; color:white; padding:15px; border-radius:12px; text-align:center; text-decoration:none;"><i class="fab fa-instagram"></i></a>
-        </div>
-        <div class="vision-text">
-            <b>THE VISION OF FENG</b><br>
-            To become the premier global hub for cinematic accessibility, bridging the gap between world-class entertainment and users in Zambia and beyond.
-        </div>
+        <iframe id="fengIframe" allowfullscreen></iframe>
     </div>
 
     <footer>
-        <div onclick="closeSets()"><i class="fas fa-home"></i><br>Home</div>
-        <div onclick="openSets()"><i class="fas fa-cog"></i><br>Settings</div>
+        <div class="nav-item active" id="homeBtn" onclick="fengEngine.switchView('home')">
+            <i class="fas fa-home"></i><br>Home
+        </div>
+        <div class="nav-item" id="setBtn" onclick="fengEngine.switchView('settings')">
+            <i class="fas fa-cog"></i><br>Settings
+        </div>
     </footer>
 
     <script>
-        const movieDB = [
-            // BATCH 13 (LATEST FEB 2026)
-            {id: 299534, title: "Avengers: Doomsday", year: 2026, g: "Movie", img: "https://image.tmdb.org/t/p/w500/or06vSqzWBFscv1qCG76uC1fsR6.jpg"},
-            {id: 111110, title: "Dexter: Resurrection", year: 2026, g: "Series", img: "https://image.tmdb.org/t/p/w500/vZloY0Cc8pPTMvS3v1wZ94Ydn94.jpg"},
-            {id: 115508, title: "The Night Agent S3", year: 2026, g: "Series", img: "https://image.tmdb.org/t/p/w500/689V8.jpg"},
-            {id: 111111, title: "Five Nights at Freddy's 2", year: 2026, g: "Horror", img: "https://image.tmdb.org/t/p/w500/78R9.jpg"},
-            {id: 420634, title: "Scream 7", year: 2026, g: "Horror", img: "https://image.tmdb.org/t/p/w500/fT0X.jpg"},
-            {id: 804616, title: "Jurassic World: Rebirth", year: 2025, g: "Movie", img: "https://image.tmdb.org/t/p/w500/yK9I.jpg"},
-            {id: 533535, title: "Deadpool & Wolverine", year: 2024, g: "Action", img: "https://image.tmdb.org/t/p/w500/8cdclPkS1fSgtHd96YvFhX7U93v.jpg"},
-            {id: 1184918, title: "The Wild Robot", year: 2024, g: "Movie", img: "https://image.tmdb.org/t/p/w500/7I90.jpg"}
-        ];
+        /**
+         * FENG CORE ENGINE v37.0
+         * Designed to handle high volume data without freezing.
+         */
+        const fengEngine = {
+            currentCategory: 'All',
+            
+            // 1. MOVIE DATABASE (BATCH 13 INCLUDED)
+            // Add Batch 14 here later!
+            database: [
+                {id: 299534, title: "Avengers: Doomsday", year: 2026, cat: "Movie", genre: "Sci-Fi", img: "https://image.tmdb.org/t/p/w500/or06vSqzWBFscv1qCG76uC1fsR6.jpg"},
+                {id: 111110, title: "Dexter: Resurrection", year: 2026, cat: "Series", genre: "Action", img: "https://image.tmdb.org/t/p/w500/vZloY0Cc8pPTMvS3v1wZ94Ydn94.jpg"},
+                {id: 115508, title: "The Night Agent S3", year: 2026, cat: "Series", genre: "Action", img: "https://image.tmdb.org/t/p/w500/689V8.jpg"},
+                {id: 420634, title: "Scream 7", year: 2026, cat: "Movie", genre: "Horror", img: "https://image.tmdb.org/t/p/w500/fT0X.jpg"},
+                {id: 111111, title: "Five Nights at Freddy's 2", year: 2026, cat: "Movie", genre: "Horror", img: "https://image.tmdb.org/t/p/w500/78R9.jpg"},
+                {id: 804616, title: "Jurassic World: Rebirth", year: 2025, cat: "Movie", genre: "Sci-Fi", img: "https://image.tmdb.org/t/p/w500/yK9I.jpg"},
+                {id: 533535, title: "Deadpool & Wolverine", year: 2024, cat: "Movie", genre: "Action", img: "https://image.tmdb.org/t/p/w500/8cdclPkS1fSgtHd96YvFhX7U93v.jpg"},
+                {id: 1184918, title: "The Wild Robot", year: 2024, cat: "Movie", genre: "Sci-Fi", img: "https://image.tmdb.org/t/p/w500/7I90.jpg"}
+            ],
 
-        let currentGenre = 'All';
+            // 2. RENDER LOGIC
+            init: function() {
+                this.renderGrid(this.database);
+            },
 
-        function render(data) {
-            const grid = document.getElementById('mainGrid');
-            grid.innerHTML = data.map(m => `
-                <div class="card" onclick="play('${m.g === 'Series' ? 'tv' : 'movie'}', '${m.id}', '${m.title}')">
-                    <img src="${m.img}" onerror="this.src='https://via.placeholder.com/300x450?text=Reloading...'">
-                    <div class="card-meta">
-                        <span class="card-title">${m.title}</span>
-                        <span style="font-size:10px; color:var(--main); font-weight:bold;">${m.year} • ${m.g}</span>
-                    </div>
-                </div>
-            `).join('');
-        }
+            renderGrid: function(data) {
+                const grid = document.getElementById('movieGrid');
+                grid.innerHTML = '';
+                
+                if(data.length === 0) {
+                    grid.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding:50px; opacity:0.5;">No titles found in this category.</div>`;
+                    return;
+                }
 
-        function play(type, id, title) {
-            document.getElementById('pTitle').innerText = title;
-            document.getElementById('player').style.display = 'flex';
-            document.getElementById('vFrame').src = `https://vidsrc.me/embed/${type}?tmdb=${id}`;
-        }
+                data.forEach(item => {
+                    const card = document.createElement('div');
+                    card.className = 'movie-card';
+                    card.onclick = () => this.openPlayer(item);
+                    card.innerHTML = `
+                        <img src="${item.img}" loading="lazy" onerror="this.src='https://via.placeholder.com/300x450?text=Reloading...'">
+                        <div class="card-body">
+                            <span class="m-title">${item.title}</span>
+                            <span class="m-meta">${item.year} • ${item.cat}</span>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                });
+            },
 
-        function setG(g, el) {
-            currentGenre = g;
-            document.querySelectorAll('.genre-pill').forEach(p => p.classList.remove('active'));
-            el.classList.add('active');
-            doSearch();
-        }
+            // 3. NAVIGATION ENGINE
+            switchView: function(view) {
+                const home = document.getElementById('homeView');
+                const settings = document.getElementById('settingsScreen');
+                const header = document.getElementById('appHeader');
+                const catNav = document.getElementById('catNav');
 
-        function doSearch() {
-            const q = document.getElementById('searchInput').value.toLowerCase();
-            const res = movieDB.filter(m => (currentGenre === 'All' || m.g === currentGenre) && m.title.toLowerCase().includes(q));
-            render(res);
-        }
+                if(view === 'home') {
+                    settings.style.display = 'none';
+                    home.style.display = 'block';
+                    header.style.display = 'block';
+                    catNav.style.display = 'flex';
+                    document.getElementById('homeBtn').classList.add('active');
+                    document.getElementById('setBtn').classList.remove('active');
+                    this.renderGrid(this.database); // Refresh grid to prevent freeze
+                } else {
+                    home.style.display = 'none';
+                    header.style.display = 'none';
+                    catNav.style.display = 'none';
+                    settings.style.display = 'flex';
+                    document.getElementById('setBtn').classList.add('active');
+                    document.getElementById('homeBtn').classList.remove('active');
+                }
+            },
 
-        function toggleT() {
-            const h = document.documentElement;
-            h.setAttribute('data-theme', h.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
-        }
+            // 4. FILTER ENGINE
+            setCategory: function(cat, el) {
+                this.currentCategory = cat;
+                document.querySelectorAll('.cat-item').forEach(i => i.classList.remove('active'));
+                el.classList.add('active');
+                this.filter();
+            },
 
-        function closeP() { document.getElementById('player').style.display='none'; document.getElementById('vFrame').src=''; }
-        function openSets() { document.getElementById('setModal').style.display='block'; }
-        function closeSets() { document.getElementById('setModal').style.display='none'; }
+            filter: function() {
+                const query = document.getElementById('mainSearch').value.toLowerCase();
+                const filtered = this.database.filter(m => {
+                    const matchesSearch = m.title.toLowerCase().includes(query);
+                    const matchesCat = (this.currentCategory === 'All' || m.cat === this.currentCategory || m.genre === this.currentCategory);
+                    return matchesSearch && matchesCat;
+                });
+                this.renderGrid(filtered);
+            },
+
+            // 5. PLAYER ENGINE
+            openPlayer: function(movie) {
+                const player = document.getElementById('playerScreen');
+                const iframe = document.getElementById('fengIframe');
+                document.getElementById('activeTitle').innerText = movie.title;
+                player.style.display = 'flex';
+                // Using vidsrc.to for highest stability in 2026
+                const type = movie.cat === 'Series' ? 'tv' : 'movie';
+                iframe.src = `https://vidsrc.to/embed/${type}/${movie.id}`;
+            },
+
+            closePlayer: function() {
+                document.getElementById('playerScreen').style.display = 'none';
+                document.getElementById('fengIframe').src = '';
+            },
+
+            toggleTheme: function() {
+                const h = document.documentElement;
+                h.setAttribute('data-theme', h.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+            }
+        };
+
+        // RUN ENGINE
+        fengEngine.init();
     </script>
 </body>
 </html>
