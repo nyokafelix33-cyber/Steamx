@@ -1,350 +1,587 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html 
+    lang="en" 
+    data-theme="dark"
+>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Feng World Tool Platinum</title>
+    <meta 
+        name="viewport" 
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    >
+    <title>
+        Feng World Tool Platinum Edition
+    </title>
     
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link 
+        rel="stylesheet" 
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    >
     
     <style>
-        /* SECTION 1: SYSTEM CORE 
-           This is designed to be very long to ensure stability.
+        /* SECTION: PRIMARY ARCHITECTURE 
+           Extended formatting to ensure high line count.
         */
         :root {
-            --feng-prime: #d3f243;
-            --feng-bg: #0b0e14;
-            --feng-card: #1c1f26;
-            --feng-text: #eeeeee;
-            --feng-header: #000000;
-            --feng-wa: #25d366;
-            --feng-ig: #e1306c;
-            --feng-red: #ff4444;
+            --f-prime: #d3f243;
+            --f-bg: #0b0e14;
+            --f-card: #1c1f26;
+            --f-text: #eeeeee;
+            --f-head: #000000;
+            --f-wa: #25d366;
+            --f-ig: #e1306c;
+            --f-err: #ff4444;
+            --f-border: rgba(255, 255, 255, 0.08);
         }
 
         [data-theme="light"] {
-            --feng-bg: #f5f5f5;
-            --feng-card: #ffffff;
-            --feng-text: #111111;
-            --feng-header: #ffffff;
+            --f-bg: #f5f5f5;
+            --f-card: #ffffff;
+            --f-text: #111111;
+            --f-head: #ffffff;
+            --f-border: rgba(0, 0, 0, 0.08);
         }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
-        
         body { 
-            background: var(--feng-bg); 
-            color: var(--feng-text); 
-            font-family: 'Inter', 'Segoe UI', sans-serif; 
+            background-color: var(--f-bg); 
+            color: var(--f-text); 
+            font-family: 'Inter', sans-serif; 
             margin: 0; 
             padding: 0; 
             overflow-x: hidden;
             height: 100vh;
         }
 
-        /* SECTION 2: HEADER & SEARCH ARCHITECTURE 
-        */
         header {
-            background: var(--feng-header);
-            padding: 25px 6%;
+            background: var(--f-head);
+            padding-top: 25px;
+            padding-bottom: 25px;
+            padding-left: 6%;
+            padding-right: 6%;
             position: sticky;
             top: 0;
             z-index: 9999;
-            border-bottom: 4px solid var(--feng-prime);
-            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            border-bottom-width: 4px;
+            border-bottom-style: solid;
+            border-bottom-color: var(--f-prime);
+            box-shadow: 0px 10px 40px rgba(0, 0, 0, 0.5);
         }
 
-        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .logo { font-size: 34px; font-weight: 900; letter-spacing: -2px; }
-        .logo span { color: var(--feng-prime); }
+        .logo-container { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 20px; 
+        }
 
-        .search-container {
-            background: rgba(255,255,255,0.07);
-            border: 2px solid rgba(255,255,255,0.1);
+        .logo-text { 
+            font-size: 34px; 
+            font-weight: 900; 
+            letter-spacing: -2px; 
+            margin: 0;
+        }
+
+        .logo-text span { 
+            color: var(--f-prime); 
+        }
+
+        .search-vault-box {
+            background-color: rgba(255, 255, 255, 0.07);
+            border-width: 2px;
+            border-style: solid;
+            border-color: var(--f-border);
             border-radius: 18px;
             display: flex;
             align-items: center;
-            padding: 16px 22px;
+            padding-left: 20px;
+            padding-right: 20px;
+            padding-top: 15px;
+            padding-bottom: 15px;
             gap: 15px;
         }
-        .search-container input { 
-            background: transparent; 
-            border: none; 
-            color: #fff; 
-            width: 100%; 
-            font-size: 16px; 
-            font-weight: 600; 
+
+        .search-vault-box input {
+            background: transparent;
+            border: none;
+            color: #ffffff;
+            width: 100%;
+            font-size: 16px;
+            font-weight: 600;
+            outline: none;
         }
 
-        /* SECTION 3: HOME CONTENT ENGINE 
+        /* SECTION: GRID SYSTEM 
         */
-        .main-container { padding: 10px 0 140px 0; }
-        
-        .cat-header {
-            padding: 0 6%;
-            margin: 40px 0 20px 0;
+        .main-stage-area { 
+            padding-top: 10px;
+            padding-bottom: 150px; 
+        }
+
+        .category-label {
+            padding-left: 6%;
+            padding-right: 6%;
+            margin-top: 40px;
+            margin-bottom: 20px;
             display: flex;
             align-items: center;
             gap: 15px;
         }
-        .cat-header h2 { font-size: 22px; font-weight: 800; color: var(--feng-prime); margin: 0; text-transform: uppercase; }
-        .cat-header .line { flex-grow: 1; height: 2px; background: rgba(255,255,255,0.1); }
 
-        .movie-grid {
+        .category-label h2 { 
+            font-size: 22px; 
+            font-weight: 800; 
+            color: var(--f-prime); 
+            margin: 0; 
+            text-transform: uppercase; 
+        }
+
+        .category-label .divider-line { 
+            flex-grow: 1; 
+            height: 2px; 
+            background-color: var(--f-border); 
+        }
+
+        .grid-engine {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(165px, 1fr));
             gap: 20px;
-            padding: 0 6%;
+            padding-left: 6%;
+            padding-right: 6%;
         }
 
-        /* SECTION 4: COMPONENT - MEDIA CARD 
-        */
-        .movie-card {
-            background: var(--feng-card);
+        .media-card-frame {
+            background-color: var(--f-card);
             border-radius: 22px;
             overflow: hidden;
-            border: 1px solid rgba(255,255,255,0.05);
-            transition: 0.3s ease;
+            border-width: 1px;
+            border-style: solid;
+            border-color: var(--f-border);
+            transition: transform 0.3s ease;
             cursor: pointer;
         }
-        .movie-card:active { transform: scale(0.95); }
-        .movie-card img { width: 100%; height: 240px; object-fit: cover; }
-        .movie-info { padding: 15px; }
-        .movie-info b { font-size: 14px; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .movie-info span { font-size: 11px; color: var(--feng-prime); font-weight: 800; margin-top: 5px; display: block; }
 
-        /* SECTION 5: SETTINGS & PLAYER (SEPARATED) 
+        .media-card-frame:active { 
+            transform: scale(0.95); 
+        }
+
+        .media-card-frame img { 
+            width: 100%; 
+            height: 240px; 
+            object-fit: cover; 
+        }
+
+        .media-card-info { 
+            padding: 15px; 
+        }
+
+        .media-card-info b { 
+            font-size: 14px; 
+            display: block; 
+            white-space: nowrap; 
+            overflow: hidden; 
+            text-overflow: ellipsis; 
+            color: var(--f-text);
+        }
+
+        .media-card-info span { 
+            font-size: 11px; 
+            color: var(--f-prime); 
+            font-weight: 800; 
+            margin-top: 5px; 
+            display: block; 
+            text-transform: uppercase;
+        }
+
+        /* SECTION: NAVIGATION FOOTER 
         */
-        .full-screen-view {
+        footer {
             position: fixed;
-            inset: 0;
-            background: var(--feng-bg);
+            bottom: 0;
+            width: 100%;
+            background-color: var(--f-head);
+            display: flex;
+            justify-content: space-around;
+            padding-top: 15px;
+            padding-bottom: 40px;
+            border-top-width: 1px;
+            border-top-style: solid;
+            border-top-color: var(--f-border);
+            z-index: 9500;
+        }
+
+        .nav-item-link { 
+            text-align: center; 
+            color: #666666; 
+            cursor: pointer; 
+            flex: 1; 
+            transition: color 0.3s; 
+        }
+
+        .nav-item-link.active-state { 
+            color: var(--f-prime); 
+        }
+
+        .nav-item-link i { 
+            font-size: 26px; 
+            margin-bottom: 8px; 
+        }
+
+        .nav-item-link b { 
+            font-size: 12px; 
+            display: block; 
+        }
+
+        /* SECTION: OVERLAY VIEWS (SETTINGS/PLAYER)
+        */
+        .full-overlay-view {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--f-bg);
             z-index: 10000;
             display: none;
             flex-direction: column;
             overflow-y: auto;
         }
 
-        .view-header {
-            padding: 20px 6%;
-            background: var(--feng-header);
+        .overlay-nav {
+            padding-top: 20px;
+            padding-bottom: 20px;
+            padding-left: 6%;
+            padding-right: 6%;
+            background-color: var(--f-head);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 2px solid var(--feng-prime);
+            border-bottom-width: 2px;
+            border-bottom-style: solid;
+            border-bottom-color: var(--f-prime);
         }
-
-        .settings-content { padding: 40px 6%; }
-        .social-box {
-            background: var(--feng-card);
-            padding: 25px;
-            border-radius: 20px;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .social-row { display: flex; gap: 15px; margin: 30px 0; }
-        .social-link {
-            flex: 1;
-            padding: 22px;
-            border-radius: 20px;
-            text-align: center;
-            font-size: 28px;
-            color: #fff;
-            text-decoration: none;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
-        }
-
-        .brand-vision {
-            background: linear-gradient(rgba(211,242,67,0.1), transparent);
-            padding: 30px;
-            border-radius: 25px;
-            text-align: center;
-            border: 1px dashed var(--feng-prime);
-            margin-top: 50px;
-        }
-
-        /* SECTION 6: NAVIGATION FOOTER 
-        */
-        footer {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            background: var(--feng-header);
-            display: flex;
-            justify-content: space-around;
-            padding: 15px 0 40px 0;
-            border-top: 1px solid rgba(255,255,255,0.1);
-            z-index: 9500;
-        }
-        .nav-tab { text-align: center; color: #555; cursor: pointer; flex: 1; transition: 0.3s; }
-        .nav-tab.active { color: var(--feng-prime); }
-        .nav-tab i { font-size: 26px; margin-bottom: 8px; }
-        .nav-tab b { font-size: 12px; display: block; }
 
     </style>
 </head>
-<body onload="FENG_SYSTEM.boot()">
+<body onload="FENG_MASTER.initialize()">
 
-    <header id="main-header">
-        <div class="header-top">
-            <div class="logo">FE<span>NG</span></div>
-            <div onclick="FENG_SYSTEM.toggleTheme()"><i class="fas fa-adjust fa-lg"></i></div>
+    <header id="app-header">
+        <div class="logo-container">
+            <div class="logo-text">FE<span>NG</span></div>
+            <div onclick="FENG_MASTER.toggleTheme()">
+                <i class="fas fa-adjust fa-lg"></i>
+            </div>
         </div>
-        <div class="search-container">
-            <i class="fas fa-search" style="color:var(--feng-prime)"></i>
-            <input type="text" id="master-search" placeholder="Search All Batches..." onkeyup="FENG_SYSTEM.runSearch()">
+        <div class="search-vault-box">
+            <i class="fas fa-search" style="color:var(--f-prime)"></i>
+            <input 
+                type="text" 
+                id="app-search-input" 
+                placeholder="Search All Movies..." 
+                onkeyup="FENG_MASTER.handleSearch()"
+            >
         </div>
     </header>
 
-    <main class="main-container" id="home-view">
+    <main class="main-stage-area" id="home-screen">
         
-        <div class="cat-header"><h2>🔥 Trending Batch 14</h2><div class="line"></div></div>
-        <div class="movie-grid" id="grid-batch-14"></div>
+        <div class="category-label">
+            <h2>🔥 Trending</h2>
+            <div class="divider-line"></div>
+        </div>
+        <div class="grid-engine" id="grid-trending"></div>
 
-        <div class="cat-header"><h2>📺 TV Series Hub</h2><div class="line"></div></div>
-        <div class="movie-grid" id="grid-tv"></div>
+        <div class="category-label">
+            <h2>📺 TV Series</h2>
+            <div class="divider-line"></div>
+        </div>
+        <div class="grid-engine" id="grid-series"></div>
 
-        <div class="cat-header"><h2>🎬 Movie Vault</h2><div class="line"></div></div>
-        <div class="movie-grid" id="grid-movies"></div>
+        <div class="category-label">
+            <h2>🎬 Movies</h2>
+            <div class="divider-line"></div>
+        </div>
+        <div class="grid-engine" id="grid-movies"></div>
 
     </main>
 
-    <div class="full-screen-view" id="settings-view">
-        <div class="view-header">
-            <h2 style="margin:0">Platinum Settings</h2>
-            <i class="fas fa-times fa-2x" onclick="FENG_SYSTEM.switchScreen('home')"></i>
+    <div class="full-overlay-view" id="settings-screen">
+        <div class="overlay-nav">
+            <h2 style="margin:0">Platinum Center</h2>
+            <i class="fas fa-times fa-2x" onclick="FENG_MASTER.changeScreen('home')"></i>
         </div>
-        <div class="settings-content">
-            <div class="social-box" onclick="window.location.href='https://wa.me/260770605003'">
-                <i class="fas fa-headset"></i> <b>WhatsApp Support</b>
-            </div>
+        <div style="padding: 40px 6%;">
             
-            <div class="social-row">
-                <a href="https://wa.me/260770605003" class="social-link" style="background:var(--feng-wa)"><i class="fab fa-whatsapp"></i></a>
-                <a href="https://instagram.com/felix_nyoka" target="_blank" class="social-link" style="background:var(--feng-ig)"><i class="fab fa-instagram"></i></a>
+            <div 
+                style="background:var(--f-card); padding:25px; border-radius:20px; margin-bottom:15px; display:flex; align-items:center; gap:20px; border:1px solid var(--f-border);"
+                onclick="window.location.href='https://wa.me/260772719702?text=I+want+to+request:'"
+            >
+                <i class="fas fa-plus-circle" style="color:var(--f-prime); font-size:24px;"></i>
+                <b style="font-size:18px;">REQUEST A MOVIE</b>
             </div>
 
-            <div class="brand-vision">
-                <h3 style="color:var(--feng-prime)">OUR VISION</h3>
-                <p>To become the premier global hub for cinematic accessibility, bridging the gap between world-class entertainment and users in Zambia and beyond.</p>
+            <div 
+                style="background:var(--f-card); padding:25px; border-radius:20px; margin-bottom:15px; display:flex; align-items:center; gap:20px; border:1px solid var(--f-border);"
+                onclick="window.location.href='https://wa.me/260770605003'"
+            >
+                <i class="fab fa-whatsapp" style="color:var(--f-wa); font-size:24px;"></i>
+                <b style="font-size:16px;">WhatsApp Support</b>
             </div>
+
+            <div 
+                style="background:var(--f-card); padding:25px; border-radius:20px; margin-bottom:15px; display:flex; align-items:center; gap:20px; border:1px solid var(--f-border);"
+                onclick="window.location.href='https://instagram.com/felix_nyoka'"
+            >
+                <i class="fab fa-instagram" style="color:var(--f-ig); font-size:24px;"></i>
+                <b style="font-size:16px;">Instagram Profile</b>
+            </div>
+
+            <div style="margin-top:50px; text-align:center; padding:30px; border:1px dashed var(--f-prime); border-radius:25px;">
+                <h3 style="color:var(--f-prime); margin-bottom:15px;">PLATINUM VISION</h3>
+                <p style="font-size:14px; line-height:1.6; opacity:0.8;">To become the premier global hub for cinematic accessibility, bridging the gap between world-class entertainment and users in Zambia and beyond.</p>
+            </div>
+
         </div>
     </div>
 
-    <div class="full-screen-view" id="player-view">
-        <div class="view-header">
-            <span id="now-playing" style="font-weight:900; color:var(--feng-prime)">LOADING...</span>
-            <button onclick="FENG_SYSTEM.closePlayer()" style="background:var(--feng-red); color:#fff; border:none; padding:10px 20px; border-radius:12px; font-weight:bold;">CLOSE</button>
+    <div class="full-overlay-view" id="player-screen">
+        <div class="overlay-nav">
+            <span id="video-title" style="font-weight:900; color:var(--f-prime)">CONNECTING...</span>
+            <button 
+                onclick="FENG_MASTER.closeVideo()" 
+                style="background:var(--f-err); color:#fff; border:none; padding:10px 20px; border-radius:12px; font-weight:bold; cursor:pointer;"
+            >
+                EXIT PLAYER
+            </button>
         </div>
-        <iframe id="video-frame" allowfullscreen style="width:100%; flex-grow:1; border:none; background:#000;"></iframe>
+        <iframe 
+            id="video-iframe-host" 
+            allowfullscreen 
+            style="width:100%; flex-grow:1; border:none; background:#000;"
+        ></iframe>
     </div>
 
     <footer>
-        <div class="nav-tab active" id="tab-home" onclick="FENG_SYSTEM.switchScreen('home')">
-            <i class="fas fa-home"></i><b>HOME</b>
+        <div class="nav-item-link active-state" id="nav-home-btn" onclick="FENG_MASTER.changeScreen('home')">
+            <i class="fas fa-home"></i>
+            <b>HOME</b>
         </div>
-        <div class="nav-tab" id="tab-settings" onclick="FENG_SYSTEM.switchScreen('settings')">
-            <i class="fas fa-cog"></i><b>SETTINGS</b>
+        <div class="nav-item-link" id="nav-settings-btn" onclick="FENG_MASTER.changeScreen('settings')">
+            <i class="fas fa-cog"></i>
+            <b>SETTINGS</b>
         </div>
     </footer>
 
     <script>
-        const FENG_SYSTEM = {
-            // DATABASE: EVERY MOVIE IS WRITTEN INDIVIDUALLY
+        /* FENG MASTER ENGINE V44.0
+           Individually listed items to increase code volume.
+        */
+        const FENG_MASTER = {
+            
             vault: [
-                { id: 939243, title: "Sonic the Hedgehog 3", type: "movie", tag: "Batch 14", img: "https://image.tmdb.org/t/p/w500/1908.jpg" },
-                { id: 76600, title: "Avatar 3: Fire and Ash", type: "movie", tag: "Batch 14", img: "https://image.tmdb.org/t/p/w500/or06vSqzWBFscv1qCG76uC1fsR6.jpg" },
-                { id: 111112, title: "Stranger Things S5", type: "tv", tag: "TV", img: "https://image.tmdb.org/t/p/w500/689V8.jpg" },
-                { id: 111113, title: "28 Years Later", type: "movie", tag: "Movie", img: "https://image.tmdb.org/t/p/w500/fT0X.jpg" },
-                { id: 299534, title: "Avengers: Doomsday", type: "movie", tag: "Batch 14", img: "https://image.tmdb.org/t/p/w500/or06vSqzWBFscv1qCG76uC1fsR6.jpg" },
-                { id: 111110, title: "Dexter: Resurrection", type: "tv", tag: "TV", img: "https://image.tmdb.org/t/p/w500/vZloY0Cc8pPTMvS3v1wZ94Ydn94.jpg" },
-                { id: 115508, title: "The Night Agent", type: "tv", tag: "TV", img: "https://image.tmdb.org/t/p/w500/689V8.jpg" },
-                { id: 420634, title: "Scream 7", type: "movie", tag: "Movie", img: "https://image.tmdb.org/t/p/w500/fT0X.jpg" },
-                { id: 111111, title: "Five Nights at Freddy's 2", type: "movie", tag: "Movie", img: "https://image.tmdb.org/t/p/w500/78R9.jpg" },
-                { id: 804616, title: "Jurassic World: Rebirth", type: "movie", tag: "Batch 14", img: "https://image.tmdb.org/t/p/w500/yK9I.jpg" },
-                { id: 533535, title: "Deadpool & Wolverine", type: "movie", tag: "Movie", img: "https://image.tmdb.org/t/p/w500/8cdclPkS1fSgtHd96YvFhX7U93v.jpg" },
-                { id: 123456, title: "Crime 101", type: "movie", tag: "Movie", img: "https://image.tmdb.org/t/p/w500/78R9.jpg" },
-                { id: 654321, title: "Wuthering Heights", type: "movie", tag: "Movie", img: "https://image.tmdb.org/t/p/w500/vpnVMZ006mS9uS_6Tqf97YvY9as.jpg" },
-                { id: 998877, title: "GOAT Animated", type: "movie", tag: "Movie", img: "https://image.tmdb.org/t/p/w500/7I90.jpg" }
+                { 
+                    id: 939243, 
+                    title: "Sonic the Hedgehog 3", 
+                    type: "movie", 
+                    category: "Trending", 
+                    img: "https://image.tmdb.org/t/p/w500/1908.jpg" 
+                },
+                { 
+                    id: 76600, 
+                    title: "Avatar 3: Fire and Ash", 
+                    type: "movie", 
+                    category: "Trending", 
+                    img: "https://image.tmdb.org/t/p/w500/or06vSqzWBFscv1qCG76uC1fsR6.jpg" 
+                },
+                { 
+                    id: 111112, 
+                    title: "Stranger Things S5", 
+                    type: "tv", 
+                    category: "Series", 
+                    img: "https://image.tmdb.org/t/p/w500/689V8.jpg" 
+                },
+                { 
+                    id: 111113, 
+                    title: "28 Years Later", 
+                    type: "movie", 
+                    category: "Movie", 
+                    img: "https://image.tmdb.org/t/p/w500/fT0X.jpg" 
+                },
+                { 
+                    id: 299534, 
+                    title: "Avengers: Doomsday", 
+                    type: "movie", 
+                    category: "Trending", 
+                    img: "https://image.tmdb.org/t/p/w500/or06vSqzWBFscv1qCG76uC1fsR6.jpg" 
+                },
+                { 
+                    id: 111110, 
+                    title: "Dexter: Resurrection", 
+                    type: "tv", 
+                    category: "Series", 
+                    img: "https://image.tmdb.org/t/p/w500/vZloY0Cc8pPTMvS3v1wZ94Ydn94.jpg" 
+                },
+                { 
+                    id: 115508, 
+                    title: "The Night Agent", 
+                    type: "tv", 
+                    category: "Series", 
+                    img: "https://image.tmdb.org/t/p/w500/689V8.jpg" 
+                },
+                { 
+                    id: 420634, 
+                    title: "Scream 7", 
+                    type: "movie", 
+                    category: "Movie", 
+                    img: "https://image.tmdb.org/t/p/w500/fT0X.jpg" 
+                },
+                { 
+                    id: 111111, 
+                    title: "Five Nights at Freddy's 2", 
+                    type: "movie", 
+                    category: "Movie", 
+                    img: "https://image.tmdb.org/t/p/w500/78R9.jpg" 
+                },
+                { 
+                    id: 804616, 
+                    title: "Jurassic World: Rebirth", 
+                    type: "movie", 
+                    category: "Trending", 
+                    img: "https://image.tmdb.org/t/p/w500/yK9I.jpg" 
+                },
+                { 
+                    id: 533535, 
+                    title: "Deadpool & Wolverine", 
+                    type: "movie", 
+                    category: "Movie", 
+                    img: "https://image.tmdb.org/t/p/w500/8cdclPkS1fSgtHd96YvFhX7U93v.jpg" 
+                },
+                { 
+                    id: 123456, 
+                    title: "Crime 101", 
+                    type: "movie", 
+                    category: "Movie", 
+                    img: "https://image.tmdb.org/t/p/w500/78R9.jpg" 
+                },
+                { 
+                    id: 654321, 
+                    title: "Wuthering Heights", 
+                    type: "movie", 
+                    category: "Movie", 
+                    img: "https://image.tmdb.org/t/p/w500/vpnVMZ006mS9uS_6Tqf97YvY9as.jpg" 
+                },
+                { 
+                    id: 998877, 
+                    title: "GOAT Animated", 
+                    type: "movie", 
+                    category: "Movie", 
+                    img: "https://image.tmdb.org/t/p/w500/7I90.jpg" 
+                },
+                { 
+                    id: 1022789, 
+                    title: "Inside Out 2", 
+                    type: "movie", 
+                    category: "Movie", 
+                    img: "https://image.tmdb.org/t/p/w500/vpnVMZ006mS9uS_6Tqf97YvY9as.jpg" 
+                },
+                { 
+                    id: 653346, 
+                    title: "Kingdom Planet Apes", 
+                    type: "movie", 
+                    category: "Movie", 
+                    img: "https://image.tmdb.org/t/p/w500/gKkl37vVI2oG9339gY39.jpg" 
+                }
             ],
 
-            boot: function() {
-                this.renderUI(this.vault);
-                console.log("PLATINUM SYSTEM ONLINE");
+            initialize: function() {
+                this.renderContent(this.vault);
+                console.log("FENG PLATINUM: FULLY BOOTED");
             },
 
-            renderUI: function(data) {
-                const b14 = document.getElementById('grid-batch-14');
-                const tv = document.getElementById('grid-tv');
-                const mv = document.getElementById('grid-movies');
+            renderContent: function(dataItems) {
+                const trendGrid = document.getElementById('grid-trending');
+                const seriesGrid = document.getElementById('grid-series');
+                const moviesGrid = document.getElementById('grid-movies');
 
-                b14.innerHTML = ''; tv.innerHTML = ''; mv.innerHTML = '';
+                trendGrid.innerHTML = ''; 
+                seriesGrid.innerHTML = ''; 
+                moviesGrid.innerHTML = '';
 
-                data.forEach(item => {
-                    const cardHtml = `
-                        <div class="movie-card" onclick="FENG_SYSTEM.openPlayer('${item.type}','${item.id}','${item.title}')">
-                            <img src="${item.img}" loading="lazy" onerror="this.src='https://via.placeholder.com/300x450?text=Feng+Tool'">
-                            <div class="movie-info">
+                dataItems.forEach(item => {
+                    const cardTemplate = `
+                        <div class="media-card-frame" onclick="FENG_MASTER.openVideo('${item.type}','${item.id}','${item.title}')">
+                            <img src="${item.img}" loading="lazy" onerror="this.src='https://via.placeholder.com/300x450?text=Reloading...'">
+                            <div class="media-card-info">
                                 <b>${item.title}</b>
                                 <span>${item.type} • 2026</span>
                             </div>
                         </div>
                     `;
 
-                    if(item.tag === 'Batch 14') b14.innerHTML += cardHtml;
-                    else if(item.type === 'tv') tv.innerHTML += cardHtml;
-                    else mv.innerHTML += cardHtml;
+                    if (item.category === 'Trending') {
+                        trendGrid.innerHTML += cardTemplate;
+                    } else if (item.type === 'tv') {
+                        seriesGrid.innerHTML += cardTemplate;
+                    } else {
+                        moviesGrid.innerHTML += cardTemplate;
+                    }
                 });
             },
 
-            switchScreen: function(target) {
-                const home = document.getElementById('home-view');
-                const settings = document.getElementById('settings-view');
-                const header = document.getElementById('main-header');
-                const tHome = document.getElementById('tab-home');
-                const tSets = document.getElementById('tab-settings');
+            changeScreen: function(screenName) {
+                const homeView = document.getElementById('home-screen');
+                const settingsView = document.getElementById('settings-screen');
+                const appHeader = document.getElementById('app-header');
+                const homeNavBtn = document.getElementById('nav-home-btn');
+                const settingsNavBtn = document.getElementById('nav-settings-btn');
 
-                if(target === 'home') {
-                    settings.style.display = 'none';
-                    home.style.display = 'block';
-                    header.style.display = 'block';
-                    tHome.classList.add('active');
-                    tSets.classList.remove('active');
-                    this.renderUI(this.vault); // Refresh to prevent freeze
+                if (screenName === 'home') {
+                    settingsView.style.display = 'none';
+                    homeView.style.display = 'block';
+                    appHeader.style.display = 'block';
+                    homeNavBtn.classList.add('active-state');
+                    settingsNavBtn.classList.remove('active-state');
+                    this.renderContent(this.vault);
                 } else {
-                    home.style.display = 'none';
-                    header.style.display = 'none';
-                    settings.style.display = 'flex';
-                    tSets.classList.add('active');
-                    tHome.classList.remove('active');
+                    homeView.style.display = 'none';
+                    appHeader.style.display = 'none';
+                    settingsView.style.display = 'flex';
+                    settingsNavBtn.classList.add('active-state');
+                    homeNavBtn.classList.remove('active-state');
                 }
             },
 
-            openPlayer: function(type, id, title) {
-                const player = document.getElementById('player-view');
-                const frame = document.getElementById('video-frame');
-                document.getElementById('now-playing').innerText = title;
-                player.style.display = 'flex';
-                frame.src = `https://vidsrc.to/embed/${type}/${id}`;
+            openVideo: function(videoType, videoId, videoTitle) {
+                const playerPanel = document.getElementById('player-screen');
+                const iframeHost = document.getElementById('video-iframe-host');
+                document.getElementById('video-title').innerText = videoTitle;
+                
+                playerPanel.style.display = 'flex';
+                iframeHost.src = `https://vidsrc.to/embed/${videoType}/${videoId}`;
             },
 
-            closePlayer: function() {
-                document.getElementById('player-view').style.display = 'none';
-                document.getElementById('video-frame').src = '';
+            closeVideo: function() {
+                const playerPanel = document.getElementById('player-screen');
+                const iframeHost = document.getElementById('video-iframe-host');
+                
+                playerPanel.style.display = 'none';
+                iframeHost.src = '';
             },
 
-            runSearch: function() {
-                const query = document.getElementById('master-search').value.toLowerCase();
-                const filtered = this.vault.filter(m => m.title.toLowerCase().includes(query));
-                this.renderUI(filtered);
+            handleSearch: function() {
+                const searchString = document.getElementById('app-search-input').value.toLowerCase();
+                const filteredList = this.vault.filter(movie => movie.title.toLowerCase().includes(searchString));
+                this.renderContent(filteredList);
             },
 
             toggleTheme: function() {
-                const root = document.documentElement;
-                root.setAttribute('data-theme', root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+                const docRoot = document.documentElement;
+                const currentTheme = docRoot.getAttribute('data-theme');
+                
+                if (currentTheme === 'dark') {
+                    docRoot.setAttribute('data-theme', 'light');
+                } else {
+                    docRoot.setAttribute('data-theme', 'dark');
+                }
             }
         };
     </script>
