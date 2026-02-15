@@ -3,95 +3,128 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StreamX | Premium worldwide</title>
+    <title>StreamX | Premium</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { --main: #d3f243; --bg: #0b0e14; --card: #1c1f26; --red: #ff0000; }
-        body { background: var(--bg); color: #fff; font-family: 'Inter', sans-serif; margin: 0; padding: 0; overflow-x: hidden; }
+        body { background: var(--bg); color: #fff; font-family: 'Inter', sans-serif; margin: 0; padding: 0; }
 
-        /* --- NAVIGATION --- */
-        header { background: #000; padding: 12px 5%; display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid var(--main); position: sticky; top: 0; z-index: 1000; }
-        .logo { font-size: 22px; font-weight: 900; color: var(--red); text-decoration: none; }
+        header { background: #000; padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--main); position: sticky; top: 0; z-index: 1000; }
+        .logo { font-size: 24px; font-weight: 900; color: var(--red); text-decoration: none; }
 
-        /* --- HERO SECTION --- */
-        .hero { background: linear-gradient(to bottom, rgba(11,14,20,0), #0b0e14), url('https://image.tmdb.org/t/p/original/13g9U99Y0vS4S9fU16E49I6I0.jpg'); height: 250px; background-size: cover; display: flex; align-items: flex-end; padding: 20px 5%; }
+        /* GRID SYSTEM - FORCED VISIBILITY */
+        .container { padding: 20px 5% 100px 5%; }
+        .row-title { color: var(--main); font-weight: bold; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 15px; min-height: 200px; }
+        .card { background: var(--card); border-radius: 10px; overflow: hidden; border: 1px solid #333; cursor: pointer; transition: 0.3s; }
+        .card img { width: 100%; height: 160px; object-fit: cover; background: #222; display: block; }
+        .card p { margin: 0; padding: 10px; font-size: 11px; font-weight: bold; text-align: center; }
 
-        /* --- CONTENT GRID --- */
-        .container { padding: 15px 5% 100px 5%; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 12px; margin-bottom: 30px; }
-        .card { background: var(--card); border-radius: 8px; overflow: hidden; border: 1px solid #222; cursor: pointer; position: relative; }
-        .card img { width: 100%; height: 165px; object-fit: cover; background: #222; }
-        .card p { margin: 0; padding: 8px; font-size: 10px; text-align: center; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-        /* --- SETTINGS MENU --- */
-        #setModal { position: fixed; inset: 0; background: var(--bg); z-index: 5000; display: none; padding: 20px; overflow-y: auto; }
-        .profile-card { background: var(--card); padding: 20px; border-radius: 12px; margin-bottom: 20px; border-left: 4px solid var(--main); }
-        .menu-row { display: flex; justify-content: space-between; align-items: center; padding: 18px 0; border-bottom: 1px solid #222; cursor: pointer; text-decoration: none; color: #fff; }
-        .menu-row i { width: 30px; color: var(--main); font-size: 18px; }
-
-        /* --- PLAYER --- */
+        /* PLAYER & AD-SHIELD */
         #player { position: fixed; inset: 0; background: #000; z-index: 6000; display: none; flex-direction: column; }
-        .btn-green { background: #28a745; color: #fff; padding: 15px; text-align: center; font-weight: bold; text-decoration: none; border-radius: 5px; margin: 10px 20px; }
+        .p-head { padding: 15px; background: #111; display: flex; justify-content: space-between; align-items: center; }
+        .p-actions { padding: 15px; display: flex; flex-direction: column; gap: 10px; background: #0b0e14; }
+        .btn { padding: 14px; border-radius: 8px; border: none; font-weight: 800; cursor: pointer; text-align: center; text-decoration: none; color: #fff; }
+        .btn-green { background: #28a745; }
+        .btn-gray { background: #444; }
 
-        footer { position: fixed; bottom: 0; width: 100%; background: #000; display: flex; justify-content: space-around; padding: 15px 0; border-top: 1px solid #222; }
+        /* SETTINGS & LOGIN FLOW */
+        #setModal { position: fixed; inset: 0; background: var(--bg); z-index: 5000; display: none; padding: 25px; overflow-y: auto; }
+        .login-box { background: var(--card); padding: 20px; border-radius: 12px; margin: 20px 0; border: 1px solid #333; }
+        .input-group { margin-bottom: 15px; }
+        .input-group label { display: block; font-size: 12px; color: #888; margin-bottom: 5px; }
+        input { width: 100%; padding: 12px; border-radius: 6px; border: 1px solid #444; background: #000; color: #fff; box-sizing: border-box; }
+        
+        .menu-row { display: flex; justify-content: space-between; align-items: center; padding: 20px 0; border-bottom: 1px solid #222; cursor: pointer; }
+        .info-panel { display: none; padding: 15px; background: #111; border-radius: 8px; font-size: 14px; line-height: 1.6; color: #ccc; }
+
+        footer { position: fixed; bottom: 0; width: 100%; background: #000; display: flex; justify-content: space-around; padding: 15px 0; border-top: 1px solid #222; z-index: 1000; }
         footer div { text-align: center; font-size: 10px; color: #555; cursor: pointer; }
         footer div.active { color: var(--main); }
         footer i { font-size: 22px; display: block; margin-bottom: 5px; }
     </style>
 </head>
-<body onload="renderHome()">
+<body onload="showPage('home')">
 
     <header>
         <a href="#" class="logo">STREAMX</a>
-        <div style="font-size:10px; color:var(--main); font-weight:bold;">V9.0 TITAN</div>
+        <i class="fas fa-search" onclick="alert('Search coming soon')"></i>
     </header>
 
-    <div id="homeView">
-        <div class="hero">
-            <h1 style="font-size:24px; text-shadow: 2px 2px #000;">Cinema in your pocket.</h1>
+    <div class="container" id="mainView">
+        <div class="row-title" id="viewTitle">Featured Content</div>
+        <div class="grid" id="contentGrid"></div>
+    </div>
+
+    <div id="player">
+        <div class="p-head">
+            <span id="pT" style="color:var(--main); font-weight:bold;">Loading...</span>
+            <button onclick="closeP()" style="background:var(--red); color:#fff; border:none; padding:8px 15px; border-radius:5px;">CLOSE X</button>
         </div>
-        <div class="container">
-            <h3 style="color:var(--main);"><i class="fas fa-fire"></i> Popular Right Now</h3>
-            <div class="grid" id="popGrid"></div>
+        <iframe id="vF" allowfullscreen style="flex-grow:1; border:none;"></iframe>
+        <div class="p-actions">
+            <a id="dL" href="#" target="_blank" class="btn btn-green"><i class="fas fa-download"></i> DOWNLOAD (SERVER 1)</a>
+            <button onclick="changeServer()" class="btn btn-gray">SWITCH SERVER (IF NO VIDEO)</button>
         </div>
     </div>
 
     <div id="setModal">
-        <div style="display:flex; align-items:center; gap:20px; margin-bottom: 20px;">
+        <div style="display:flex; align-items:center; gap:20px; margin-bottom:30px;">
             <i class="fas fa-arrow-left fa-lg" onclick="closeSets()"></i>
-            <h2>Settings</h2>
+            <h2 style="margin:0;">More Options</h2>
         </div>
-        
-        <div class="profile-card">
-            <h3>Login to StreamX</h3>
-            <p style="font-size:12px; color:#888;">Sync your watch list across devices</p>
-            <input type="email" placeholder="Email" style="width:100%; padding:10px; margin-top:10px; border-radius:5px; border:none; background:#000; color:#fff;">
-            <button onclick="alert('Login system connecting...')" style="background:var(--main); border:none; width:100%; padding:10px; border-radius:8px; font-weight:900; margin-top:10px; cursor:pointer;">CONTINUE</button>
+
+        <div class="login-box" id="authBox">
+            <div id="emailStep">
+                <h3 style="margin:0 0 10px 0;">Sign In</h3>
+                <div class="input-group">
+                    <label>Email Address</label>
+                    <input type="email" id="userEmail" placeholder="Enter your email">
+                </div>
+                <button class="btn btn-green" style="width:100%" onclick="toPassword()">Continue</button>
+            </div>
+
+            <div id="passStep" style="display:none;">
+                <h3 style="margin:0 0 10px 0;">Enter Password</h3>
+                <div class="input-group">
+                    <input type="password" id="userPass" placeholder="Password">
+                </div>
+                <button class="btn btn-green" style="width:100%; margin-bottom:10px;" onclick="alert('Success!')">Login</button>
+                <div style="text-align:center;">
+                    <a href="#" style="color:var(--main); font-size:12px;" onclick="toPin()">Forgot Password?</a>
+                </div>
+            </div>
+
+            <div id="pinStep" style="display:none;">
+                <h3 style="margin:0 0 10px 0;">Enter PIN</h3>
+                <p style="font-size:11px; color:#888;">We sent a 4-digit PIN to your email.</p>
+                <div class="input-group">
+                    <input type="number" placeholder="0 0 0 0" style="text-align:center; letter-spacing:10px;">
+                </div>
+                <button class="btn btn-green" style="width:100%" onclick="alert('Account Verified')">Verify</button>
+            </div>
+        </div>
+
+        <div class="menu-row" onclick="toggleInfo('aboutPanel')"><span><i class="fas fa-info-circle"></i> About StreamX</span><i class="fas fa-chevron-right"></i></div>
+        <div id="aboutPanel" class="info-panel">
+            StreamX Premium provides worldwide cinema access. <br><br>
+            <strong>Founder:</strong> Felix Nyoka<br>
+            <strong>Version:</strong> 10.0 Stable
         </div>
 
         <div class="menu-row" onclick="window.location.href='mailto:nyokafelix33@gmail.com'">
-            <span><i class="fas fa-bug"></i> Report Issues (Gmail)</span><i class="fas fa-chevron-right"></i>
+            <span><i class="fas fa-envelope"></i> Report an issue</span><i class="fas fa-chevron-right"></i>
         </div>
-        
-        <a href="https://instagram.com/felix_nyoka" target="_blank" class="menu-row">
-            <span><i class="fab fa-instagram"></i> Follow Developer</span><i class="fas fa-chevron-right"></i>
-        </a>
 
-        <div class="menu-row"><span><i class="fas fa-info-circle"></i> About StreamX</span><i class="fas fa-chevron-right"></i></div>
-    </div>
-
-    <div id="player">
-        <div style="padding:15px; background:#111; display:flex; justify-content:space-between;">
-            <span id="pT">...</span><button onclick="closeP()" style="background:var(--red); color:#fff; border:none; padding:5px 10px; border-radius:3px;">CLOSE X</button>
+        <div class="menu-row" onclick="window.open('https://instagram.com/felix_nyoka')">
+            <span><i class="fab fa-instagram"></i> Follow on Instagram</span><i class="fas fa-chevron-right"></i>
         </div>
-        <iframe id="vF" allowfullscreen style="flex-grow:1; border:none;"></iframe>
-        <a id="dL" href="#" class="btn-green"><i class="fas fa-download"></i> DOWNLOAD HD</a>
     </div>
 
     <footer>
-        <div class="active" onclick="location.reload()"><i class="fas fa-home"></i>Home</div>
-        <div onclick="renderType('movie')"><i class="fas fa-play-circle"></i>Movies</div>
-        <div onclick="renderType('tv')"><i class="fas fa-tv"></i>Series</div>
+        <div id="nav-home" onclick="showPage('home')"><i class="fas fa-home"></i>Home</div>
+        <div id="nav-movie" onclick="showPage('movie')"><i class="fas fa-play-circle"></i>Movies</div>
+        <div id="nav-tv" onclick="showPage('tv')"><i class="fas fa-tv"></i>Series</div>
         <div onclick="openSets()"><i class="fas fa-bars"></i>More</div>
     </footer>
 
@@ -99,47 +132,59 @@
         const catalog = [
             {id: 823464, title: "Godzilla x Kong", img: "https://image.tmdb.org/t/p/w500/13g9U99Y0vS4S9fU16E49I6I0.jpg", type: "movie"},
             {id: 40075, title: "Gravity Falls", img: "https://image.tmdb.org/t/p/w500/8uO0gUMYpCU9etQoYmX799s9jPS.jpg", type: "tv"},
-            {id: 11031, title: "Friday the 13th", img: "https://image.tmdb.org/t/p/w500/pI69iKTo0s7FpXbUjDkS89n059f.jpg", type: "movie"},
-            {id: 121542, title: "The Housemaid", img: "https://image.tmdb.org/t/p/w500/f89WnNo9u5hF3X9U5hYVf6E49.jpg", type: "movie"},
             {id: 1022722, title: "Inside Out 2", img: "https://image.tmdb.org/t/p/w500/vpnVM9B6NMmQpWeZvzLvRIoYpZf.jpg", type: "movie"},
-            {id: 60735, title: "The Flash", img: "https://image.tmdb.org/t/p/w500/l99vgn6z9GqyG79p9Ujqr9uYQYI.jpg", type: "tv"}
+            {id: 60735, title: "The Flash", img: "https://image.tmdb.org/t/p/w500/l99vgn6z9GqyG79p9Ujqr9uYQYI.jpg", type: "tv"},
+            {id: 719221, title: "The Fall Guy", img: "https://image.tmdb.org/t/p/w500/tMefBTEvBrCc0vUun0Zp8oQ39p2.jpg", type: "movie"},
+            {id: 94605, title: "Arcane", img: "https://image.tmdb.org/t/p/w500/fqldWg2tWp7uQMC23ZSTbt6z06p.jpg", type: "tv"}
         ];
 
-        function renderHome() {
-            const grid = document.getElementById('popGrid');
-            grid.innerHTML = "";
-            catalog.forEach(m => {
-                const div = document.createElement('div');
-                div.className = 'card';
-                div.onclick = () => play(m.id, m.title, m.type);
-                div.innerHTML = `<img src="${m.img}" onerror="this.src='https://via.placeholder.com/300x450?text=No+Preview'"><p>${m.title}</p>`;
-                grid.appendChild(div);
-            });
-        }
+        let activeId = ""; let activeType = "";
 
-        function renderType(type) {
-            document.getElementById('homeView').style.display = 'none';
-            const grid = document.getElementById('popGrid');
+        function showPage(page) {
+            document.querySelectorAll('footer div').forEach(d => d.classList.remove('active'));
+            const grid = document.getElementById('contentGrid');
+            const title = document.getElementById('viewTitle');
             grid.innerHTML = "";
-            catalog.filter(m => m.type === type).forEach(m => {
+            
+            let filtered = (page === 'home') ? catalog : catalog.filter(m => m.type === page);
+            document.getElementById('nav-' + (page === 'home' ? 'home' : page)).classList.add('active');
+            title.innerText = page.toUpperCase() + " SELECTION";
+
+            filtered.forEach(m => {
                 const div = document.createElement('div');
                 div.className = 'card';
                 div.onclick = () => play(m.id, m.title, m.type);
-                div.innerHTML = `<img src="${m.img}"><p>${m.title}</p>`;
+                div.innerHTML = `<img src="${m.img}" onerror="this.src='https://via.placeholder.com/300x450?text=Reloading...'"> <p>${m.title}</p>`;
                 grid.appendChild(div);
             });
         }
 
         function play(id, title, type) {
+            activeId = id; activeType = type;
             document.getElementById('player').style.display = 'flex';
             document.getElementById('pT').innerText = title;
             document.getElementById('vF').src = `https://vidsrc.to/embed/${type}/${id}`;
             document.getElementById('dL').href = `https://dl.vidsrc.me/download/${type}/${id}`;
         }
 
+        function changeServer() {
+            const current = document.getElementById('vF').src;
+            document.getElementById('vF').src = current.includes('vidsrc.to') 
+                ? `https://vidsrc.me/embed/${activeType}/${activeId}` 
+                : `https://vidsrc.to/embed/${activeType}/${activeId}`;
+        }
+
         function closeP() { document.getElementById('player').style.display = 'none'; document.getElementById('vF').src = ''; }
         function openSets() { document.getElementById('setModal').style.display = 'block'; }
         function closeSets() { document.getElementById('setModal').style.display = 'none'; }
+        
+        // AUTH LOGIC
+        function toPassword() { document.getElementById('emailStep').style.display='none'; document.getElementById('passStep').style.display='block'; }
+        function toPin() { document.getElementById('passStep').style.display='none'; document.getElementById('pinStep').style.display='block'; }
+        function toggleInfo(id) { 
+            const el = document.getElementById(id); 
+            el.style.display = (el.style.display === 'block') ? 'none' : 'block'; 
+        }
     </script>
 </body>
 </html>
