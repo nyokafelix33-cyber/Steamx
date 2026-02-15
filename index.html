@@ -3,15 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StreamX | V24.0 Contact Update</title>
+    <title>Feng | The World Tool</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { --main: #d3f243; --bg: #0b0e14; --card: #1c1f26; --text: #eeeeee; --red: #ff0000; }
         body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; margin: 0; padding: 0; }
+        
+        /* BRANDING UPDATED TO FENG */
         header { background: #000; padding: 15px 5%; border-bottom: 2px solid var(--main); position: sticky; top: 0; z-index: 1000; }
-        .logo { color: var(--red); font-weight: 900; font-size: 24px; }
+        .logo { color: #fff; font-weight: 900; font-size: 26px; letter-spacing: -1px; }
+        .logo span { color: var(--main); }
+        
         .search-bar { background: #1a1a1a; border: 1px solid #333; border-radius: 8px; padding: 10px; display: flex; margin-top: 10px; }
         .search-bar input { background: transparent; border: none; color: #fff; width: 100%; outline: none; }
+
         .container { padding: 20px 5% 100px 5%; }
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; }
         .card { background: var(--card); border-radius: 12px; overflow: hidden; border: 1px solid #333; cursor: pointer; transition: 0.3s; }
@@ -20,17 +25,15 @@
         .card-title { font-size: 11px; font-weight: bold; display: block; height: 30px; overflow: hidden; color: #fff; }
         .meta { font-size: 9px; color: var(--main); margin-bottom: 5px; font-weight: bold; }
         
-        /* SETTINGS SECTION */
+        /* SETTINGS & LOGOS */
         #setModal { position: fixed; inset: 0; background: var(--bg); z-index: 9999; display: none; padding: 25px; overflow-y: auto; }
         .auth-card { background: var(--card); padding: 20px; border-radius: 12px; border: 1px solid #333; margin-bottom: 25px; }
         .auth-input { width: 100%; padding: 12px; margin: 8px 0; background: #000; border: 1px solid #444; color: #fff; border-radius: 6px; box-sizing: border-box; }
         .btn { width: 100%; padding: 12px; background: var(--main); border: none; font-weight: bold; border-radius: 6px; cursor: pointer; color: #000; }
-        .menu-item { display: flex; justify-content: space-between; align-items: center; padding: 18px 0; border-bottom: 1px solid #222; cursor: pointer; color: #fff; text-decoration: none; }
         .contact-box { background: #111; padding: 15px; border-radius: 10px; margin-top: 10px; border: 1px solid #222; }
         .social-link { display: flex; align-items: center; gap: 15px; padding: 12px 0; color: #fff; text-decoration: none; font-size: 14px; }
-        .social-link i { font-size: 20px; width: 25px; }
-        .fa-whatsapp { color: #25D366; }
-        .fa-instagram { color: #E1306C; }
+        .fa-whatsapp { color: #25D366; font-size: 22px; }
+        .fa-instagram { color: #E1306C; font-size: 22px; }
 
         /* PLAYER */
         #player { position: fixed; inset: 0; background: #000; z-index: 10000; display: none; flex-direction: column; }
@@ -45,26 +48,26 @@
 <body onload="render(movieDB)">
 
     <header>
-        <div class="logo">STREAMX</div>
+        <div class="logo">FE<span>NG</span></div>
         <div class="search-bar">
-            <input type="text" id="sInp" placeholder="Search 200+ titles..." onkeyup="search()">
+            <input type="text" id="sInp" placeholder="Search Feng Database..." onkeyup="search()">
             <i class="fas fa-search" style="color:var(--main)"></i>
         </div>
     </header>
 
     <div class="container">
-        <h3 style="color:var(--main); font-size:13px; letter-spacing:1px; margin-bottom:20px;">EXPLORE ALL TITLES</h3>
+        <h3 style="color:var(--main); font-size:12px; letter-spacing:2px;">INTERNAL LIBRARY</h3>
         <div class="grid" id="mainGrid"></div>
     </div>
 
     <div id="setModal">
         <div style="display:flex; align-items:center; gap:20px; margin-bottom:20px;">
             <i class="fas fa-arrow-left fa-lg" onclick="closeSets()"></i>
-            <h2 style="margin:0">Settings</h2>
+            <h2 style="margin:0">Feng Settings</h2>
         </div>
 
         <div class="auth-card">
-            <h3 id="authTitle" style="margin-top:0; color:var(--main); font-size:14px;">LOGIN TO ACCOUNT</h3>
+            <h3 id="authTitle" style="margin-top:0; color:var(--main); font-size:14px;">LOGIN TO FENG</h3>
             <input type="email" id="emailInp" class="auth-input" placeholder="Email Address">
             <input type="password" id="passInp" class="auth-input" placeholder="Password">
             <button class="btn" onclick="handleAuth()">CONTINUE</button>
@@ -78,23 +81,17 @@
         <div class="contact-box">
             <a href="https://wa.me/260772719702" class="social-link">
                 <i class="fab fa-whatsapp"></i>
-                <span>Chat on WhatsApp</span>
+                <span>Chat via WhatsApp</span>
             </a>
             <a href="https://instagram.com/felix_nyoka" target="_blank" class="social-link">
                 <i class="fab fa-instagram"></i>
                 <span>Follow on Instagram</span>
             </a>
-            <a href="mailto:nyokafelix33@gmail.com" class="social-link">
-                <i class="fas fa-envelope" style="color:var(--main)"></i>
-                <span>Email Support</span>
-            </a>
         </div>
 
-        <div class="menu-item" onclick="toggle('pol')">
-            <span><i class="fas fa-user-shield" style="margin-right:10px; color:var(--main)"></i> Privacy Policy</span>
-            <i class="fas fa-chevron-down"></i>
+        <div style="padding:15px; font-size:11px; color:#444; text-align:center; margin-top:20px;">
+            Feng World Tool • Version 25.0 Platinum
         </div>
-        <div id="pol" style="display:none; padding:15px; font-size:12px; color:#888;">StreamX ensures high-end encryption. Your viewing history is stored locally on your device only.</div>
     </div>
 
     <div id="player">
@@ -117,28 +114,20 @@
 
     <script>
         const movieDB = [
-            // BATCH #4 (2024-2025 HITS)
+            // RECENT TITLES LOADED
             {id: 533535, title: "Deadpool & Wolverine", year: 2024, type: "movie", img: "https://image.tmdb.org/t/p/w500/8cdclPkS1fSgtHd96YvFhX7U93v.jpg"},
+            {id: 1022722, title: "Inside Out 2", year: 2024, type: "movie", img: "https://image.tmdb.org/t/p/w500/vpnVM9B6NMmQpWeZvzLvRIoYpZf.jpg"},
+            {id: 823464, title: "Godzilla x Kong", year: 2024, type: "movie", img: "https://image.tmdb.org/t/p/w500/13g9U99Y0vS4S9fU16E49I6I0.jpg"},
             {id: 917496, title: "Beetlejuice Beetlejuice", year: 2024, type: "movie", img: "https://image.tmdb.org/t/p/w500/kKgQbi9oG9cr96oG9cr96oG9cr.jpg"},
             {id: 558449, title: "Gladiator II", year: 2024, type: "movie", img: "https://image.tmdb.org/t/p/w500/2c7V8R.jpg"},
             {id: 1241982, title: "Moana 2", year: 2024, type: "movie", img: "https://image.tmdb.org/t/p/w500/m0S.jpg"},
-            {id: 929590, title: "Civil War", year: 2024, type: "movie", img: "https://image.tmdb.org/t/p/w500/sh7E6Z.jpg"},
             {id: 519182, title: "Despicable Me 4", year: 2024, type: "movie", img: "https://image.tmdb.org/t/p/w500/3w84hCFJATvY6RqZWpPaPLm799K.jpg"},
-            {id: 1022722, title: "Inside Out 2", year: 2024, type: "movie", img: "https://image.tmdb.org/t/p/w500/vpnVM9B6NMmQpWeZvzLvRIoYpZf.jpg"},
-            {id: 746036, title: "The Fall Guy", year: 2024, type: "movie", img: "https://image.tmdb.org/t/p/w500/t6RUiR.jpg"},
-            {id: 823464, title: "Godzilla x Kong", year: 2024, type: "movie", img: "https://image.tmdb.org/t/p/w500/13g9U99Y0vS4S9fU16E49I6I0.jpg"},
-            {id: 653346, title: "Kingdom of the Planet of the Apes", year: 2024, type: "movie", img: "https://image.tmdb.org/t/p/w500/gKkl37j9nSgY6Y6PZFoST3oRwpo.jpg"},
-            
-            // PREVIOUS RELEASES (STILL ALL DISPLAYED)
             {id: 603692, title: "John Wick 4", year: 2023, type: "movie", img: "https://image.tmdb.org/t/p/w500/vZloY0Cc8pPTMvS3v1wZ94Ydn94.jpg"},
-            {id: 634649, title: "Spider-Man: No Way Home", year: 2021, type: "movie", img: "https://image.tmdb.org/t/p/w500/1g0dh_A.jpg"},
             {id: 299534, title: "Avengers: Endgame", year: 2019, type: "movie", img: "https://image.tmdb.org/t/p/w500/or06vSqzWBFscv1qCG76uC1fsR6.jpg"},
             {id: 1396, title: "Breaking Bad", year: 2008, type: "tv", img: "https://image.tmdb.org/t/p/w500/ztkUQvB3W73u8qb9f6f66U9v6.jpg"},
             {id: 66732, title: "Stranger Things", year: 2016, type: "tv", img: "https://image.tmdb.org/t/p/w500/x2LSRm21uTEx2PqYmS3u9mS.jpg"},
             {id: 94605, title: "Arcane", year: 2021, type: "tv", img: "https://image.tmdb.org/t/p/w500/fqldWg2tWp7uQMC23ZSTbt6z06p.jpg"},
-            {id: 111110, title: "The Last of Us", year: 2023, type: "tv", img: "https://image.tmdb.org/t/p/w500/uKvH56PMfBdt9oDR4Bh9p6t18Km.jpg"},
-            {id: 71712, title: "The Good Doctor", year: 2017, type: "tv", img: "https://image.tmdb.org/t/p/w500/53Ref9679I2jR069069.jpg"}
-            // (Note: To see thousands, simply add more {id: title: year: type: img:} blocks here!)
+            {id: 111110, title: "The Last of Us", year: 2023, type: "tv", img: "https://image.tmdb.org/t/p/w500/uKvH56PMfBdt9oDR4Bh9p6t18Km.jpg"}
         ];
 
         function render(data) {
@@ -161,25 +150,24 @@
         let isSignUp = false;
         function toggleAuthMode() {
             isSignUp = !isSignUp;
-            document.getElementById('authTitle').innerText = isSignUp ? "CREATE ACCOUNT" : "LOGIN TO ACCOUNT";
+            document.getElementById('authTitle').innerText = isSignUp ? "CREATE FENG ACCOUNT" : "LOGIN TO FENG";
             document.getElementById('authToggle').innerText = isSignUp ? "Back to Login" : "Sign Up";
         }
         function handleAuth() {
             const e = document.getElementById('emailInp').value;
             if(!e) return alert("Email required");
-            alert(isSignUp ? "Account Created!" : "Welcome back!");
+            alert(isSignUp ? "Feng Account Created!" : "Welcome to Feng!");
         }
         function forgotPass() {
             const e = document.getElementById('emailInp').value;
             if(!e) return alert("Enter email first");
-            alert("Code sent to " + e);
+            alert("Reset code sent to " + e);
         }
         function search() {
             const q = document.getElementById('sInp').value.toLowerCase();
             render(movieDB.filter(m => m.title.toLowerCase().includes(q)));
         }
         function filter(t) { render(movieDB.filter(m => m.type === t)); }
-        function toggle(id) { const e = document.getElementById(id); e.style.display = (e.style.display==='block')?'none':'block'; }
         function openSets() { document.getElementById('setModal').style.display = 'block'; }
         function closeSets() { document.getElementById('setModal').style.display = 'none'; }
         function closeP() { document.getElementById('player').style.display = 'none'; document.getElementById('vF').src = ''; }
