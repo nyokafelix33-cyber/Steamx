@@ -1,312 +1,210 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Feng Vision 68.1.1</title>
-
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-
-<style>
+<title>Feng World Streaming</title><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<link rel="manifest" href="manifest.json"><style>
 :root {
-    --primary: #d3f243;
-    --bg: #0b0e14;
-    --card: #1c1f26;
-    --text: #ffffff;
-    --nav: #080a0f;
+  --primary:#d3f243;
+  --bg:#0b0e14;
+  --card:#1c1f26;
+  --text:#fff;
+  --nav:#080a0f;
 }
 
-body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    overflow-x: hidden;
+*{box-sizing:border-box;}
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:Arial, sans-serif;
 }
 
-/* HEADER */
-header {
-    padding: 15px 5%;
-    background: var(--bg);
-    position: sticky;
-    top: 0;
-    z-index: 100;
+header{
+  padding:12px 5%;
+  background:var(--bg);
+  position:sticky;
+  top:0;
+  z-index:1000;
 }
 
-.logo-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 15px;
+.logo-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:10px;
 }
 
-.logo {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+.logo{display:flex;align-items:center;gap:10px;}
+.f-box{background:var(--primary);color:#000;padding:4px 10px;border-radius:6px;font-weight:bold;}
+
+.search-bar{
+  display:flex;
+  align-items:center;
+  background:var(--card);
+  padding:10px;
+  border-radius:10px;
+  border:1px solid rgba(211,242,67,.3);
+}
+.search-bar input{
+  background:none;border:none;outline:none;color:#fff;margin-left:8px;width:100%;
 }
 
-.f-box {
-    background: var(--primary);
-    color: #000;
-    padding: 5px 12px;
-    border-radius: 8px;
-    font-weight: 900;
-    font-size: 20px;
+.shelf{padding:10px 5%;color:var(--primary);font-weight:bold;letter-spacing:1px;}
+
+.content-grid{
+  padding:10px 5% 140px;
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(120px,1fr));
+  gap:10px;
 }
 
-.search-bar {
-    background: var(--card);
-    border: 1px solid rgba(211, 242, 67, 0.4);
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    padding: 12px 15px;
+.item-card{
+  background:var(--card);
+  border-radius:10px;
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,.05);
+  cursor:pointer;
+  transition:.2s;
+}
+.item-card:hover{transform:scale(1.03);}
+
+.item-card img{
+  width:100%;
+  aspect-ratio:2/3;
+  object-fit:cover;
+  display:block;
 }
 
-.search-bar input {
-    background: transparent;
-    border: none;
-    color: white;
-    margin-left: 10px;
-    width: 100%;
-    outline: none;
-}
-
-/* GRID */
-.shelf {
-    padding: 20px 5% 5px;
-    font-size: 14px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    color: var(--primary);
-    font-weight: bold;
-}
-
-.content-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-    padding: 10px 5% 160px;
-}
-
-.item-card {
-    background: var(--card);
-    border-radius: 10px;
-    overflow: hidden;
-    border: 1px solid rgba(255,255,255,0.05);
-    cursor: pointer;
-}
-
-.item-card img {
-    width: 100%;
-    aspect-ratio: 2/3;
-    object-fit: cover;
-}
-
-.item-info {
-    padding: 8px;
-}
-
-.item-info b {
-    font-size: 11px;
-    display: block;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
+.item-info{padding:6px;font-size:11px;}
+.item-info b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 
 /* DETAILS PANEL */
-#details-panel {
-    position: fixed;
-    inset: 0;
-    background: var(--bg);
-    z-index: 2000;
-    display: none;
-    flex-direction: column;
+#details-panel{
+  position:fixed;inset:0;background:var(--bg);z-index:3000;display:none;flex-direction:column;
+}
+.panel-header{padding:12px;border-bottom:1px solid #222;display:flex;align-items:center;gap:10px;}
+.selector-box{padding:12px;overflow:auto;}
+.ep-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(60px,1fr));gap:8px;}
+.ep-btn{background:#252830;padding:10px;border-radius:6px;text-align:center;font-size:12px;cursor:pointer;}
+
+/* PLAYER */
+#playerPanel{
+  display:none;position:fixed;inset:0;background:black;z-index:4000;
+}
+#playerPanel iframe{width:100%;height:100%;border:none;}
+#closePlayer{
+  position:absolute;top:10px;left:10px;z-index:5000;background:var(--primary);border:none;padding:8px;border-radius:6px;font-weight:bold;
 }
 
-.panel-header {
-    padding: 20px;
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    border-bottom: 1px solid #222;
+/* FOOTER */
+footer{
+  position:fixed;bottom:0;width:100%;background:var(--nav);
+  display:flex;justify-content:space-around;padding:8px 0;border-top:1px solid #1c1f26;z-index:9999;
 }
+.nav-link{text-align:center;color:#666;font-size:10px;}
+.nav-link.active{color:var(--primary);} 
+.nav-link i{font-size:20px;display:block;}
+</style></head><body onload="render()"><header>
+  <div class="logo-row">
+    <div class="logo"><div class="f-box">F</div>FENG <span style="color:var(--primary)">WORLD</span></div>
+    <i class="fas fa-user-circle"></i>
+  </div>
+  <div class="search-bar">
+    <i class="fas fa-search" style="color:var(--primary)"></i>
+    <input id="searchInput" onkeyup="searchContent()" placeholder="Search movies, series...">
+  </div>
+</header><div class="shelf">Trending</div>
+<div id="main-grid" class="content-grid"></div><!-- DETAILS PANEL --><div id="details-panel">
+  <div class="panel-header">
+    <i class="fas fa-arrow-left" onclick="closeDetails()"></i>
+    <h3 id="det-title"></h3>
+  </div>
+  <div class="selector-box">
+    <div id="ep-list" class="ep-grid"></div>
+  </div>
+</div><!-- PLAYER --><div id="playerPanel">
+  <button id="closePlayer" onclick="closePlayer()">BACK</button>
+  <iframe id="movieFrame" allowfullscreen></iframe>
+</div><footer>
+  <div class="nav-link active"><i class="fas fa-home"></i>Home</div>
+  <div class="nav-link"><i class="fas fa-play-circle"></i>Movies</div>
+  <div class="nav-link"><i class="fas fa-tv"></i>Series</div>
+  <div class="nav-link"><i class="fas fa-history"></i>History</div>
+</footer><script>
+// REGISTER SERVICE WORKER
+if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js');}
 
-.selector-box {
-    padding: 20px;
-    overflow-y: auto;
-}
-
-.pill-row {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
-    overflow-x: auto;
-}
-
-.pill {
-    background: var(--card);
-    padding: 8px 20px;
-    border-radius: 20px;
-    border: 1px solid #333;
-}
-
-.pill.active {
-    background: var(--primary);
-    color: black;
-    font-weight: bold;
-}
-
-.ep-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
-}
-
-.ep-btn {
-    background: #252830;
-    padding: 15px 5px;
-    text-align: center;
-    border-radius: 8px;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-/* BOTTOM NAV */
-footer {
-    position: fixed;
-    bottom: 0;
-    width: 100%;
-    background: var(--nav);
-    display: flex;
-    justify-content: space-around;
-    padding: 10px 0;
-    border-top: 1px solid #1c1f26;
-    z-index: 9999;
-    pointer-events: auto;
-}
-
-.nav-link {
-    text-align: center;
-    color: #555;
-    font-size: 10px;
-}
-
-.nav-link.active {
-    color: var(--primary);
-}
-
-.nav-link i {
-    font-size: 22px;
-    display: block;
-    margin-bottom: 4px;
-}
-</style>
-</head>
-
-<body onload="render()">
-
-<header>
-    <div class="logo-row">
-        <div class="logo">
-            <div class="f-box">F</div>
-            <span>FENG <span style="color:var(--primary)">WORLD</span></span>
-        </div>
-        <i class="fas fa-user-circle fa-lg"></i>
-    </div>
-
-    <div class="search-bar">
-        <i class="fas fa-search" style="color:var(--primary)"></i>
-        <input type="text" placeholder="Search movies, series...">
-    </div>
-</header>
-
-<div class="shelf">Trending Series</div>
-<div class="content-grid" id="main-grid"></div>
-
-<!-- DETAILS PANEL -->
-<div id="details-panel">
-    <div class="panel-header">
-        <i class="fas fa-arrow-left fa-lg" onclick="closeDetails()"></i>
-        <h2 id="det-title"></h2>
-    </div>
-
-    <div class="selector-box">
-        <div class="pill-row">
-            <div class="pill active">Season 1</div>
-            <div class="pill">Season 2</div>
-            <div class="pill">Season 3</div>
-        </div>
-
-        <p style="color:#777;font-size:13px;">Episodes</p>
-        <div class="ep-grid" id="ep-list"></div>
-    </div>
-</div>
-
-<footer>
-    <div class="nav-link active"><i class="fas fa-home"></i>Home</div>
-    <div class="nav-link"><i class="fas fa-play-circle"></i>Movies</div>
-    <div class="nav-link"><i class="fas fa-tv"></i>Series</div>
-    <div class="nav-link"><i class="fas fa-history"></i>History</div>
-</footer>
-
-<script>
-// DATA
-const FENG_CORE = {
-    archive: [
-        { title: "Stranger Things", type: "tv", year: "2016", img: "https://image.tmdb.org/t/p/w500/49WfTJs0vSzMG26Y3otR9C3qOQn.jpg" },
-        { title: "Breaking Bad", type: "tv", year: "2008", img: "https://image.tmdb.org/t/p/w500/ztkUQ09o9h969Re6S9vDUs9GKV3.jpg" },
-        { title: "Money Heist", type: "tv", year: "2017", img: "https://image.tmdb.org/t/p/w500/reEMJA1uzpG3SZky9cyuQzvm0bz.jpg" },
-        { title: "The Boys", type: "tv", year: "2019", img: "https://image.tmdb.org/t/p/w500/77v7mBoi5Y9PeG9jk3vIq9oYv9f.jpg" },
-        { title: "Avengers Endgame", type: "movie", year: "2019", img: "https://image.tmdb.org/t/p/w500/or06vSqzWBFscv1qCG76uC1fsR6.jpg" },
-        { title: "Interstellar", type: "movie", year: "2014", img: "https://image.tmdb.org/t/p/w500/gEU2QniE6E77NI6lCU6MxlSabaC.jpg" }
-    ]
-};
+// SAMPLE DATA
+const FENG_CORE={archive:[
+ {id:66732,title:"Stranger Things",type:"tv",year:"2016",img:"https://image.tmdb.org/t/p/w500/49WfTJs0vSzMG26Y3otR9C3qOQn.jpg"},
+ {id:1396,title:"Breaking Bad",type:"tv",year:"2008",img:"https://image.tmdb.org/t/p/w500/ztkUQ09o9h969Re6S9vDUs9GKV3.jpg"},
+ {id:71446,title:"Money Heist",type:"tv",year:"2017",img:"https://image.tmdb.org/t/p/w500/reEMJA1uzpG3SZky9cyuQzvm0bz.jpg"},
+ {id:299534,title:"Avengers Endgame",type:"movie",year:"2019",img:"https://image.tmdb.org/t/p/w500/or06vSqzWBFscv1qCG76uC1fsR6.jpg"},
+ {id:157336,title:"Interstellar",type:"movie",year:"2014",img:"https://image.tmdb.org/t/p/w500/gEU2QniE6E77NI6lCU6MxlSabaC.jpg"}
+]};
 
 // RENDER GRID
-function render() {
-    const grid = document.getElementById("main-grid");
-    grid.innerHTML = "";
-
-    FENG_CORE.archive.forEach(item => {
-        grid.innerHTML += `
-        <div class="item-card" onclick="openDetails('${item.title}', '${item.type}')">
-            <img src="${item.img}" loading="lazy">
-            <div class="item-info">
-                <b>${item.title}</b>
-                <span>${item.year}</span>
-            </div>
-        </div>
-        `;
-    });
+function render(){
+ const grid=document.getElementById('main-grid');
+ grid.innerHTML="";
+ FENG_CORE.archive.forEach(item=>{
+  grid.innerHTML+=`<div class=\"item-card\" onclick=\"openDetails(${item.id},'${item.type}','${item.title}')\">\n<img src=\"${item.img}\" onerror=\"this.src='fallback.jpg'\">\n<div class=\"item-info\"><b>${item.title}</b><span>${item.year}</span></div></div>`;
+ });
 }
 
-// OPEN DETAILS
-function openDetails(title, type) {
-    if (type === "movie") {
-        alert("Opening Movie Player...");
-        return;
-    }
-
-    document.getElementById("det-title").innerText = title;
-    const epList = document.getElementById("ep-list");
-    epList.innerHTML = "";
-
-    for (let i = 1; i <= 12; i++) {
-        epList.innerHTML += `<div class="ep-btn" onclick="alert('Playing Episode ${i}')">${i}</div>`;
-    }
-
-    document.getElementById("details-panel").style.display = "flex";
+// SEARCH
+function searchContent(){
+ const q=document.getElementById('searchInput').value.toLowerCase();
+ const grid=document.getElementById('main-grid');
+ grid.innerHTML="";
+ FENG_CORE.archive.filter(i=>i.title.toLowerCase().includes(q)).forEach(item=>{
+  grid.innerHTML+=`<div class=\"item-card\" onclick=\"openDetails(${item.id},'${item.type}','${item.title}')\">\n<img src=\"${item.img}\" onerror=\"this.src='fallback.jpg'\">\n<div class=\"item-info\"><b>${item.title}</b><span>${item.year}</span></div></div>`;
+ });
 }
 
-// CLOSE DETAILS
-function closeDetails() {
-    document.getElementById("details-panel").style.display = "none";
+// OPEN DETAILS OR PLAYER
+function openDetails(id,type,title){
+ if(type==='movie'){playMovie(id);return;}
+ document.getElementById('det-title').innerText=title;
+ loadEpisodes(id,1);
+ document.getElementById('details-panel').style.display='flex';
 }
-</script>
 
-</body>
+function closeDetails(){document.getElementById('details-panel').style.display='none';}
+
+// PLAYER
+function playMovie(id){
+ document.getElementById('movieFrame').src=`https://vidsrc.to/embed/movie/${id}`;
+ document.getElementById('playerPanel').style.display='block';
+}
+
+function playEpisode(id,s,e){
+ document.getElementById('movieFrame').src=`https://vidsrc.to/embed/tv/${id}/${s}/${e}`;
+ document.getElementById('playerPanel').style.display='block';
+}
+
+function closePlayer(){
+ document.getElementById('movieFrame').src='';
+ document.getElementById('playerPanel').style.display='none';
+}
+
+// TMDB API
+const TMDB_KEY='PUT_YOUR_TMDB_KEY_HERE';
+async function loadEpisodes(id,season){
+ const epList=document.getElementById('ep-list');
+ epList.innerHTML='Loading...';
+ try{
+  const res=await fetch(`https://api.themoviedb.org/3/tv/${id}/season/${season}?api_key=${TMDB_KEY}`);
+  const data=await res.json();
+  epList.innerHTML='';
+  data.episodes.forEach(ep=>{
+    epList.innerHTML+=`<div class='ep-btn' onclick=\"playEpisode(${id},${season},${ep.episode_number})\">Ep ${ep.episode_number}</div>`;
+  });
+ }catch(e){
+  epList.innerHTML='TMDB API ERROR';
+ }
+}
+</script></body>
 </html>
