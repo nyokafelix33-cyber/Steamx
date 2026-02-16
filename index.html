@@ -29,7 +29,7 @@ header{padding:20px 5%;background:var(--bg);position:sticky;top:0;z-index:2000;b
 .item-meta{padding:8px;} .item-meta b{font-size:11px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .item-meta span{font-size:9px;color:#777;font-weight:800;}
 
-.drawer{position:fixed;inset:0;background:var(--bg);z-index:5000;display:none;flex-direction:column;}
+.drawer{position:fixed;inset:0;background:var(--bg);z-index:5000;display:none;flex-direction:column;overflow-y:auto;}
 .drawer-head{padding:25px 5%;border-bottom:1px solid #222;display:flex;justify-content:space-between;align-items:center;}
 .set-item{padding:20px 5%;border-bottom:1px solid #1a1a1a;display:flex;justify-content:space-between;align-items:center;cursor:pointer;}
 
@@ -39,12 +39,14 @@ header{padding:20px 5%;background:var(--bg);position:sticky;top:0;z-index:2000;b
 .season-pill.active{background:var(--primary);color:#000;}
 
 #info-grid{padding:20px; display:flex; flex-direction:column; gap:15px;}
+#info-backdrop{width:100%; height:200px; background-size:cover; background-position:center; border-radius:12px;}
 #info-grid img{width:100%; border-radius:12px;}
 .info-title{font-size:22px;font-weight:900;margin:5px 0;}
 .info-sub{font-size:12px;color:#aaa;margin-bottom:10px;}
 .info-genres{font-size:11px;color:#ccc;margin:5px 0;}
 .info-overview{font-size:14px;margin:10px 0;color:#ddd;}
 .download-btn{padding:10px 15px;background:var(--primary);color:#000;font-weight:900;border:none;border-radius:8px;cursor:pointer;width:max-content;}
+
 footer{position:fixed;bottom:0;width:100%;background:#000;display:flex;padding:15px 0 35px;border-top:1px solid #1c1f26;z-index:3000;}
 .tab{flex:1;text-align:center;color:#555;cursor:pointer;}
 .tab.active{color:var(--primary);}
@@ -84,7 +86,7 @@ footer{position:fixed;bottom:0;width:100%;background:#000;display:flex;padding:1
 <i class="fas fa-sync-alt"></i>
 </div>
 <div class="set-item">
-<div><b>App Version</b><br><small>Vision Web 2.0</small></div>
+<div><b>App Version</b><br><small>Vision Web 2.1</small></div>
 <i class="fas fa-code-branch"></i>
 </div>
 <div class="set-item" onclick="window.location.href='https://wa.me/260770605003'">
@@ -108,6 +110,7 @@ footer{position:fixed;bottom:0;width:100%;background:#000;display:flex;padding:1
 <h2 id="info-title"></h2>
 <i class="fas fa-times fa-2x" onclick="FENG.hideDrawers()"></i>
 </div>
+<div id="info-backdrop"></div>
 <div id="info-grid"></div>
 </div>
 
@@ -158,7 +161,11 @@ openInfo: async function(type,id){
     this.hideDrawers();
     document.getElementById('pane-info').style.display='flex';
     const r=await fetch(`https://api.themoviedb.org/3/${type}/${id}?api_key=${KEY}`);
-    const d=await r.json(); const grid=document.getElementById('info-grid'); grid.innerHTML='';
+    const d=await r.json(); 
+    const grid=document.getElementById('info-grid'); 
+    const backdrop=document.getElementById('info-backdrop');
+    backdrop.style.backgroundImage=`url(https://image.tmdb.org/t/p/original${d.backdrop_path})`;
+    grid.innerHTML='';
     document.getElementById('info-title').innerText=d.title||d.name;
     let genres=d.genres.map(g=>g.name).join(', ');
     let overview=d.overview||'No description available.';
@@ -183,9 +190,13 @@ openTVSeasons:function(tv){
     });
     if(tv.seasons.length>0)this.loadEpisodes(tv.id,tv.seasons[0].season_number,tv.name||tv.title);
 },
-loadEpisodes:function(tvId,season,title){
+loadEpisodes: async function(tvId,season,title){
     const grid=document.getElementById('ep-grid'); grid.innerHTML='';
-    for(let i=1;i<=12;i++){grid.innerHTML+=`<div style="background:#252830;padding:15px;text-align:center;border-radius:10px;font-weight:900;" onclick="FENG.play('tv','${tvId}/${season}/${i}','${title} E${i}')">${i}</div>`;}
+    const r=await fetch(`https://api.themoviedb.org/3/tv/${tvId}/season/${season}?api_key=${KEY}`);
+    const d=await r.json();
+    d.episodes.forEach(ep=>{
+        grid.innerHTML+=`<div style="background:#252830;padding:15px;text-align:center;border-radius:10px;font-weight:900;" onclick="FENG.play('tv','${tvId}/${season}/${ep.episode_number}','${title} E${ep.episode_number}')">${ep.episode_number}</div>`;
+    });
 },
 search: async function(query){if(query.length<3)return;
     const r=await fetch(`https://api.themoviedb.org/3/search/multi?api_key=${KEY}&query=${query}`);
@@ -204,6 +215,5 @@ hideDrawers:function(){document.querySelectorAll('.drawer').forEach(d=>d.style.d
 stopPlayer:function(){this.hideDrawers(); document.getElementById('video-frame').src='';}
 };
 </script>
-
 </body>
 </html>
