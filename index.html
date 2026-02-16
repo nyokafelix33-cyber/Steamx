@@ -1,161 +1,92 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Feng World TV</title>
-<link rel="manifest" href="manifest.json">
+<title>FENG WORLD</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
 <style>
-body{margin:0;background:#000;color:#fff;font-family:Arial}
-header{padding:10px;background:#111;display:flex;align-items:center;gap:10px}
-input{padding:8px;border-radius:5px;border:none;width:220px}
-.row{margin:15px}
-.row h2{margin:5px 0;font-size:18px}
-.slider{display:flex;overflow-x:auto;gap:10px;scroll-behavior:smooth}
-.card{min-width:120px;background:#111;border-radius:8px;padding:4px;cursor:pointer}
-.card img{width:100%;border-radius:6px}
-.card p{font-size:12px;text-align:center}
-.card:focus{outline:3px solid red}
-#player{position:fixed;top:0;left:0;width:100%;height:100%;background:#000;display:none;z-index:999}
-#player iframe{width:100%;height:100%;border:none}
-#closeBtn{position:absolute;top:10px;right:10px;padding:10px;background:red;border:none;color:#fff;font-size:16px}
-#episodes{position:fixed;bottom:0;left:0;width:100%;max-height:40%;background:#111;overflow:auto;display:none;padding:10px}
-.episode{padding:6px;border-bottom:1px solid #333;cursor:pointer}
+body {
+  background:#0b0e14;
+  color:white;
+  font-family:Arial;
+  margin:0;
+}
+
+header {
+  padding:10px;
+  background:#111;
+  font-size:22px;
+  font-weight:bold;
+}
+
+#grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(140px,1fr));
+  gap:10px;
+  padding:10px;
+}
+
+.card {
+  background:#1c1f26;
+  border-radius:10px;
+  overflow:hidden;
+  cursor:pointer;
+}
+
+.card img {
+  width:100%;
+  height:200px;
+  object-fit:cover;
+}
+
+.card div {
+  padding:5px;
+  font-size:12px;
+}
 </style>
+
 </head>
 <body>
-<header>
-<h2>Feng World TV</h2>
-<input id="search" placeholder="Search movies or series...">
-</header>
 
-<div id="rows"></div>
+<header>🎬 FENG WORLD</header>
 
-<div id="player">
-<button id="closeBtn" onclick="closePlayer()">X</button>
-<iframe id="video"></iframe>
-</div>
-
-<div id="episodes"></div>
+<div id="grid"></div>
 
 <script>
-// ===== YOUR TMDB API KEY =====
 const TMDB_KEY = "ea593c3fa4d4942ece315977cd7e32c9";
 const IMG = "https://image.tmdb.org/t/p/w500";
 
-let allMovies = [];
-let allShows = [];
-let focusIndex = 0;
+async function loadTrending() {
+  const res = await fetch(`https://api.themoviedb.org/3/trending/all/week?api_key=${TMDB_KEY}`);
+  const data = await res.json();
 
-// FETCH MOVIES
-async function getMovies(){
- let res = await fetch(`https://api.themoviedb.org/3/trending/movie/week?api_key=${TMDB_KEY}`);
- let data = await res.json();
- allMovies = data.results;
- render();
-}
+  const grid = document.getElementById("grid");
+  grid.innerHTML = "";
 
-// FETCH TV SHOWS
-async function getShows(){
- let res = await fetch(`https://api.themoviedb.org/3/trending/tv/week?api_key=${TMDB_KEY}`);
- let data = await res.json();
- allShows = data.results;
- render();
-}
+  data.results.forEach(item => {
+    const title = item.title || item.name;
+    const poster = item.poster_path ? IMG + item.poster_path : "";
 
-// RENDER NETFLIX ROWS
-function render(){
- const rows = document.getElementById('rows');
- rows.innerHTML="";
- createRow("Trending Movies", allMovies, "movie");
- createRow("Trending Series", allShows, "tv");
-}
-
-function createRow(title, list, type){
- let row = document.createElement('div');
- row.className='row';
- row.innerHTML=`<h2>${title}</h2><div class="slider"></div>`;
- let slider = row.querySelector('.slider');
- list.forEach(item=>{
-  let card = document.createElement('div');
-  card.className='card';
-  card.tabIndex=0;
-  let img = item.poster_path ? IMG+item.poster_path : 'fallback.jpg';
-  card.innerHTML=`<img src="${img}" onerror="this.src='fallback.jpg'"><p>${item.title||item.name}</p>`;
-  card.onclick=()=>{
-   if(type==="movie") playMovie(item.id);
-   else showSeasons(item.id);
-  };
-  slider.appendChild(card);
- });
- rows.appendChild(row);
-}
-
-// PLAY MOVIE
-function playMovie(id){
- document.getElementById('player').style.display='block';
- document.getElementById('video').src = `https://vidsrc.me/embed/${id}`;
-}
-
-// CLOSE PLAYER
-function closePlayer(){
- document.getElementById('player').style.display='none';
- document.getElementById('video').src="";
- document.getElementById('episodes').style.display='none';
-}
-
-// SHOW SEASONS & EPISODES
-async function showSeasons(id){
- let res = await fetch(`https://api.themoviedb.org/3/tv/${id}?api_key=${TMDB_KEY}`);
- let data = await res.json();
- let epDiv = document.getElementById('episodes');
- epDiv.innerHTML=`<h3>${data.name}</h3>`;
- for(let s of data.seasons){
-  let sRes = await fetch(`https://api.themoviedb.org/3/tv/${id}/season/${s.season_number}?api_key=${TMDB_KEY}`);
-  let sData = await sRes.json();
-  sData.episodes.forEach(e=>{
-   let div=document.createElement('div');
-   div.className='episode';
-   div.innerText=`S${s.season_number}E${e.episode_number} - ${e.name}`;
-   div.onclick=()=>playEpisode(id,s.season_number,e.episode_number);
-   epDiv.appendChild(div);
+    grid.innerHTML += `
+      <div class="card" onclick="play('${item.media_type}','${item.id}')">
+        <img src="${poster}">
+        <div>${title}</div>
+      </div>
+    `;
   });
- }
- epDiv.style.display='block';
 }
 
-// PLAY EPISODE
-function playEpisode(id,s,e){
- document.getElementById('player').style.display='block';
- document.getElementById('video').src = `https://vidsrc.me/embed/tv/${id}/${s}/${e}`;
+function play(type,id){
+  if(type=="movie"){
+    window.open(`https://vidsrc.to/embed/movie/${id}`);
+  } else {
+    window.open(`https://vidsrc.to/embed/tv/${id}`);
+  }
 }
 
-// SEARCH
-search.oninput=()=>{
- let q=search.value.toLowerCase();
- let fm=allMovies.filter(m=>(m.title||'').toLowerCase().includes(q));
- let fs=allShows.filter(m=>(m.name||'').toLowerCase().includes(q));
- const rows=document.getElementById('rows');
- rows.innerHTML="";
- createRow("Search Movies",fm,"movie");
- createRow("Search Series",fs,"tv");
-}
-
-// ANDROID TV REMOTE NAVIGATION
-function getCards(){return document.querySelectorAll('.card');}
-document.addEventListener('keydown',e=>{
- let cards=getCards();
- if(!cards.length)return;
- if(e.key==='ArrowRight')focusIndex=(focusIndex+1)%cards.length;
- if(e.key==='ArrowLeft')focusIndex=(focusIndex-1+cards.length)%cards.length;
- if(e.key==='Enter')cards[focusIndex].click();
- cards.forEach(c=>c.blur());
- cards[focusIndex].focus();
-});
-
-// INIT
-getMovies();
-getShows();
+loadTrending();
 </script>
+
 </body>
 </html>
