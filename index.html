@@ -9,19 +9,22 @@
 :root{--primary:#d3f243;--bg:#0b0e14;--card:#1c1f26;--text:#fff;--accent:#25d366;--radius:12px;}
 body{margin:0;padding:0;font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;}
 header{padding:20px 5%;background:var(--bg);position:sticky;top:0;z-index:2000;border-bottom:2px solid var(--primary);}
-.header-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;}
+.header-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
 .logo{font-weight:900;font-size:24px;} .logo span{color:var(--primary);}
-.search-area{background:rgba(255,255,255,0.07);border-radius:12px;padding:12px 15px;display:flex;align-items:center;gap:10px;}
+.search-area{background:rgba(255,255,255,0.07);border-radius:12px;padding:12px 15px;display:flex;align-items:center;gap:10px;margin-bottom:10px;}
 .search-area input{background:transparent;border:none;color:#fff;width:100%;outline:none;}
+#genre-filters{display:flex;overflow-x:auto;padding:0 5%;gap:8px;margin-bottom:10px;}
+.genre-pill{padding:5px 12px;border-radius:20px;background:#222;color:#fff;cursor:pointer;white-space:nowrap;}
+.genre-pill.active{background:var(--primary);color:#000;}
 
-.slider-container{width:100%;height:45vh;position:relative;overflow:hidden;}
-.slide{position:absolute;inset:0;opacity:0;transition:1s ease-in-out;background-size:cover;background-position:center;display:flex;align-items:flex-end;padding:0 5% 50px;}
+.slider-container{width:100%;height:40vh;position:relative;overflow:hidden;margin-bottom:15px;}
+.slide{position:absolute;inset:0;opacity:0;transition:1s ease-in-out;background-size:cover;background-position:center;display:flex;align-items:flex-end;padding:0 5% 40px;}
 .slide.active{opacity:1;}
 .slide::after{content:'';position:absolute;inset:0;background:linear-gradient(to top,var(--bg)10%,transparent);}
 .slide-content{position:relative;z-index:2;}
 .badge{background:var(--primary);color:#000;padding:4px 10px;border-radius:4px;font-weight:900;font-size:10px;margin-bottom:8px;display:inline-block;}
 
-.shelf-title{padding:20px 5% 10px;font-weight:800;color:var(--primary);font-size:13px;text-transform:uppercase;}
+.shelf-title{padding:5px 5% 10px;font-weight:800;color:var(--primary);font-size:13px;text-transform:uppercase;}
 .row{display:flex;overflow-x:auto;gap:12px;padding:0 5% 20px;scrollbar-width:none;}
 .row::-webkit-scrollbar{display:none;}
 .item{min-width:125px;background:var(--card);border-radius:var(--radius);overflow:hidden;position:relative;cursor:pointer;}
@@ -65,6 +68,7 @@ footer{position:fixed;bottom:0;width:100%;background:#000;display:flex;padding:1
 <i class="fas fa-search" style="color:var(--primary)"></i>
 <input type="text" id="search-bar" placeholder="Find movies, TV shows..." onkeyup="FENG.search(this.value)">
 </div>
+<div id="genre-filters"></div>
 </header>
 
 <main id="pane-home">
@@ -132,8 +136,30 @@ footer{position:fixed;bottom:0;width:100%;background:#000;display:flex;padding:1
 const KEY='ea593c3fa4d4942ece315977cd7e32c9';
 let currentSlide=0;
 
+const GENRES={}; // Will store genre name => id mapping
+
 const FENG={
-boot:function(){this.loadHero(); this.loadShelf('movie/popular','row-movies'); this.loadShelf('tv/top_rated','row-series');},
+boot: async function(){
+    await this.loadGenres();
+    this.loadHero();
+    this.loadShelf('movie/popular','row-movies');
+    this.loadShelf('tv/top_rated','row-series');
+},
+loadGenres: async function(){
+    const r=await fetch(`https://api.themoviedb.org/3/genre/movie/list?api_key=${KEY}`);
+    const d=await r.json();
+    d.genres.forEach(g=>{
+        GENRES[g.name]=g.id;
+        const pill=document.createElement('div');
+        pill.className='genre-pill'; pill.innerText=g.name;
+        pill.onclick=()=>{document.querySelectorAll('.genre-pill').forEach(p=>p.classList.remove('active')); pill.classList.add('active'); this.filterByGenre(g.id);}
+        document.getElementById('genre-filters').appendChild(pill);
+    });
+},
+filterByGenre: function(genreId){
+    this.loadShelf(`discover/movie?with_genres=${genreId}`,'row-movies');
+    this.loadShelf(`discover/tv?with_genres=${genreId}`,'row-series');
+},
 loadHero: async function(){
     const r=await fetch(`https://api.themoviedb.org/3/trending/all/day?api_key=${KEY}`);
     const d=await r.json(); const slider=document.getElementById('hero-slider'); slider.innerHTML='';
@@ -147,7 +173,7 @@ loadHero: async function(){
 },
 nextSlide:function(){const slides=document.querySelectorAll('.slide');slides[currentSlide].classList.remove('active');currentSlide=(currentSlide+1)%slides.length;slides[currentSlide].classList.add('active');},
 loadShelf: async function(path,id){
-    const r=await fetch(`https://api.themoviedb.org/3/${path}?api_key=${KEY}`);
+    const r=await fetch(`https://api.themoviedb.org/3/${path}&api_key=${KEY}`);
     const d=await r.json(); const container=document.getElementById(id); container.innerHTML='';
     d.results.forEach(item=>{
         const type=item.media_type||(item.name?'tv':'movie'); const title=item.title||item.name;
@@ -170,14 +196,11 @@ openInfo: async function(type,id){
     let overview=d.overview||'No description available.';
     let date=d.release_date||d.first_air_date||'Unknown';
     let rating=d.vote_average||'N/A';
-
-    // Trailer button if available
-    let trailer = '';
+    let trailer='';
     if(d.videos && d.videos.results.length>0){
         let vid = d.videos.results.find(v=>v.type==='Trailer' && v.site==='YouTube');
-        if(vid) trailer = `<button class="download-btn" onclick="window.open('https://www.youtube.com/watch?v=${vid.key}','_blank')">TRAILER</button>`;
+        if(vid) trailer=`<button class="download-btn" onclick="window.open('https://www.youtube.com/watch?v=${vid.key}','_blank')">TRAILER</button>`;
     }
-
     grid.innerHTML=`<img src="https://image.tmdb.org/t/p/w500${d.poster_path}">
     <div class="info-title">${d.title||d.name}</div>
     <div class="info-sub">${date} • ⭐ ${rating}</div>
@@ -185,10 +208,9 @@ openInfo: async function(type,id){
     <div class="info-overview">${overview}</div>
     <div style="display:flex;gap:10px;">
         <button class="download-btn" onclick="FENG.play('${type}','${d.id}','${d.title||d.name}')">WATCH</button>
-        <button class="download-btn" onclick="alert('Download feature coming soon!')">DOWNLOAD</button>
+        <button class="download-btn" onclick="alert('Download coming soon!')">DOWNLOAD</button>
         ${trailer}
     </div>`;
-
     if(type==='tv'){this.openTVSeasons(d);}
 },
 openTVSeasons:function(tv){
