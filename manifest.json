@@ -1,15 +1,8 @@
 {
-  "name": "Feng World",
+  "name": "Feng World TV",
   "short_name": "FengTV",
   "start_url": ".",
   "display": "standalone",
   "background_color": "#000000",
-  "theme_color": "#000000",
-  "icons": [
-    {
-      "src": "icon.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    }
-  ]
+  "theme_color": "#000000"
 }
