@@ -2,253 +2,228 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>FENG WORLD - OnStream Clone</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<title>FENG WORLD</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- HLS Player -->
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+
 <style>
-:root{--primary:#d3f243;--bg:#0b0e14;--card:#1c1f26;--text:#fff;--accent:#25d366;--radius:12px;}
-body{margin:0;padding:0;font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;}
-header{padding:20px 5%;background:var(--bg);position:sticky;top:0;z-index:2000;border-bottom:2px solid var(--primary);}
-.header-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
-.logo{font-weight:900;font-size:24px;} .logo span{color:var(--primary);}
-.search-area{background:rgba(255,255,255,0.07);border-radius:12px;padding:12px 15px;display:flex;align-items:center;gap:10px;margin-bottom:10px;}
-.search-area input{background:transparent;border:none;color:#fff;width:100%;outline:none;}
-#genre-filters{display:flex;overflow-x:auto;padding:0 5%;gap:8px;margin-bottom:10px;}
-.genre-pill{padding:5px 12px;border-radius:20px;background:#222;color:#fff;cursor:pointer;white-space:nowrap;}
-.genre-pill.active{background:var(--primary);color:#000;}
+body { margin:0; font-family:Arial; background:#000; color:white; }
+header {
+  padding:10px;
+  background:#111;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+input, select {
+  padding:8px;
+  border-radius:5px;
+  border:none;
+  outline:none;
+}
+button { padding:8px; border:none; border-radius:5px; cursor:pointer; }
 
-.slider-container{width:100%;height:40vh;position:relative;overflow:hidden;margin-bottom:15px;}
-.slide{position:absolute;inset:0;opacity:0;transition:1s ease-in-out;background-size:cover;background-position:center;display:flex;align-items:flex-end;padding:0 5% 40px;}
-.slide.active{opacity:1;}
-.slide::after{content:'';position:absolute;inset:0;background:linear-gradient(to top,var(--bg)10%,transparent);}
-.slide-content{position:relative;z-index:2;}
-.badge{background:var(--primary);color:#000;padding:4px 10px;border-radius:4px;font-weight:900;font-size:10px;margin-bottom:8px;display:inline-block;}
+.grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(140px,1fr));
+  gap:10px;
+  padding:10px;
+}
+.card {
+  cursor:pointer;
+  transition:.2s;
+}
+.card:hover { transform:scale(1.05); }
+.card img { width:100%; border-radius:6px; }
 
-.shelf-title{padding:5px 5% 10px;font-weight:800;color:var(--primary);font-size:13px;text-transform:uppercase;}
-.row{display:flex;overflow-x:auto;gap:12px;padding:0 5% 20px;scrollbar-width:none;}
-.row::-webkit-scrollbar{display:none;}
-.item{min-width:125px;background:var(--card);border-radius:var(--radius);overflow:hidden;position:relative;cursor:pointer;}
-.item img{width:100%;aspect-ratio:2/3;object-fit:cover;}
-.item-meta{padding:8px;} .item-meta b{font-size:11px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.item-meta span{font-size:9px;color:#777;font-weight:800;}
+.drawer {
+  position:fixed;
+  top:0; right:-100%;
+  width:100%; height:100%;
+  background:#000;
+  overflow:auto;
+  transition:.3s;
+}
+.drawer.show { right:0; }
 
-.drawer{position:fixed;inset:0;background:var(--bg);z-index:5000;display:none;flex-direction:column;overflow-y:auto;}
-.drawer-head{padding:25px 5%;border-bottom:1px solid #222;display:flex;justify-content:space-between;align-items:center;}
-.set-item{padding:20px 5%;border-bottom:1px solid #1a1a1a;display:flex;justify-content:space-between;align-items:center;cursor:pointer;}
+.drawer-header {
+  height:220px;
+  background-size:cover;
+  background-position:center;
+  position:relative;
+}
+.drawer-header::after {
+  content:"";
+  position:absolute;
+  inset:0;
+  background:linear-gradient(to bottom, rgba(0,0,0,.3), #000);
+}
 
-#ep-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:20px;}
-#season-pills{padding:15px 5%;display:flex;gap:10px;overflow-x:auto;}
-.season-pill{padding:5px 12px;border-radius:20px;background:#222;color:#fff;cursor:pointer;}
-.season-pill.active{background:var(--primary);color:#000;}
+.drawer-content { padding:15px; }
 
-#info-grid{padding:20px; display:flex; flex-direction:column; gap:15px;}
-#info-backdrop{width:100%; height:200px; background-size:cover; background-position:center; border-radius:12px;}
-#info-grid img{width:100%; border-radius:12px;}
-.info-title{font-size:22px;font-weight:900;margin:5px 0;}
-.info-sub{font-size:12px;color:#aaa;margin-bottom:10px;}
-.info-genres{font-size:11px;color:#ccc;margin:5px 0;}
-.info-overview{font-size:14px;margin:10px 0;color:#ddd;}
-.download-btn{padding:10px 15px;background:var(--primary);color:#000;font-weight:900;border:none;border-radius:8px;cursor:pointer;width:max-content;}
-footer{position:fixed;bottom:0;width:100%;background:#000;display:flex;padding:15px 0 35px;border-top:1px solid #1c1f26;z-index:3000;}
-.tab{flex:1;text-align:center;color:#555;cursor:pointer;}
-.tab.active{color:var(--primary);}
-.tab i{font-size:22px;display:block;margin-bottom:5px;}
-.tab span{font-size:10px;font-weight:800;}
-#video-frame{width:100%;height:80%;border:none;background:#000;}
+video {
+  width:100%;
+  background:black;
+  margin-top:10px;
+}
 </style>
 </head>
-<body onload="FENG.boot()">
+
+<body>
 
 <header>
-<div class="header-top">
-<div class="logo">FE<span>NG</span> WORLD</div>
-<i class="fas fa-cog fa-lg" onclick="FENG.view('settings')"></i>
-</div>
-<div class="search-area">
-<i class="fas fa-search" style="color:var(--primary)"></i>
-<input type="text" id="search-bar" placeholder="Find movies, TV shows..." onkeyup="FENG.search(this.value)">
-</div>
-<div id="genre-filters"></div>
+  <h2>🎬 FENG WORLD</h2>
+  <input id="search" placeholder="Search movies or series...">
+  <select id="genreFilter">
+    <option value="">All Genres</option>
+  </select>
 </header>
 
-<main id="pane-home">
-<div class="slider-container" id="hero-slider"></div>
-<div class="shelf-title">Trending Movies</div>
-<div class="row" id="row-movies"></div>
-<div class="shelf-title">Popular Series</div>
-<div class="row" id="row-series"></div>
-</main>
+<div id="grid" class="grid"></div>
 
-<div class="drawer" id="pane-settings">
-<div class="drawer-head">
-<h2>Settings</h2>
-<i class="fas fa-times fa-2x" onclick="FENG.view('home')"></i>
-</div>
-<div class="set-item" onclick="location.reload()">
-<div><b>Sync Database</b><br><small>Refresh API Content</small></div>
-<i class="fas fa-sync-alt"></i>
-</div>
-<div class="set-item">
-<div><b>Web App Vision</b><br><small>Version 1.0</small></div>
-<i class="fas fa-code-branch"></i>
-</div>
-<div class="set-item" onclick="window.location.href='https://wa.me/260770605003'">
-<div><b>Support</b><br><small>WhatsApp Developer</small></div>
-<i class="fab fa-whatsapp"></i>
-</div>
-</div>
+<!-- INFO DRAWER -->
+<div id="drawer" class="drawer">
+  <div id="drawerHeader" class="drawer-header"></div>
+  <div class="drawer-content">
+    <button onclick="closeDrawer()">❌ Close</button>
+    <h2 id="title"></h2>
+    <p id="genres"></p>
+    <p id="overview"></p>
 
-<div class="drawer" id="pane-episodes">
-<div class="drawer-head">
-<h2 id="ep-title"></h2>
-<i class="fas fa-times fa-2x" onclick="FENG.hideDrawers()"></i>
-</div>
-<div id="season-pills"></div>
-<div class="shelf-title">Select Episode</div>
-<div id="ep-grid"></div>
-</div>
+    <!-- Episodes -->
+    <div id="episodes"></div>
 
-<div class="drawer" id="pane-info">
-<div class="drawer-head">
-<h2 id="info-title"></h2>
-<i class="fas fa-times fa-2x" onclick="FENG.hideDrawers()"></i>
-</div>
-<div id="info-backdrop"></div>
-<div id="info-grid"></div>
-</div>
+    <!-- Player -->
+    <video id="player" controls></video>
 
-<div class="drawer" id="pane-player">
-<div class="drawer-head">
-<span id="now-playing">Loading...</span>
-<button onclick="FENG.stopPlayer()" style="background:red;color:#fff;border:none;padding:8px 15px;border-radius:8px;">EXIT</button>
-</div>
-<iframe id="video-frame" allowfullscreen></iframe>
-</div>
+    <br>
+    <button onclick="downloadStream()">⬇ Download</button>
 
-<footer>
-<div class="tab active" onclick="FENG.view('home',this)"><i class="fas fa-home"></i><span>Home</span></div>
-<div class="tab" onclick="FENG.loadType('movie',this)"><i class="fas fa-film"></i><span>Movies</span></div>
-<div class="tab" onclick="FENG.loadType('tv',this)"><i class="fas fa-tv"></i><span>Series</span></div>
-<div class="tab" onclick="FENG.view('settings',this)"><i class="fas fa-user-cog"></i><span>Settings</span></div>
-</footer>
+    <hr>
+    <h3>⚙ Settings</h3>
+    <p>FENG WORLD Vision 1.0 – Free streaming platform built with open APIs and custom player.</p>
+  </div>
+</div>
 
 <script>
-const KEY='ea593c3fa4d4942ece315977cd7e32c9';
-let currentSlide=0;
+const API_KEY = "YOUR_TMDB_KEY_HERE"; // PUT YOUR KEY
+const IMG = "https://image.tmdb.org/t/p/w500";
+const BACKDROP = "https://image.tmdb.org/t/p/original";
+const grid = document.getElementById("grid");
 
-const GENRES={}; // Will store genre name => id mapping
+let currentMedia = null;
 
-const FENG={
-boot: async function(){
-    await this.loadGenres();
-    this.loadHero();
-    this.loadShelf('movie/popular','row-movies');
-    this.loadShelf('tv/top_rated','row-series');
-},
-loadGenres: async function(){
-    const r=await fetch(`https://api.themoviedb.org/3/genre/movie/list?api_key=${KEY}`);
-    const d=await r.json();
-    d.genres.forEach(g=>{
-        GENRES[g.name]=g.id;
-        const pill=document.createElement('div');
-        pill.className='genre-pill'; pill.innerText=g.name;
-        pill.onclick=()=>{document.querySelectorAll('.genre-pill').forEach(p=>p.classList.remove('active')); pill.classList.add('active'); this.filterByGenre(g.id);}
-        document.getElementById('genre-filters').appendChild(pill);
-    });
-},
-filterByGenre: function(genreId){
-    this.loadShelf(`discover/movie?with_genres=${genreId}`,'row-movies');
-    this.loadShelf(`discover/tv?with_genres=${genreId}`,'row-series');
-},
-loadHero: async function(){
-    const r=await fetch(`https://api.themoviedb.org/3/trending/all/day?api_key=${KEY}`);
-    const d=await r.json(); const slider=document.getElementById('hero-slider'); slider.innerHTML='';
-    d.results.slice(0,5).forEach((item,i)=>{
-        const title=item.title||item.name;
-        slider.innerHTML+=`<div class="slide ${i===0?'active':''}" style="background-image:url(https://image.tmdb.org/t/p/original${item.backdrop_path})">
-        <div class="slide-content"><span class="badge">TRENDING</span><h1 style="margin:0;font-size:32px;">${title}</h1>
-        <p style="font-size:12px;color:var(--primary)">${item.release_date||item.first_air_date} • ⭐ ${item.vote_average}</p></div></div>`;
-    });
-    setInterval(()=>this.nextSlide(),5000);
-},
-nextSlide:function(){const slides=document.querySelectorAll('.slide');slides[currentSlide].classList.remove('active');currentSlide=(currentSlide+1)%slides.length;slides[currentSlide].classList.add('active');},
-loadShelf: async function(path,id){
-    const r=await fetch(`https://api.themoviedb.org/3/${path}&api_key=${KEY}`);
-    const d=await r.json(); const container=document.getElementById(id); container.innerHTML='';
-    d.results.forEach(item=>{
-        const type=item.media_type||(item.name?'tv':'movie'); const title=item.title||item.name;
-        const date=(item.release_date||item.first_air_date||'').split('-')[0];
-        container.innerHTML+=`<div class="item" onclick="FENG.openInfo('${type}','${item.id}')">
-        <img src="https://image.tmdb.org/t/p/w500${item.poster_path}"><div class="item-meta"><b>${title}</b><span>${date} • ${type.toUpperCase()}</span></div></div>`;
-    });
-},
-openInfo: async function(type,id){
-    this.hideDrawers();
-    document.getElementById('pane-info').style.display='flex';
-    const r=await fetch(`https://api.themoviedb.org/3/${type}/${id}?api_key=${KEY}&append_to_response=videos`);
-    const d=await r.json(); 
-    const grid=document.getElementById('info-grid'); 
-    const backdrop=document.getElementById('info-backdrop');
-    backdrop.style.backgroundImage=`url(https://image.tmdb.org/t/p/original${d.backdrop_path})`;
-    grid.innerHTML='';
-    document.getElementById('info-title').innerText=d.title||d.name;
-    let genres=d.genres.map(g=>g.name).join(', ');
-    let overview=d.overview||'No description available.';
-    let date=d.release_date||d.first_air_date||'Unknown';
-    let rating=d.vote_average||'N/A';
-    let trailer='';
-    if(d.videos && d.videos.results.length>0){
-        let vid = d.videos.results.find(v=>v.type==='Trailer' && v.site==='YouTube');
-        if(vid) trailer=`<button class="download-btn" onclick="window.open('https://www.youtube.com/watch?v=${vid.key}','_blank')">TRAILER</button>`;
-    }
-    grid.innerHTML=`<img src="https://image.tmdb.org/t/p/w500${d.poster_path}">
-    <div class="info-title">${d.title||d.name}</div>
-    <div class="info-sub">${date} • ⭐ ${rating}</div>
-    <div class="info-genres"><b>Genres:</b> ${genres}</div>
-    <div class="info-overview">${overview}</div>
-    <div style="display:flex;gap:10px;">
-        <button class="download-btn" onclick="FENG.play('${type}','${d.id}','${d.title||d.name}')">WATCH</button>
-        <button class="download-btn" onclick="alert('Download coming soon!')">DOWNLOAD</button>
-        ${trailer}
-    </div>`;
-    if(type==='tv'){this.openTVSeasons(d);}
-},
-openTVSeasons:function(tv){
-    const seasonContainer=document.getElementById('season-pills'); seasonContainer.innerHTML='';
-    tv.seasons.forEach(s=>{
-        if(!s.name.includes('Specials')){
-            const pill=document.createElement('div'); pill.innerText=s.name; pill.className='season-pill';
-            pill.onclick=()=>{this.loadEpisodes(tv.id,s.season_number,tv.name||tv.title); document.querySelectorAll('.season-pill').forEach(p=>p.classList.remove('active')); pill.classList.add('active');};
-            seasonContainer.appendChild(pill);
-        }
-    });
-    if(tv.seasons.length>0)this.loadEpisodes(tv.id,tv.seasons[0].season_number,tv.name||tv.title);
-},
-loadEpisodes: async function(tvId,season,title){
-    const grid=document.getElementById('ep-grid'); grid.innerHTML='';
-    const r=await fetch(`https://api.themoviedb.org/3/tv/${tvId}/season/${season}?api_key=${KEY}`);
-    const d=await r.json();
-    d.episodes.forEach(ep=>{
-        grid.innerHTML+=`<div style="background:#252830;padding:15px;text-align:center;border-radius:10px;font-weight:900;"
-        onclick="FENG.play('tv','${tvId}/${season}/${ep.episode_number}','${title} E${ep.episode_number}')">${ep.episode_number}</div>`;
-    });
-},
-search: async function(query){if(query.length<3)return;
-    const r=await fetch(`https://api.themoviedb.org/3/search/multi?api_key=${KEY}&query=${query}`);
-    const d=await r.json(); const container=document.getElementById('row-movies'); container.innerHTML='';
-    d.results.forEach(item=>{
-        const type=item.media_type||(item.name?'tv':'movie'); const title=item.title||item.name;
-        const date=(item.release_date||item.first_air_date||'').split('-')[0];
-        container.innerHTML+=`<div class="item" onclick="FENG.openInfo('${type}','${item.id}')">
-        <img src="https://image.tmdb.org/t/p/w500${item.poster_path}"><div class="item-meta"><b>${title}</b><span>${date} • ${type.toUpperCase()}</span></div></div>`;
-    });
-},
-play:function(type,path,title){this.hideDrawers(); document.getElementById('now-playing').innerText=title; document.getElementById('video-frame').src=`https://vidsrc.to/embed/${type}/${path}`; document.getElementById('pane-player').style.display='flex';},
-view:function(pane,tab){this.hideDrawers(); if(tab)document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active')),tab.classList.add('active'); if(pane!=='home')document.getElementById('pane-'+pane).style.display='flex';},
-loadType:function(type,tab){this.view('home',tab); this.loadShelf(`discover/${type}`,type==='movie'?'row-movies':'row-series');},
-hideDrawers:function(){document.querySelectorAll('.drawer').forEach(d=>d.style.display='none');},
-stopPlayer:function(){this.hideDrawers(); document.getElementById('video-frame').src='';}
+// Load Genres
+fetch(`https://api.themoviedb.org/3/genre/movie/list?api_key=${API_KEY}`)
+.then(r=>r.json()).then(d=>{
+  d.genres.forEach(g=>{
+    let opt=document.createElement("option");
+    opt.value=g.id;
+    opt.textContent=g.name;
+    genreFilter.appendChild(opt);
+  });
+});
+
+// Load Trending
+loadTrending();
+
+function loadTrending(){
+fetch(`https://api.themoviedb.org/3/trending/all/day?api_key=${API_KEY}`)
+.then(r=>r.json()).then(d=>render(d.results));
+}
+
+function render(list){
+grid.innerHTML="";
+list.forEach(item=>{
+  if(!item.poster_path) return;
+  let div=document.createElement("div");
+  div.className="card";
+  div.innerHTML=`<img src="${IMG+item.poster_path}"><p>${item.title||item.name}</p>`;
+  div.onclick=()=>openDrawer(item);
+  grid.appendChild(div);
+});
+}
+
+// Search
+search.oninput=()=>{
+let q=search.value;
+if(!q) return loadTrending();
+fetch(`https://api.themoviedb.org/3/search/multi?api_key=${API_KEY}&query=${q}`)
+.then(r=>r.json()).then(d=>render(d.results));
 };
+
+// Genre filter
+genreFilter.onchange=()=>{
+let g=genreFilter.value;
+if(!g) return loadTrending();
+fetch(`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=${g}`)
+.then(r=>r.json()).then(d=>render(d.results));
+};
+
+function openDrawer(item){
+currentMedia=item;
+drawer.classList.add("show");
+title.textContent=item.title||item.name;
+overview.textContent=item.overview || "No description available.";
+
+drawerHeader.style.backgroundImage=`url(${BACKDROP+item.backdrop_path})`;
+
+// Genres
+fetch(`https://api.themoviedb.org/3/${item.media_type}/${item.id}?api_key=${API_KEY}`)
+.then(r=>r.json()).then(d=>{
+genres.textContent="Genres: "+d.genres.map(g=>g.name).join(", ");
+
+if(item.media_type==="tv"){
+loadEpisodes(item.id);
+}else{
+episodes.innerHTML="";
+}
+});
+
+// Auto play placeholder demo stream
+playStream("https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8");
+}
+
+function closeDrawer(){
+drawer.classList.remove("show");
+}
+
+// Episodes Loader
+function loadEpisodes(id){
+fetch(`https://api.themoviedb.org/3/tv/${id}?api_key=${API_KEY}`)
+.then(r=>r.json()).then(show=>{
+episodes.innerHTML="<h3>Episodes</h3>";
+show.seasons.forEach(season=>{
+if(season.season_number==0) return;
+let btn=document.createElement("button");
+btn.textContent=`Season ${season.season_number} (${season.episode_count} episodes)`;
+btn.onclick=()=>alert("You must connect real episode streams in backend.");
+episodes.appendChild(btn);
+});
+});
+}
+
+// Player (No ads)
+function playStream(url){
+let video=document.getElementById("player");
+if(Hls.isSupported()){
+let hls=new Hls();
+hls.loadSource(url);
+hls.attachMedia(video);
+}else{
+video.src=url;
+}
+video.play();
+}
+
+// Download
+function downloadStream(){
+if(!currentMedia) return;
+alert("Real downloads require your own server streaming links.");
+}
 </script>
+
 </body>
 </html>
