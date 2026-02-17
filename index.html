@@ -2,64 +2,128 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>FENG WORLD Cinema</title>
+<title>FENG WORLD</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Firebase (replace with your config) -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"></script>
+
 <style>
-body{background:#000;color:white;font-family:Arial;margin:0}
-header{background:#111;padding:10px;position:sticky;top:0}
-h2{margin:0}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;padding:10px}
-.card{background:#111;padding:5px;border-radius:8px;cursor:pointer}
-.card img{width:100%;border-radius:6px}
-.playerBox{position:fixed;bottom:-100%;left:0;width:100%;height:60%;background:#000;padding:10px;transition:.3s}
+body{margin:0;background:#000;color:#fff;font-family:Arial}
+header{position:fixed;top:0;width:100%;background:#000;padding:10px;z-index:99}
+input{width:90%;padding:8px;border-radius:6px;border:none}
+section{padding-top:60px}
+h2{margin:10px}
+.row{display:flex;overflow-x:auto;gap:10px;padding:10px}
+.card{min-width:140px;background:#111;border-radius:8px;cursor:pointer}
+.card img{width:100%;border-radius:8px}
+#playerOverlay{position:fixed;top:0;left:0;width:100%;height:100%;background:black;display:none}
 video{width:100%;height:100%}
+button{padding:10px;background:red;border:none;color:white;border-radius:6px}
 </style>
 </head>
 
 <body>
 
 <header>
-<h2>🎬 FENG WORLD Cinema</h2>
+<input id="search" placeholder="Search movies or series...">
 </header>
 
-<div id="grid" class="grid"></div>
+<section id="app"></section>
 
-<div id="playerBox" class="playerBox">
-<button onclick="playerBox.style.bottom='-100%'" style="background:red;color:white;padding:8px">Close</button>
+<!-- PLAYER -->
+<div id="playerOverlay">
+<button onclick="closePlayer()">Close</button>
 <video id="player" controls></video>
 </div>
 
 <script>
-// Public Domain Movie Library
-const movies=[
-{title:"Night of the Living Dead", poster:"https://archive.org/download/night_of_the_living_dead/night_of_the_living_dead.jpg",
+// ===== FIREBASE CONFIG (PUT YOURS HERE) =====
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+
+// ===== MOVIE DATABASE (PUBLIC DOMAIN DEMO) =====
+const MOVIES = [
+{title:"Night of the Living Dead", genre:"Horror",
+poster:"https://archive.org/download/night_of_the_living_dead/night_of_the_living_dead.jpg",
 video:"https://archive.org/download/night_of_the_living_dead/night_of_the_living_dead.mp4"},
 
-{title:"Plan 9 from Outer Space", poster:"https://archive.org/download/Plan9FromOuterSpace1959/Plan9FromOuterSpace1959.jpg",
+{title:"Plan 9 from Outer Space", genre:"Sci-Fi",
+poster:"https://archive.org/download/Plan9FromOuterSpace1959/Plan9FromOuterSpace1959.jpg",
 video:"https://archive.org/download/Plan9FromOuterSpace1959/Plan9FromOuterSpace1959.mp4"},
 
-{title:"The Little Shop of Horrors", poster:"https://archive.org/download/TheLittleShopOfHorrors1960/TheLittleShopOfHorrors1960.jpg",
-video:"https://archive.org/download/TheLittleShopOfHorrors1960/TheLittleShopOfHorrors1960.mp4"},
+{title:"His Girl Friday", genre:"Comedy",
+poster:"https://archive.org/download/HisGirlFriday/HisGirlFriday.jpg",
+video:"https://archive.org/download/HisGirlFriday/HisGirlFriday.mp4"},
 
-{title:"His Girl Friday", poster:"https://archive.org/download/HisGirlFriday/HisGirlFriday.jpg",
-video:"https://archive.org/download/HisGirlFriday/HisGirlFriday.mp4"}
+{title:"The Little Shop of Horrors", genre:"Horror",
+poster:"https://archive.org/download/TheLittleShopOfHorrors1960/TheLittleShopOfHorrors1960.jpg",
+video:"https://archive.org/download/TheLittleShopOfHorrors1960/TheLittleShopOfHorrors1960.mp4"}
 ];
 
-const grid=document.getElementById("grid");
-const player=document.getElementById("player");
-const playerBox=document.getElementById("playerBox");
+// ===== UI RENDER =====
+const app=document.getElementById("app");
+function renderCategory(name){
+let row=document.createElement("div");
+row.innerHTML=`<h2>${name}</h2><div class="row" id="${name}"></div>`;
+app.appendChild(row);
+}
 
-// Load movies automatically
-movies.forEach(m=>{
-let div=document.createElement("div");
-div.className="card";
-div.innerHTML=`<img src="${m.poster}"><p>${m.title}</p>`;
-div.onclick=()=>{
+["Horror","Comedy","Sci-Fi"].forEach(renderCategory);
+
+MOVIES.forEach(m=>{
+let card=document.createElement("div");
+card.className="card";
+card.innerHTML=`<img src="${m.poster}"><p>${m.title}</p>`;
+card.onclick=()=>playMovie(m);
+document.getElementById(m.genre).appendChild(card);
+});
+
+// ===== PLAYER + HISTORY =====
+const player=document.getElementById("player");
+const overlay=document.getElementById("playerOverlay");
+
+function playMovie(m){
 player.src=m.video;
-playerBox.style.bottom="0";
+overlay.style.display="block";
 player.play();
+
+// Save watch history
+let history=JSON.parse(localStorage.getItem("history")||"[]");
+history.unshift({title:m.title,time:new Date().toISOString()});
+localStorage.setItem("history",JSON.stringify(history.slice(0,10)));
+}
+
+function closePlayer(){
+overlay.style.display="none";
+player.pause();
+}
+
+// ===== SEARCH =====
+document.getElementById("search").oninput=function(){
+let q=this.value.toLowerCase();
+document.querySelectorAll(".card").forEach(c=>{
+c.style.display=c.innerText.toLowerCase().includes(q)?"block":"none";
+});
 };
-grid.appendChild(div);
+
+// ===== CONTINUE WATCHING (DEMO) =====
+player.ontimeupdate=function(){
+localStorage.setItem("continueTime",player.currentTime);
+};
+player.onloadedmetadata=function(){
+let t=localStorage.getItem("continueTime");
+if(t) player.currentTime=t;
+};
+
+// ===== SIMPLE LOGIN BUTTON =====
+auth.onAuthStateChanged(u=>{
+if(u) alert("Logged in as "+u.email);
 });
 </script>
 
