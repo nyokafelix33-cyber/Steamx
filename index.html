@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FENG WORLD Vision 6.0</title>
+<title>FENG WORLD Vision 7.0</title>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
@@ -15,265 +15,78 @@
 --text:#ffffff;
 --radius:14px;
 }
+body{margin:0;font-family:Arial;background:var(--bg);color:var(--text);overflow-x:hidden}
 
-body{
-margin:0;
-font-family:Arial,Helvetica,sans-serif;
-background:var(--bg);
-color:var(--text);
-overflow-x:hidden;
-}
-
-/* LOGO STYLE */
-.feng-logo{
-width:55px;
-height:55px;
-}
+/* LOGO */
+.feng-logo{width:55px;height:55px}
 
 /* HEADER */
-header{
-padding:15px 5%;
-background:#000;
-position:sticky;
-top:0;
-z-index:999;
-border-bottom:2px solid var(--primary);
-}
+header{padding:15px 5%;background:#000;position:sticky;top:0;z-index:999;border-bottom:2px solid var(--primary)}
+.header-top{display:flex;justify-content:space-between;align-items:center}
+.logo-wrap{display:flex;align-items:center;gap:10px;font-size:20px;font-weight:900}
+.search-area{background:#141820;padding:10px 15px;border-radius:12px;display:flex;gap:10px;margin-top:10px}
+.search-area input{background:none;border:none;color:white;width:100%;outline:none}
 
-.header-top{
-display:flex;
-justify-content:space-between;
-align-items:center;
-gap:10px;
-}
+/* GENRES */
+#genre-filters{display:flex;gap:10px;overflow-x:auto;padding:10px 5%}
+.genre-pill{padding:5px 12px;border-radius:20px;background:#222;cursor:pointer;font-size:12px;white-space:nowrap}
+.genre-pill.active{background:var(--primary);color:#000}
 
-.logo-wrap{
-display:flex;
-align-items:center;
-gap:12px;
-font-size:22px;
-font-weight:900;
-}
-
-.search-area{
-background:#141820;
-padding:10px 15px;
-border-radius:12px;
-display:flex;
-gap:10px;
-margin-top:10px;
-}
-
-.search-area input{
-background:none;
-border:none;
-color:white;
-width:100%;
-outline:none;
-}
-
-/* GENRE FILTERS */
-#genre-filters{
-display:flex;
-gap:10px;
-overflow-x:auto;
-padding:10px 5%;
-}
-
-.genre-pill{
-padding:5px 12px;
-border-radius:20px;
-background:#222;
-cursor:pointer;
-font-size:12px;
-white-space:nowrap;
-}
-.genre-pill.active{
-background:var(--primary);
-color:#000;
-}
-
-/* SLIDER */
-.slider-container{
-width:100%;
-height:35vh;
-position:relative;
-overflow:hidden;
-}
-
-.slide{
-position:absolute;
-inset:0;
-background-size:cover;
-background-position:center;
-opacity:0;
-transition:1s;
-display:flex;
-align-items:flex-end;
-padding:20px;
-}
-.slide.active{opacity:1;}
-
-.slide::after{
-content:'';
-position:absolute;
-inset:0;
-background:linear-gradient(to top,#000 20%,transparent);
-}
-
-.slide-content{
-position:relative;
-z-index:2;
-font-size:22px;
-font-weight:900;
-}
+/* HERO SLIDER */
+.slider-container{width:100%;height:35vh;position:relative;overflow:hidden}
+.slide{position:absolute;inset:0;background-size:cover;background-position:center;opacity:0;transition:1s;display:flex;align-items:flex-end;padding:20px;cursor:pointer}
+.slide.active{opacity:1}
+.slide::after{content:'';position:absolute;inset:0;background:linear-gradient(to top,#000 20%,transparent)}
+.slide-content{position:relative;z-index:2;font-size:22px;font-weight:900}
 
 /* ROWS */
-.shelf-title{
-padding:10px 5%;
-font-weight:bold;
-color:var(--primary);
-}
-
-.row{
-display:flex;
-gap:12px;
-overflow-x:auto;
-padding:0 5% 20px;
-}
-
-.item{
-min-width:130px;
-background:var(--card);
-border-radius:14px;
-overflow:hidden;
-cursor:pointer;
-}
-
-.item img{
-width:100%;
-aspect-ratio:2/3;
-object-fit:cover;
-}
-
-.item-meta{
-padding:8px;
-font-size:11px;
-}
+.shelf-title{padding:10px 5%;font-weight:bold;color:var(--primary)}
+.row{display:flex;gap:12px;overflow-x:auto;padding:0 5% 20px}
+.item{min-width:130px;background:var(--card);border-radius:14px;overflow:hidden;cursor:pointer}
+.item img{width:100%;aspect-ratio:2/3;object-fit:cover}
+.item-meta{padding:8px;font-size:11px}
 
 /* DRAWERS */
-.drawer{
-position:fixed;
-inset:0;
-background:#000;
-display:none;
-flex-direction:column;
-z-index:9999;
-overflow-y:auto;
-}
-
-.drawer-head{
-padding:15px;
-border-bottom:1px solid #222;
-display:flex;
-justify-content:space-between;
-align-items:center;
-}
+.drawer{position:fixed;inset:0;background:#000;display:none;flex-direction:column;z-index:9999;overflow-y:auto}
+.drawer-head{padding:15px;border-bottom:1px solid #222;display:flex;justify-content:space-between;align-items:center}
 
 /* SETTINGS */
-.set-item{
-padding:15px;
-border-bottom:1px solid #222;
-display:flex;
-justify-content:space-between;
-align-items:center;
-}
+.set-item{padding:15px;border-bottom:1px solid #222;display:flex;justify-content:space-between;align-items:center}
 
 /* INFO PAGE */
-#info-backdrop{
-width:100%;
-height:200px;
-background-size:cover;
-background-position:center;
-}
-
-#info-grid{
-padding:15px;
-}
-
-.info-title{
-font-size:22px;
-font-weight:900;
-}
-
-.info-genres{
-font-size:12px;
-color:#aaa;
-}
-
-.info-overview{
-font-size:14px;
-margin-top:10px;
-}
-
-.btn{
-padding:10px 15px;
-border:none;
-border-radius:10px;
-background:var(--primary);
-font-weight:bold;
-cursor:pointer;
-}
+#info-backdrop{width:100%;height:200px;background-size:cover;background-position:center}
+#info-grid{padding:15px}
+.info-title{font-size:22px;font-weight:900}
+.info-genres{font-size:12px;color:#aaa}
+.info-overview{font-size:14px;margin-top:10px}
+.btn{padding:10px 15px;border:none;border-radius:10px;background:var(--primary);font-weight:bold;cursor:pointer}
 
 /* PLAYER */
-#video-frame{
-width:100%;
-height:80vh;
-border:none;
-background:black;
-}
+#video-frame{width:100%;height:80vh;border:none;background:black}
 
 /* FOOTER */
-footer{
-position:fixed;
-bottom:0;
-width:100%;
-background:#000;
-display:flex;
-padding:10px 0;
-border-top:1px solid #222;
-}
-
-.tab{
-flex:1;
-text-align:center;
-color:#555;
-font-size:12px;
-cursor:pointer;
-}
-.tab.active{color:var(--primary);}
-.tab i{font-size:22px;}
+footer{position:fixed;bottom:0;width:100%;background:#000;display:flex;padding:10px 0;border-top:1px solid #222}
+.tab{flex:1;text-align:center;color:#555;font-size:12px;cursor:pointer}
+.tab.active{color:var(--primary)}
+.tab i{font-size:22px}
 </style>
 </head>
 
 <body onload="FENG.boot()">
 
-<!-- SVG LOGO -->
+<!-- LOGO SVG -->
 <svg id="fengLogo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" style="display:none;">
 <circle cx="100" cy="100" r="90" fill="#000"/>
 <polygon points="100,20 160,100 100,180 40,100" fill="#d3f243"/>
 <circle cx="100" cy="100" r="25" fill="#000"/>
 </svg>
 
-<!-- HEADER -->
 <header>
 <div class="header-top">
-
 <div class="logo-wrap">
 <img class="feng-logo" id="logoHome">
 <span>FENG WORLD</span>
 </div>
-
 <i class="fas fa-cog fa-lg" onclick="FENG.view('settings')"></i>
 </div>
 
@@ -285,7 +98,6 @@ cursor:pointer;
 <div id="genre-filters"></div>
 </header>
 
-<!-- MAIN -->
 <div class="slider-container" id="hero"></div>
 
 <div class="shelf-title">Trending Movies</div>
@@ -293,7 +105,6 @@ cursor:pointer;
 
 <div class="shelf-title">Popular Series</div>
 <div class="row" id="series"></div>
-
 
 <!-- SETTINGS -->
 <div class="drawer" id="pane-settings">
@@ -306,7 +117,7 @@ cursor:pointer;
 </div>
 
 <div class="set-item">
-<div><b>Web App Vision</b><br><small>FENG WORLD Vision 6.0</small></div>
+<div><b>Web App Vision</b><br><small>FENG WORLD Vision 7.0</small></div>
 <i class="fas fa-code-branch"></i>
 </div>
 
@@ -324,11 +135,9 @@ cursor:pointer;
 <div><b>Developer</b><br><small>Felix Nyoka • FENG Labs</small></div>
 <i class="fas fa-user-secret"></i>
 </div>
-
 </div>
 
-
-<!-- INFO DRAWER -->
+<!-- INFO -->
 <div class="drawer" id="pane-info">
 <div class="drawer-head">
 <b id="infoTitle"></b>
@@ -337,7 +146,6 @@ cursor:pointer;
 <div id="info-backdrop"></div>
 <div id="info-grid"></div>
 </div>
-
 
 <!-- PLAYER -->
 <div class="drawer" id="pane-player">
@@ -348,15 +156,12 @@ cursor:pointer;
 <iframe id="video-frame" allowfullscreen></iframe>
 </div>
 
-
-<!-- FOOTER -->
 <footer>
 <div class="tab active" onclick="FENG.home(this)"><i class="fas fa-home"></i><div>Home</div></div>
 <div class="tab" onclick="FENG.loadMovies(this)"><i class="fas fa-film"></i><div>Movies</div></div>
 <div class="tab" onclick="FENG.loadSeries(this)"><i class="fas fa-tv"></i><div>Series</div></div>
 <div class="tab" onclick="FENG.view('settings',this)"><i class="fas fa-cog"></i><div>Settings</div></div>
 </footer>
-
 
 <script>
 const API="ea593c3fa4d4942ece315977cd7e32c9";
@@ -368,8 +173,8 @@ boot:()=>{
 FENG.loadLogo();
 FENG.genres();
 FENG.hero();
-FENG.shelf("movie/popular","movies");
-FENG.shelf("tv/popular","series");
+FENG.loadMovies();
+FENG.loadSeries();
 },
 
 loadLogo:()=>{
@@ -378,6 +183,7 @@ document.getElementById("logoHome").src="data:image/svg+xml;base64,"+btoa(svg);
 document.getElementById("logoSettings").src="data:image/svg+xml;base64,"+btoa(svg);
 },
 
+/* GENRES */
 genres:async()=>{
 const r=await fetch(`https://api.themoviedb.org/3/genre/movie/list?api_key=${API}`);
 const d=await r.json();
@@ -391,18 +197,24 @@ document.getElementById("genre-filters").appendChild(div);
 },
 
 filter:(id)=>{
-FENG.shelf(`discover/movie?with_genres=${id}`,"movies");
-FENG.shelf(`discover/tv?with_genres=${id}`,"series");
+FENG.shelf(`discover/movie?with_genres=${id}`,"movies","movie");
+FENG.shelf(`discover/tv?with_genres=${id}`,"series","tv");
 },
 
+/* HERO CLICKABLE */
 hero:async()=>{
 const r=await fetch(`https://api.themoviedb.org/3/trending/all/day?api_key=${API}`);
 const d=await r.json();
 const hero=document.getElementById("hero");
 hero.innerHTML="";
 d.results.slice(0,5).forEach((x,i)=>{
-hero.innerHTML+=`<div class="slide ${i==0?'active':''}" style="background-image:url(https://image.tmdb.org/t/p/original${x.backdrop_path})">
-<div class="slide-content">${x.title||x.name}</div></div>`;
+let type=x.media_type=="tv"?"tv":"movie";
+hero.innerHTML+=`
+<div class="slide ${i==0?'active':''}" 
+onclick="FENG.info('${type}',${x.id})"
+style="background-image:url(https://image.tmdb.org/t/p/original${x.backdrop_path})">
+<div class="slide-content">${x.title||x.name}</div>
+</div>`;
 });
 setInterval(()=>{
 let slides=document.querySelectorAll(".slide");
@@ -412,20 +224,36 @@ slides[slideIndex].classList.add("active");
 },4000);
 },
 
-shelf:async(path,id)=>{
+/* LOAD SHELVES */
+shelf:async(path,id,type)=>{
 const r=await fetch(`https://api.themoviedb.org/3/${path}&api_key=${API}`);
 const d=await r.json();
 const c=document.getElementById(id);
 c.innerHTML="";
 d.results.forEach(x=>{
+if(!x.poster_path)return;
 let t=x.title||x.name;
-let type=x.name?"tv":"movie";
-c.innerHTML+=`<div class="item" onclick="FENG.info('${type}',${x.id})">
+c.innerHTML+=`
+<div class="item" onclick="FENG.info('${type}',${x.id})">
 <img src="https://image.tmdb.org/t/p/w500${x.poster_path}">
-<div class="item-meta">${t}</div></div>`;
+<div class="item-meta">${t}</div>
+</div>`;
 });
 },
 
+/* MOVIES BUTTON FIX */
+loadMovies:(tab)=>{
+if(tab)FENG.home(tab);
+FENG.shelf("movie/popular","movies","movie");
+},
+
+/* SERIES BUTTON FIX */
+loadSeries:(tab)=>{
+if(tab)FENG.home(tab);
+FENG.shelf("tv/popular","series","tv");
+},
+
+/* INFO PAGE */
 info:async(type,id)=>{
 FENG.closeAll();
 document.getElementById("pane-info").style.display="flex";
@@ -442,6 +270,7 @@ document.getElementById("info-grid").innerHTML=`
 `;
 },
 
+/* PLAYER */
 play:(type,id,title)=>{
 FENG.closeAll();
 document.getElementById("pane-player").style.display="flex";
@@ -454,6 +283,7 @@ document.getElementById("video-frame").src="";
 FENG.closeAll();
 },
 
+/* SEARCH */
 search:async(q)=>{
 if(q.length<3)return;
 const r=await fetch(`https://api.themoviedb.org/3/search/multi?api_key=${API}&query=${q}`);
@@ -463,39 +293,19 @@ c.innerHTML="";
 d.results.forEach(x=>{
 if(!x.poster_path)return;
 let t=x.title||x.name;
-let type=x.name?"tv":"movie";
-c.innerHTML+=`<div class="item" onclick="FENG.info('${type}',${x.id})">
+let type=x.media_type=="tv"?"tv":"movie";
+c.innerHTML+=`
+<div class="item" onclick="FENG.info('${type}',${x.id})">
 <img src="https://image.tmdb.org/t/p/w500${x.poster_path}">
-<div class="item-meta">${t}</div></div>`;
+<div class="item-meta">${t}</div>
+</div>`;
 });
 },
 
-closeAll:()=>{
-document.querySelectorAll(".drawer").forEach(d=>d.style.display="none");
-},
-
-view:(x,tab)=>{
-FENG.closeAll();
-document.getElementById("pane-"+x).style.display="flex";
-document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
-if(tab)tab.classList.add("active");
-},
-
-home:(t)=>{
-document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
-t.classList.add("active");
-},
-
-loadMovies:(t)=>{
-FENG.home(t);
-FENG.shelf("movie/popular","movies");
-},
-
-loadSeries:(t)=>{
-FENG.home(t);
-FENG.shelf("tv/popular","series");
-}
-
+/* UI HELPERS */
+closeAll:()=>{document.querySelectorAll(".drawer").forEach(d=>d.style.display="none")},
+view:(x,tab)=>{FENG.closeAll();document.getElementById("pane-"+x).style.display="flex";if(tab)FENG.home(tab)},
+home:(t)=>{document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));t.classList.add("active")}
 };
 </script>
 
