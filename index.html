@@ -1,341 +1,255 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<title>FENG WORLD Vision 14</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FENG WORLD</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
-body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: #000;
-    color: white;
+
+/* ===== GLOBAL STYLE ===== */
+body{
+ background:#000;
+ color:white;
+ font-family:Arial;
+ margin:0;
 }
 
-header {
-    display: flex;
-    align-items: center;
-    padding: 10px;
-    background: #111;
-    border-bottom: 2px solid red;
+/* ===== HEADER ===== */
+header{
+ display:flex;
+ align-items:center;
+ justify-content:space-between;
+ padding:10px;
+ background:#111;
+ position:sticky;
+ top:0;
+ z-index:1000;
 }
 
-header img {
-    height: 40px;
-    margin-right: 10px;
+.logo{
+ font-size:22px;
+ font-weight:bold;
+ color:red;
 }
 
-header h1 {
-    font-size: 22px;
-    color: red;
+input{
+ padding:8px;
+ border-radius:5px;
+ border:none;
+ width:160px;
 }
 
-nav {
-    display: flex;
-    gap: 10px;
-    padding: 10px;
-    background: #141414;
+/* ===== HERO BANNER ===== */
+#hero{
+ height:250px;
+ background-size:cover;
+ background-position:center;
+ display:flex;
+ align-items:end;
+ padding:20px;
+ font-size:24px;
+ font-weight:bold;
 }
 
-nav button {
-    background: red;
-    border: none;
-    padding: 8px 14px;
-    color: white;
-    border-radius: 4px;
-    cursor: pointer;
+/* ===== GRID MOVIES ===== */
+h2{
+ margin:10px;
 }
 
-#searchBar {
-    width: 100%;
-    padding: 10px;
-    border: none;
-    outline: none;
-    font-size: 16px;
+.grid{
+ display:grid;
+ grid-template-columns:repeat(auto-fill,140px);
+ gap:10px;
+ padding:10px;
 }
 
-.section {
-    padding: 10px;
+.grid img{
+ width:100%;
+ border-radius:10px;
+ cursor:pointer;
+ transition:0.3s;
 }
 
-.grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-    gap: 10px;
+.grid img:hover{
+ transform:scale(1.1);
 }
 
-.card {
-    background: #111;
-    border-radius: 8px;
-    padding: 5px;
-    cursor: pointer;
-    transition: 0.2s;
+/* ===== GENRES ===== */
+.genres{
+ display:flex;
+ flex-wrap:wrap;
+ padding:10px;
 }
 
-.card:hover {
-    transform: scale(1.05);
+.genres button{
+ background:red;
+ color:white;
+ border:none;
+ padding:8px;
+ margin:5px;
+ border-radius:5px;
+ cursor:pointer;
 }
 
-.card img {
-    width: 100%;
-    border-radius: 6px;
+/* ===== SEASONS & EPISODES ===== */
+#seasons button, #episodes button{
+ background:#222;
+ color:white;
+ border:none;
+ padding:8px;
+ margin:5px;
+ border-radius:5px;
+ cursor:pointer;
 }
-
-#playerBox {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0,0,0,0.95);
-    display: none;
-    flex-direction: column;
-    padding: 10px;
-    z-index: 9999;
-}
-
-#playerBox video {
-    width: 100%;
-    max-height: 60vh;
-    background: black;
-}
-
-#playerClose {
-    background: red;
-    padding: 10px;
-    border: none;
-    color: white;
-    font-size: 16px;
-    margin-bottom: 10px;
-}
-
-.genre-btn {
-    background: #222;
-    padding: 8px;
-    border-radius: 5px;
-    display: inline-block;
-    margin: 5px;
-    cursor: pointer;
-}
-
-.hidden { display:none; }
 
 </style>
 </head>
-
 <body>
 
 <header>
-<img src="feng-logo.png" onerror="this.src='https://via.placeholder.com/100x40?text=FENG'" />
-<h1>FENG WORLD</h1>
+<div class="logo">FENG WORLD</div>
+<input id="searchBox" placeholder="Search...">
 </header>
 
-<input id="searchBar" placeholder="Search movies or series..." onkeyup="searchContent()">
+<div id="hero">Loading...</div>
 
-<nav>
-<button onclick="showHome()">Home</button>
-<button onclick="showGenres()">Genres</button>
-<button onclick="showCategories()">Categories</button>
-<button onclick="showSettings()">Settings</button>
-</nav>
-
-<div id="home" class="section">
-<h2>🎬 Movies</h2>
+<h2>🎬 Popular Movies</h2>
 <div id="moviesGrid" class="grid"></div>
 
-<h2>📺 Series</h2>
+<h2>📺 Popular Series</h2>
 <div id="seriesGrid" class="grid"></div>
-</div>
 
-<div id="genresPage" class="section hidden">
-<h2>Genres</h2>
-<div id="genresList"></div>
+<h2>🎭 Genres</h2>
+<div id="genresList" class="genres"></div>
+
+<h2>Genre Results</h2>
 <div id="genreResults" class="grid"></div>
-</div>
 
-<div id="categoriesPage" class="section hidden">
-<h2>Categories</h2>
-<div class="genre-btn" onclick="filterCategory('Popular')">Popular</div>
-<div class="genre-btn" onclick="filterCategory('Trending')">Trending</div>
-<div class="genre-btn" onclick="filterCategory('New')">New</div>
-<div id="categoryResults" class="grid"></div>
-</div>
-
-div class="setting-box">🌍 App Name: <b>FENG WORLD</b></div>
-<div class="setting-box">🚀 Version: <b>13</b></div>
-<div class="setting-box">🎥 Player: vidsrc.to</div>
-<div class="setting-box">👨‍💻 Developer: Feng World Group</div>
-<div class="setting-box">📧 Support: felixnyoka19@gmail.com</div>
-<div class="setting-box">ℹ About: Streaming movies & series platform</div
-
-<div id="playerBox">
-<button id="playerClose" onclick="closePlayer()">Close Player</button>
-<video id="videoPlayer" controls></video>
-<div id="seasonEpisodeBox"></div>
-</div>
+<h2 id="showTitle"></h2>
+<div id="seasons"></div>
+<div id="episodes"></div>
 
 <script>
-// ===== SAMPLE DATABASE =====
-let movies = [
-{title:"Action Hero", genre:"Action", category:"Popular", poster:"https://via.placeholder.com/300x450?text=Action+Hero", video:"https://www.w3schools.com/html/mov_bbb.mp4"},
-{title:"Love Story", genre:"Romance", category:"Trending", poster:"https://via.placeholder.com/300x450?text=Love+Story", video:"https://www.w3schools.com/html/movie.mp4"},
-];
+// ===== TMDB API =====
+const API_KEY = "YOUR_TMDB_API_KEY_HERE";
+const BASE = "https://api.themoviedb.org/3";
+const IMG = "https://image.tmdb.org/t/p/w500";
 
-let series = [
-{
-title:"Dragon Saga",
-genre:"Action",
-category:"Popular",
-poster:"https://via.placeholder.com/300x450?text=Dragon+Saga",
-seasons:{
-"Season 1":[
-{ep:"Episode 1", video:"https://www.w3schools.com/html/mov_bbb.mp4"},
-{ep:"Episode 2", video:"https://www.w3schools.com/html/movie.mp4"}
-],
-"Season 2":[
-{ep:"Episode 1", video:"https://www.w3schools.com/html/mov_bbb.mp4"}
-]
-}
-}
-];
-
-// ===== LOAD HOME =====
-function loadHome() {
-let mg = document.getElementById("moviesGrid");
-let sg = document.getElementById("seriesGrid");
-mg.innerHTML=""; sg.innerHTML="";
-
-movies.forEach(m=>{
-mg.innerHTML += `<div class="card" onclick="playMovie('${m.video}')">
-<img src="${m.poster}">
-<p>${m.title}</p>
-</div>`;
-});
-
-series.forEach(s=>{
-sg.innerHTML += `<div class="card" onclick="showSeasons('${s.title}')">
-<img src="${s.poster}">
-<p>${s.title}</p>
-</div>`;
-});
+// ===== HERO MOVIE =====
+async function loadHero(){
+ let res = await fetch(`${BASE}/trending/movie/week?api_key=${API_KEY}`);
+ let data = await res.json();
+ let movie = data.results[0];
+ document.getElementById("hero").style.backgroundImage = `url(${IMG}${movie.backdrop_path})`;
+ document.getElementById("hero").innerText = movie.title;
 }
 
-// ===== PLAYER =====
-function playMovie(url){
-document.getElementById("playerBox").style.display="flex";
-let v=document.getElementById("videoPlayer");
-v.src=url;
-document.getElementById("seasonEpisodeBox").innerHTML="";
+// ===== MOVIES =====
+async function loadMovies(){
+ let res = await fetch(`${BASE}/trending/movie/week?api_key=${API_KEY}`);
+ let data = await res.json();
+ let grid = document.getElementById("moviesGrid");
+
+ data.results.forEach(m=>{
+  let img = document.createElement("img");
+  img.src = IMG + m.poster_path;
+  grid.appendChild(img);
+ });
 }
 
-function closePlayer(){
-document.getElementById("playerBox").style.display="none";
-document.getElementById("videoPlayer").pause();
-}
+// ===== SERIES =====
+async function loadSeries(){
+ let res = await fetch(`${BASE}/trending/tv/week?api_key=${API_KEY}`);
+ let data = await res.json();
+ let grid = document.getElementById("seriesGrid");
 
-// ===== SERIES SEASONS =====
-function showSeasons(title){
-let s = series.find(x=>x.title==title);
-let box=document.getElementById("seasonEpisodeBox");
-box.innerHTML="<h3>"+title+"</h3>";
-
-for(let season in s.seasons){
-box.innerHTML += `<div class="genre-btn" onclick="showEpisodes('${title}','${season}')">${season}</div>`;
-}
-document.getElementById("playerBox").style.display="flex";
-document.getElementById("videoPlayer").src="";
-}
-
-// ===== EPISODES =====
-function showEpisodes(title, season){
-let s = series.find(x=>x.title==title);
-let box=document.getElementById("seasonEpisodeBox");
-box.innerHTML="<h3>"+title+" - "+season+"</h3>";
-
-s.seasons[season].forEach(ep=>{
-box.innerHTML += `<div class="genre-btn" onclick="playMovie('${ep.video}')">${ep.ep}</div>`;
-});
+ data.results.forEach(s=>{
+  let img = document.createElement("img");
+  img.src = IMG + s.poster_path;
+  img.onclick = ()=>loadSeasons(s.id);
+  grid.appendChild(img);
+ });
 }
 
 // ===== GENRES =====
-let genres = ["Action","Romance","Comedy","Horror"];
+async function loadGenres(){
+ let res = await fetch(`${BASE}/genre/movie/list?api_key=${API_KEY}`);
+ let data = await res.json();
+ let box = document.getElementById("genresList");
 
-function showGenres(){
-hideAll();
-document.getElementById("genresPage").classList.remove("hidden");
-let gbox=document.getElementById("genresList");
-gbox.innerHTML="";
-genres.forEach(g=>{
-gbox.innerHTML += `<div class="genre-btn" onclick="filterGenre('${g}')">${g}</div>`;
-});
+ data.genres.forEach(g=>{
+  let btn = document.createElement("button");
+  btn.innerText = g.name;
+  btn.onclick = ()=>loadGenreMovies(g.id);
+  box.appendChild(btn);
+ });
 }
 
-function filterGenre(g){
-let res=document.getElementById("genreResults");
-res.innerHTML="";
-movies.filter(m=>m.genre==g).forEach(m=>{
-res.innerHTML += `<div class="card" onclick="playMovie('${m.video}')"><img src="${m.poster}"><p>${m.title}</p></div>`;
-});
-series.filter(s=>s.genre==g).forEach(s=>{
-res.innerHTML += `<div class="card" onclick="showSeasons('${s.title}')"><img src="${s.poster}"><p>${s.title}</p></div>`;
-});
+async function loadGenreMovies(id){
+ let res = await fetch(`${BASE}/discover/movie?api_key=${API_KEY}&with_genres=${id}`);
+ let data = await res.json();
+ let grid = document.getElementById("genreResults");
+ grid.innerHTML="";
+
+ data.results.forEach(m=>{
+  let img = document.createElement("img");
+  img.src = IMG + m.poster_path;
+  grid.appendChild(img);
+ });
 }
 
-// ===== CATEGORIES =====
-function showCategories(){
-hideAll();
-document.getElementById("categoriesPage").classList.remove("hidden");
+// ===== SEASONS & EPISODES =====
+async function loadSeasons(id){
+ let res = await fetch(`${BASE}/tv/${id}?api_key=${API_KEY}`);
+ let show = await res.json();
+ document.getElementById("showTitle").innerText = show.name;
+
+ let seasonsBox = document.getElementById("seasons");
+ seasonsBox.innerHTML="";
+
+ show.seasons.forEach(s=>{
+  let btn = document.createElement("button");
+  btn.innerText = "Season " + s.season_number;
+  btn.onclick = ()=>loadEpisodes(id, s.season_number);
+  seasonsBox.appendChild(btn);
+ });
 }
 
-function filterCategory(c){
-let res=document.getElementById("categoryResults");
-res.innerHTML="";
-movies.filter(m=>m.category==c).forEach(m=>{
-res.innerHTML += `<div class="card" onclick="playMovie('${m.video}')"><img src="${m.poster}"><p>${m.title}</p></div>`;
-});
-series.filter(s=>s.category==c).forEach(s=>{
-res.innerHTML += `<div class="card" onclick="showSeasons('${s.title}')"><img src="${s.poster}"><p>${s.title}</p></div>`;
-});
+async function loadEpisodes(id, season){
+ let res = await fetch(`${BASE}/tv/${id}/season/${season}?api_key=${API_KEY}`);
+ let data = await res.json();
+ let epBox = document.getElementById("episodes");
+ epBox.innerHTML="";
+
+ data.episodes.forEach(e=>{
+  let btn = document.createElement("button");
+  btn.innerText = "Episode " + e.episode_number + " - " + e.name;
+  epBox.appendChild(btn);
+ });
 }
 
 // ===== SEARCH =====
-function searchContent(){
-let q=document.getElementById("searchBar").value.toLowerCase();
-let mg=document.getElementById("moviesGrid");
-let sg=document.getElementById("seriesGrid");
-mg.innerHTML=""; sg.innerHTML="";
-
-movies.filter(m=>m.title.toLowerCase().includes(q)).forEach(m=>{
-mg.innerHTML += `<div class="card" onclick="playMovie('${m.video}')"><img src="${m.poster}"><p>${m.title}</p></div>`;
+document.getElementById("searchBox").addEventListener("keyup", async function(e){
+ if(e.key==="Enter"){
+  let q = this.value;
+  let res = await fetch(`${BASE}/search/movie?api_key=${API_KEY}&query=${q}`);
+  let data = await res.json();
+  let grid = document.getElementById("moviesGrid");
+  grid.innerHTML="";
+  data.results.forEach(m=>{
+   let img = document.createElement("img");
+   img.src = IMG + m.poster_path;
+   grid.appendChild(img);
+  });
+ }
 });
 
-series.filter(s=>s.title.toLowerCase().includes(q)).forEach(s=>{
-sg.innerHTML += `<div class="card" onclick="showSeasons('${s.title}')"><img src="${s.poster}"><p>${s.title}</p></div>`;
-});
-}
+// ===== LOAD ALL =====
+loadHero();
+loadMovies();
+loadSeries();
+loadGenres();
 
-// ===== SETTINGS =====
-function showSettings(){
-hideAll();
-document.getElementById("settingsPage").classList.remove("hidden");
-}
-
-// ===== HOME =====
-function showHome(){
-hideAll();
-document.getElementById("home").classList.remove("hidden");
-}
-
-// ===== HIDE ALL =====
-function hideAll(){
-["home","genresPage","categoriesPage","settingsPage"].forEach(id=>{
-document.getElementById(id).classList.add("hidden");
-});
-}
-
-// INIT
-loadHome();
 </script>
 
 </body>
