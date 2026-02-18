@@ -106,6 +106,10 @@ footer{position:fixed;bottom:0;width:100%;background:#000;display:flex;padding:1
 .category-item{background:var(--card);padding:15px;border-radius:12px;margin-bottom:10px;cursor:pointer;transition:0.3s}
 .category-item:hover{transform:scale(1.02)}
 
+/* SETTINGS */
+#pane-settings div{padding:20px;}
+#pane-settings b{color:var(--primary);}
+
 </style>
 </head>
 
@@ -165,7 +169,7 @@ footer{position:fixed;bottom:0;width:100%;background:#000;display:flex;padding:1
 <h2>Settings</h2>
 <i class="fas fa-times fa-2x" onclick="FENG.hideDrawers()"></i>
 </div>
-<div style="padding:20px;">
+<div>
 <p>Web App Vision: <b>16 PRO</b></p>
 <p>Player Engine: Cloud Embed</p>
 <p>Developer: Felix Nyoka</p>
@@ -228,13 +232,12 @@ let userName=localStorage.getItem("fengUser")||null;
 const FENG={
 boot: async function(){
 this.showLogin();
-this.loadGenres();
-this.loadShelf("movie/popular","row-movies");
-this.loadShelf("tv/top_rated","row-series");
+await this.loadGenres();
+await this.loadShelf("movie/popular","row-movies");
+await this.loadShelf("tv/top_rated","row-series");
 this.loadCategories();
 },
 
-/* LOGIN */
 showLogin:function(){
 if(!userName){
 document.getElementById("login-box").style.display="flex";
@@ -254,7 +257,6 @@ localStorage.clear();
 location.reload();
 },
 
-/* GENRES */
 loadGenres: async function(){
 const r=await fetch(`https://api.themoviedb.org/3/genre/movie/list?api_key=${KEY}`);
 const d=await r.json();
@@ -268,17 +270,18 @@ pill.onclick=()=>this.filterGenre(g.id);
 gcontainer.appendChild(pill);
 });
 },
+
 filterGenre:function(id){
 this.loadShelf(`discover/movie?with_genres=${id}`,"row-movies");
 this.loadShelf(`discover/tv?with_genres=${id}`,"row-series");
 },
 
-/* LOAD CONTENT */
 loadShelf: async function(path,id){
 const r=await fetch(`https://api.themoviedb.org/3/${path}?api_key=${KEY}`);
 const d=await r.json();
 const container=document.getElementById(id);
 container.innerHTML="";
+if(!d.results) return;
 d.results.forEach(item=>{
 let type=item.name?"tv":"movie";
 let title=item.title||item.name;
@@ -290,7 +293,6 @@ container.innerHTML+=`
 });
 },
 
-/* INFO PANEL */
 openInfo: async function(type,id){
 this.hideDrawers();
 document.getElementById("pane-info").style.display="flex";
@@ -305,7 +307,6 @@ document.getElementById("info-grid").innerHTML=`
 ${type==='tv'?`<button class="download-btn" onclick="FENG.showEpisodes(${id})">EPISODES</button>`:''}`;
 },
 
-/* EPISODES */
 showEpisodes: async function(id){
 this.hideDrawers();
 document.getElementById("pane-episodes").style.display="flex";
@@ -321,6 +322,7 @@ pill.onclick=()=>this.loadEpisodes(id,s.season_number,pill);
 seasons.appendChild(pill);
 });
 },
+
 loadEpisodes: async function(id,season,pill){
 document.querySelectorAll(".season-pill").forEach(p=>p.classList.remove("active"));
 pill.classList.add("active");
@@ -335,7 +337,6 @@ onclick="FENG.play('tv','${id}/${season}/${ep.episode_number}','Episode ${ep.epi
 });
 },
 
-/* PLAYER */
 play:function(type,path,title){
 this.hideDrawers();
 document.getElementById("now-playing").innerText=title;
@@ -343,7 +344,6 @@ document.getElementById("video-frame").src=`https://vidsrc.to/embed/${type}/${pa
 document.getElementById("pane-player").style.display="flex";
 },
 
-/* CATEGORIES */
 loadCategories:function(){
 const categories=["Action","Comedy","Drama","Horror","Romance","Thriller","Animation"];
 const list=document.getElementById("categories-list");
@@ -356,22 +356,25 @@ div.onclick=()=>this.filterCategory(c);
 list.appendChild(div);
 });
 },
+
 filterCategory:function(name){
-let genreMap={"Action":28,"Comedy":35,"Drama":18,"Horror":27,"Romance":10749,"Thriller":53,"Animation":16};
+const genreMap={"Action":28,"Comedy":35,"Drama":18,"Horror":27,"Romance":10749,"Thriller":53,"Animation":16};
 let id=genreMap[name];
 if(id)this.filterGenre(id);
 this.view("home");
 },
 
-/* SEARCH */
 search:function(query){
 query=query.toLowerCase();
-if(!query)return this.loadShelf("movie/popular","row-movies");
+if(!query){
+this.loadShelf("movie/popular","row-movies");
+this.loadShelf("tv/top_rated","row-series");
+return;
+}
 this.loadShelf(`search/movie?query=${encodeURIComponent(query)}`,"row-movies");
 this.loadShelf(`search/tv?query=${encodeURIComponent(query)}`,"row-series");
 },
 
-/* UI */
 view:function(pane,tab){
 this.hideDrawers();
 if(tab){
@@ -380,20 +383,23 @@ tab.classList.add("active");
 }
 if(pane!=="home") document.getElementById("pane-"+pane).style.display="flex";
 },
+
 loadType:function(type,tab){
 this.view("home",tab);
 this.loadShelf(`discover/${type}`,(type==="movie"?"row-movies":"row-series"));
 },
+
 hideDrawers:function(){
 document.querySelectorAll(".drawer").forEach(d=>d.style.display="none");
 },
+
 stopPlayer:function(){
 this.hideDrawers();
 document.getElementById("video-frame").src="";
 }
+
 };
 
-// SPLASH HIDE
 window.addEventListener("load",()=>setTimeout(()=>document.getElementById("splash").style.display="none",3000));
 </script>
 
