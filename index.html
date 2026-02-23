@@ -1,294 +1,322 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FENG WORLD ULTRA</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>FENG WORLD Vision 18 PRO</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root { --primary: #d3f243; --bg: #0b0e14; --card: #1c1f26; --text: #ffffff; --radius: 16px; }
+        * { box-sizing: border-box; margin: 0; padding: 0; outline: none; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); overflow-x: hidden; }
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+        /* HEADER */
+        header { padding: 15px 5%; background: rgba(11,14,20,0.95); backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 1000; border-bottom: 1px solid #222; }
+        .logo { font-size: 24px; font-weight: 900; margin-bottom: 10px; }
+        .logo span { color: var(--primary); }
+        .search-box { display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.06); padding: 12px; border-radius: 12px; border: 1px solid #333; }
+        .search-box input { flex: 1; background: none; border: none; color: white; font-size: 16px; }
 
-<style>
-:root{
---primary:#d3f243;
---bg:#0b0e14;
---card:#1c1f26;
---text:#fff;
---radius:16px;
-}
+        /* WELCOME BANNER */
+        #welcome-banner { width:100%; background:linear-gradient(90deg,#d3f243,#00ffa6); color:#000; text-align:center; padding:12px; font-weight:900; letter-spacing:2px; text-transform:uppercase; border-bottom:2px solid #000; animation:glow 2s infinite alternate; }
+        @keyframes glow { from { box-shadow:0 0 5px #d3f243;} to { box-shadow:0 0 25px #00ffa6;} }
 
-*{margin:0;padding:0;box-sizing:border-box;font-family:Arial}
-body{background:var(--bg);color:var(--text);overflow-x:hidden}
+        /* HERO SLIDER */
+        #hero-slider { width:100%; height:45vh; position:relative; overflow:hidden; background:#000; }
+        .slide { position:absolute; inset:0; opacity:0; transition:1s; background-size:cover; background-position:center; display:flex; align-items:flex-end; padding:40px 5%; }
+        .slide.active { opacity:1; }
+        .slide::after { content:''; position:absolute; inset:0; background:linear-gradient(to top,var(--bg) 10%,transparent); }
+        .slide-content { position:relative; z-index:2; width:100%; }
 
-/* HEADER */
-header{
-position:sticky;top:0;z-index:1000;
-padding:12px;background:#000;
-border-bottom:1px solid #222;
-display:flex;justify-content:space-between;align-items:center;
-}
-.logo{font-size:22px;font-weight:bold}
-.logo span{color:var(--primary)}
-#searchBox{
-padding:8px 12px;border-radius:20px;border:none;
-background:#222;color:#fff;width:180px;
-}
+        /* BADGES */
+        .badge { position:absolute; top:10px; left:10px; padding:4px 8px; border-radius:6px; font-size:10px; font-weight:900; z-index:5; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        .hd { background:var(--primary); color:#000; }
+        .cam { background:#ff4757; color:#fff; }
 
-/* BANNER */
-#welcomeBanner{
-padding:20px;text-align:center;
-font-size:22px;font-weight:bold;
-background:linear-gradient(90deg,#d3f243,#00ffaa);
-color:#000;
-}
+        /* ROWS */
+        .shelf-title { padding:20px 5% 5px; color:var(--primary); font-weight:900; font-size:14px; text-transform:uppercase; letter-spacing:1px; }
+        .row { display:flex; overflow-x:auto; gap:15px; padding:10px 5% 25px; scrollbar-width:none; }
+        .item { min-width:140px; background:var(--card); border-radius:var(--radius); overflow:hidden; position:relative; transition: 0.3s; }
+        .item:active { transform: scale(0.95); }
+        .item img { width:100%; aspect-ratio:2/3; object-fit:cover; }
+        .item-meta { padding:10px; font-size:12px; }
+        .item-meta b { display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 
-/* HERO SLIDER */
-#hero-slider{height:45vh;position:relative;overflow:hidden}
-.slide{
-position:absolute;inset:0;
-background-size:cover;background-position:center;
-opacity:0;transition:1s;
-display:flex;align-items:flex-end;padding:20px;
-}
-.slide.active{opacity:1}
-.slide::after{
-content:"";position:absolute;inset:0;
-background:linear-gradient(to top,#000 20%,transparent);
-}
-.slide h2{z-index:2}
+        /* DRAWERS */
+        .drawer { position:fixed; inset:0; background:var(--bg); z-index:5000; display:none; flex-direction:column; overflow-y:auto; animation: slideUp 0.3s ease; }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        .drawer-head { padding:20px 5%; display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid #222; position:sticky; top:0; background:var(--bg); z-index: 10; }
+        .btn-action { background:var(--primary); color:#000; padding:16px; border-radius:12px; border:none; font-weight:900; width:100%; margin: 10px 0; cursor:pointer; }
 
-/* ROWS */
-.shelf-title{padding:10px;font-weight:bold;color:var(--primary)}
-.row{display:flex;overflow-x:auto;gap:12px;padding:10px}
-.item{
-min-width:140px;background:var(--card);
-border-radius:12px;overflow:hidden;position:relative;
-}
-.item img{width:100%;aspect-ratio:2/3;object-fit:cover}
-.item-meta{padding:8px;font-size:12px}
+        /* EPISODES & CAST */
+        #season-pills { display:flex; gap:10px; padding:15px 5%; overflow-x:auto; }
+        .pill { padding:10px 20px; background:#222; border-radius:10px; white-space:nowrap; cursor:pointer; }
+        .pill.active { background:var(--primary); color:#000; font-weight:bold; }
+        #ep-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; padding:15px 5%; }
+        .ep-card { background:#222; padding:15px; border-radius:10px; text-align:center; font-weight:bold; }
+        .cast-card { min-width:100px; background:var(--card); border-radius:12px; overflow:hidden; text-align:center; font-size:11px; }
+        .cast-card img { width:100%; height:120px; object-fit:cover; }
 
-/* BADGES */
-.badge{
-position:absolute;top:5px;left:5px;
-padding:4px 6px;border-radius:5px;font-size:10px;font-weight:bold
-}
-.hd{background:#00ffaa;color:#000}
-.cam{background:#ff4757;color:#fff}
+        /* FOOTER */
+        footer { position:fixed; bottom:0; width:100%; background:rgba(0,0,0,0.9); backdrop-filter: blur(10px); display:flex; padding:12px 0 30px; border-top:1px solid #222; z-index:4000; }
+        .tab { flex:1; text-align:center; color:#555; font-size:10px; cursor:pointer; transition: 0.3s; }
+        .tab.active { color:var(--primary); }
+        .tab i { font-size:22px; display:block; margin-bottom:5px; }
 
-/* INFO DRAWER */
-#infoBox{
-position:fixed;inset:0;background:#000;
-z-index:9999;display:none;flex-direction:column;overflow:auto
-}
-#infoBackdrop{height:220px;background-size:cover;background-position:center}
-#infoContent{padding:15px}
-#infoCast{display:flex;gap:10px;overflow-x:auto;margin-top:10px}
-.castCard{
-min-width:100px;background:#111;border-radius:10px;
-overflow:hidden;font-size:12px;text-align:center
-}
-.castCard img{width:100%;height:130px;object-fit:cover}
-
-/* PLAYER */
-#playerBox{
-position:fixed;inset:0;background:#000;
-display:none;z-index:9999
-}
-#playerBox iframe{width:100%;height:90vh;border:none}
-
-/* GENRES */
-#genres{display:flex;gap:10px;overflow-x:auto;padding:10px}
-.genreBtn{
-padding:8px 15px;background:#222;border-radius:20px;
-font-size:13px;white-space:nowrap
-}
-
-/* FOOTER */
-footer{
-position:fixed;bottom:0;width:100%;
-background:#000;border-top:1px solid #222;
-display:flex;padding:10px
-}
-.tab{flex:1;text-align:center;font-size:12px;color:#555}
-.tab.active{color:var(--primary)}
-</style>
+        #loader { position:fixed; inset:0; background:black; z-index:9999; display:flex; justify-content:center; align-items:center; color:var(--primary); }
+    </style>
 </head>
 
-<body>
+<body onload="V18.boot()">
+
+<div id="loader"><i class="fas fa-circle-notch fa-spin fa-3x"></i></div>
 
 <header>
-<div class="logo">FE<span>NG</span> WORLD</div>
-<input id="searchBox" placeholder="Search movies or series...">
+    <div class="logo">FE<span>NG</span> WORLD</div>
+    <div class="search-box">
+        <i class="fas fa-search" style="color:var(--primary)"></i>
+        <input type="text" id="searchInput" placeholder="Search movies, series, actors..." oninput="V18.search(this.value)">
+    </div>
 </header>
 
-<div id="welcomeBanner">🔥 WELCOME TO FENG WORLD 🔥</div>
+<main id="pane-home">
+    <div id="welcome-banner">🚀 WELCOME TO FENG WORLD V18 PLATINUM 🚀</div>
+    <div id="hero-slider"></div>
+    <div id="home-content">
+        <div class="shelf-title" id="shelf-1-title">Trending Now</div>
+        <div class="row" id="row-trending"></div>
+        <div class="shelf-title" id="shelf-2-title">Popular Series</div>
+        <div class="row" id="row-series"></div>
+    </div>
+</main>
 
-<div id="hero-slider"></div>
-
-<div class="shelf-title">Genres</div>
-<div id="genres"></div>
-
-<div class="shelf-title">Trending Movies</div>
-<div class="row" id="movieRow"></div>
-
-<div class="shelf-title">Popular Series</div>
-<div class="row" id="tvRow"></div>
-
-<!-- INFO BOX -->
-<div id="infoBox">
-<div id="infoBackdrop"></div>
-<div id="infoContent">
-<h2 id="infoTitle"></h2>
-<p id="infoOverview"></p>
-<h3>Cast & Actors</h3>
-<div id="infoCast"></div>
-<button onclick="closeInfo()">CLOSE</button>
-<button id="watchBtn">WATCH NOW</button>
-</div>
+<div class="drawer" id="pane-categories">
+    <div class="drawer-head"><h2>Genres</h2><i class="fas fa-times fa-2x" onclick="V18.close()"></i></div>
+    <div id="cat-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:15px;padding:20px;"></div>
 </div>
 
-<!-- PLAYER -->
-<div id="playerBox">
-<button onclick="closePlayer()" style="padding:10px;background:red;color:white;border:none">EXIT</button>
-<iframe id="playerFrame"></iframe>
+<div class="drawer" id="pane-info">
+    <div class="drawer-head"><h2>Details</h2><i class="fas fa-times fa-2x" onclick="V18.close()"></i></div>
+    <div id="info-backdrop" style="height:250px;background-size:cover;background-position:center;"></div>
+    <div style="padding:20px;">
+        <h1 id="info-name"></h1>
+        <p id="info-overview" style="color:#aaa;margin:15px 0;line-height:1.6;"></p>
+        <div id="info-btns"></div>
+        <h2 style="margin-top:25px;color:var(--primary);font-size:16px;">Top Cast</h2>
+        <div id="cast-grid" style="display:flex;gap:12px;overflow-x:auto;padding:10px 0;"></div>
+    </div>
+</div>
+
+<div class="drawer" id="pane-episodes">
+    <div class="drawer-head"><h2>Select Episode</h2><i class="fas fa-times fa-2x" onclick="V18.close()"></i></div>
+    <div id="season-pills"></div>
+    <div id="ep-grid"></div>
+</div>
+
+<div class="drawer" id="pane-player">
+    <div class="drawer-head"><span id="play-title" style="font-weight:900;color:var(--primary)"></span><button onclick="V18.stop()" style="background:red;color:white;border:none;padding:8px 15px;border-radius:8px;font-weight:bold;">EXIT</button></div>
+    <iframe id="video-frame" allowfullscreen style="width:100%;height:85vh;border:none;background:#000;"></iframe>
 </div>
 
 <footer>
-<div class="tab active">Home</div>
-<div class="tab">Movies</div>
-<div class="tab">Series</div>
+    <div class="tab active" onclick="V18.view('home',this)"><i class="fas fa-home"></i>Home</div>
+    <div class="tab" onclick="V18.loadType('movie',this)"><i class="fas fa-film"></i>Movies</div>
+    <div class="tab" onclick="V18.loadType('tv',this)"><i class="fas fa-tv"></i>Series</div>
+    <div class="tab" onclick="V18.view('categories',this)"><i class="fas fa-th-large"></i>Genres</div>
 </footer>
 
 <script>
-const API_KEY="ea593c3fa4d4942ece315977cd7e32c9";
-const IMG="https://image.tmdb.org/t/p/w500";
+const KEY="ea593c3fa4d4942ece315977cd7e32c9";
+let currentSlide=0;
 
-let slideIndex=0;
+const V18={
+    boot(){
+        this.loadHero();
+        this.loadShelf("trending/all/week","row-trending");
+        this.loadShelf("tv/popular","row-series");
+        this.loadGenres();
+        document.getElementById("loader").style.display="none";
+    },
 
-// HERO SLIDER
-async function loadHero(){
-const res=await fetch(`https://api.themoviedb.org/3/trending/all/day?api_key=${API_KEY}`);
-const data=await res.json();
-const slider=document.getElementById("hero-slider");
-slider.innerHTML="";
-data.results.slice(0,5).forEach((m,i)=>{
-slider.innerHTML+=`
-<div class="slide ${i==0?'active':''}" style="background-image:url(${IMG+m.backdrop_path})">
-<h2>${m.title||m.name}</h2>
-</div>`;
-});
-setInterval(()=>{
-const slides=document.querySelectorAll(".slide");
-slides[slideIndex].classList.remove("active");
-slideIndex=(slideIndex+1)%slides.length;
-slides[slideIndex].classList.add("active");
-},4000);
-}
+    async loadHero(){
+        const r=await fetch(`https://api.themoviedb.org/3/trending/all/day?api_key=${KEY}`);
+        const d=await r.json();
+        const s=document.getElementById("hero-slider");
+        s.innerHTML="";
+        d.results.slice(0,6).forEach((m,i)=>{
+            s.innerHTML+=`
+            <div class="slide ${i==0?'active':''}" style="background-image:url(https://image.tmdb.org/t/p/original${m.backdrop_path})">
+                <div class="slide-content">
+                    <h1 style="font-size:28px;margin-bottom:10px;">${m.title||m.name}</h1>
+                    <button class="btn-action" style="width:auto;padding:10px 25px;" onclick="V18.openInfo('${m.media_type}','${m.id}')">STREAM NOW</button>
+                </div>
+            </div>`;
+        });
+        setInterval(()=>{
+            const slides=document.querySelectorAll(".slide");
+            if(!slides.length) return;
+            slides[currentSlide].classList.remove("active");
+            currentSlide=(currentSlide+1)%slides.length;
+            slides[currentSlide].classList.add("active");
+        },5000);
+    },
 
-// LOAD MOVIES
-async function loadMovies(){
-const res=await fetch(`https://api.themoviedb.org/3/trending/movie/week?api_key=${API_KEY}`);
-const data=await res.json();
-showGrid("movieRow",data.results,"movie");
-}
+    async loadShelf(path,id){
+        const r=await fetch(`https://api.themoviedb.org/3/${path}?api_key=${KEY}`);
+        const d=await r.json();
+        const c=document.getElementById(id);
+        c.innerHTML="";
+        d.results.forEach(m=>{
+            if(!m.poster_path) return;
+            const type=m.title?"movie":"tv";
+            const date=new Date(m.release_date||m.first_air_date||"2024-01-01");
+            const isCam=(type=="movie" && date > new Date(Date.now() - 45*24*60*60*1000));
+            c.innerHTML+=`
+            <div class="item" onclick="V18.openInfo('${type}','${m.id}')">
+                <div class="badge ${isCam?'cam':'hd'}">${isCam?'CAM':'HD'}</div>
+                <img src="https://image.tmdb.org/t/p/w500${m.poster_path}">
+                <div class="item-meta"><b>${m.title||m.name}</b></div>
+            </div>`;
+        });
+    },
 
-// LOAD SERIES
-async function loadTV(){
-const res=await fetch(`https://api.themoviedb.org/3/trending/tv/week?api_key=${API_KEY}`);
-const data=await res.json();
-showGrid("tvRow",data.results,"tv");
-}
+    async search(q) {
+        const homeContent = document.getElementById('home-content');
+        const slider = document.getElementById('hero-slider');
+        const shelf1 = document.getElementById('row-trending');
+        const shelf2 = document.getElementById('row-series');
+        const title1 = document.getElementById('shelf-1-title');
+        const title2 = document.getElementById('shelf-2-title');
 
-// SHOW GRID
-function showGrid(id,list,type){
-const row=document.getElementById(id);
-row.innerHTML="";
-list.forEach(m=>{
-if(!m.poster_path)return;
-const year=new Date(m.release_date||m.first_air_date||"2024").getFullYear();
-const isCam=(type==="movie" && year>=new Date().getFullYear());
-row.innerHTML+=`
-<div class="item" onclick="openInfo('${type}',${m.id})">
-<div class="badge ${isCam?'cam':'hd'}">${isCam?'CAM':'HD'}</div>
-<img src="${IMG+m.poster_path}">
-<div class="item-meta">${m.title||m.name}<br>${year}</div>
-</div>`;
-});
-}
+        if(q.length < 2) {
+            slider.style.display = "block";
+            title1.innerText = "Trending Now";
+            title2.innerText = "Popular Series";
+            this.boot();
+            return;
+        }
 
-// GENRES
-const genreList=[
-{id:28,n:"Action"},{id:35,n:"Comedy"},{id:27,n:"Horror"},
-{id:18,n:"Drama"},{id:878,n:"Sci-Fi"},{id:16,n:"Animation"}
-];
-const genreDiv=document.getElementById("genres");
-genreList.forEach(g=>{
-genreDiv.innerHTML+=`<div class="genreBtn" onclick="loadGenre(${g.id})">${g.n}</div>`;
-});
+        slider.style.display = "none";
+        title1.innerText = "Search Results: Movies";
+        title2.innerText = "Search Results: Series";
+        
+        const r = await fetch(`https://api.themoviedb.org/3/search/multi?api_key=${KEY}&query=${encodeURIComponent(q)}`);
+        const d = await r.json();
+        
+        shelf1.innerHTML = "";
+        shelf2.innerHTML = "";
+        
+        d.results.forEach(m => {
+            if(!m.poster_path) return;
+            const target = (m.media_type === 'tv') ? shelf2 : shelf1;
+            target.innerHTML += `
+            <div class="item" onclick="V18.openInfo('${m.media_type}','${m.id}')">
+                <img src="https://image.tmdb.org/t/p/w500${m.poster_path}">
+                <div class="item-meta"><b>${m.title||m.name}</b></div>
+            </div>`;
+        });
+    },
 
-async function loadGenre(id){
-const res=await fetch(`https://api.themoviedb.org/3/discover/movie?with_genres=${id}&api_key=${API_KEY}`);
-const data=await res.json();
-showGrid("movieRow",data.results,"movie");
-}
+    loadGenres(){
+        const g=[{id:28,n:"Action"},{id:35,n:"Comedy"},{id:27,n:"Horror"},{id:18,n:"Drama"},{id:878,n:"Sci-Fi"},{id:16,n:"Animation"},{id:10749,n:"Romance"}];
+        const grid=document.getElementById("cat-grid");
+        grid.innerHTML="";
+        g.forEach(x=>{
+            grid.innerHTML+=`<div class="btn-action" style="text-align:center" onclick="V18.filter(${x.id})">${x.n}</div>`;
+        });
+    },
 
-// INFO + CAST
-async function openInfo(type,id){
-document.getElementById("infoBox").style.display="flex";
+    filter(id){
+        this.close();
+        document.getElementById('hero-slider').style.display = "none";
+        document.getElementById('shelf-1-title').innerText = "Genre Results";
+        document.getElementById('shelf-2-title').innerText = "";
+        document.getElementById('row-series').innerHTML = "";
+        this.loadShelf(`discover/movie?with_genres=${id}`,"row-trending");
+        window.scrollTo(0,0);
+    },
 
-const res=await fetch(`https://api.themoviedb.org/3/${type}/${id}?api_key=${API_KEY}`);
-const d=await res.json();
+    async openInfo(type,id){
+        const r=await fetch(`https://api.themoviedb.org/3/${type}/${id}?api_key=${KEY}`);
+        const d=await r.json();
+        const cr=await fetch(`https://api.themoviedb.org/3/${type}/${id}/credits?api_key=${KEY}`);
+        const cd=await cr.json();
 
-document.getElementById("infoTitle").innerText=d.title||d.name;
-document.getElementById("infoOverview").innerText=d.overview;
-document.getElementById("infoBackdrop").style.backgroundImage=`url(${IMG+d.backdrop_path})`;
+        document.getElementById("info-name").innerText=d.title||d.name;
+        document.getElementById("info-overview").innerText=d.overview;
+        document.getElementById("info-backdrop").style.backgroundImage=`url(https://image.tmdb.org/t/p/original${d.backdrop_path})`;
+        document.getElementById("info-btns").innerHTML=`
+            <button class="btn-action" onclick="V18.play('${type}','${id}','${d.title||d.name}')">WATCH NOW</button>
+            ${type=="tv"?`<button class="btn-action" style="background:#333;color:#fff" onclick="V18.getSeasons('${id}')">EPISODES</button>`:""}
+        `;
 
-document.getElementById("watchBtn").onclick=()=>play(type,id);
+        const cast=document.getElementById("cast-grid");
+        cast.innerHTML="";
+        cd.cast.slice(0,10).forEach(c=>{
+            if(!c.profile_path)return;
+            cast.innerHTML+=`
+            <div class="cast-card">
+                <img src="https://image.tmdb.org/t/p/w185${c.profile_path}">
+                <div style="padding:5px;"><b>${c.name}</b></div>
+            </div>`;
+        });
+        this.view("info");
+    },
 
-// CAST
-const cRes=await fetch(`https://api.themoviedb.org/3/${type}/${id}/credits?api_key=${API_KEY}`);
-const cData=await cRes.json();
-const castDiv=document.getElementById("infoCast");
-castDiv.innerHTML="";
-cData.cast.slice(0,10).forEach(c=>{
-if(!c.profile_path)return;
-castDiv.innerHTML+=`
-<div class="castCard">
-<img src="${IMG+c.profile_path}">
-<div>${c.name}<br><small>${c.character}</small></div>
-</div>`;
-});
-}
+    async getSeasons(id){
+        const r=await fetch(`https://api.themoviedb.org/3/tv/${id}?api_key=${KEY}`);
+        const d=await r.json();
+        const p=document.getElementById("season-pills");
+        p.innerHTML="";
+        d.seasons.forEach(s=>{
+            if(s.season_number==0)return;
+            const div=document.createElement("div");
+            div.className="pill";
+            div.innerText="Season "+s.season_number;
+            div.onclick=()=>this.getEpisodes(id,s.season_number,div);
+            p.appendChild(div);
+        });
+        this.view("episodes");
+        p.firstChild.click();
+    },
 
-function closeInfo(){document.getElementById("infoBox").style.display="none"}
+    async getEpisodes(id,s,el){
+        document.querySelectorAll(".pill").forEach(x=>x.classList.remove("active"));
+        el.classList.add("active");
+        const r=await fetch(`https://api.themoviedb.org/3/tv/${id}/season/${s}?api_key=${KEY}`);
+        const d=await r.json();
+        const g=document.getElementById("ep-grid");
+        g.innerHTML="";
+        d.episodes.forEach(e=>{
+            g.innerHTML+=`<div class="ep-card" onclick="V18.play('tv','${id}/${s}/${e.episode_number}','Episode ${e.episode_number}')">E${e.episode_number}</div>`;
+        });
+    },
 
-// PLAYER (AUTO STREAM)
-function play(type,id){
-closeInfo();
-document.getElementById("playerBox").style.display="block";
-document.getElementById("playerFrame").src=`https://vidsrc.to/embed/${type}/${id}`;
-}
+    play(type,path,title){
+        this.view("player");
+        document.getElementById("play-title").innerText=title;
+        document.getElementById("video-frame").src=`https://vidsrc.to/embed/${type}/${path}`;
+    },
 
-function closePlayer(){
-document.getElementById("playerBox").style.display="none";
-document.getElementById("playerFrame").src="";
-}
+    view(id, tab){
+        this.close();
+        document.getElementById("pane-"+id).style.display="flex";
+        if(tab) {
+            document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+            tab.classList.add("active");
+        }
+    },
 
-// SEARCH
-document.getElementById("searchBox").addEventListener("keyup",async e=>{
-if(e.key==="Enter"){
-const q=e.target.value;
-const res=await fetch(`https://api.themoviedb.org/3/search/multi?api_key=${API_KEY}&query=${q}`);
-const data=await res.json();
-showGrid("movieRow",data.results.filter(x=>x.media_type==="movie"),"movie");
-showGrid("tvRow",data.results.filter(x=>x.media_type==="tv"),"tv");
-}
-});
-
-// BOOT
-loadHero();
-loadMovies();
-loadTV();
+    close(){ document.querySelectorAll(".drawer").forEach(d=>d.style.display="none"); },
+    stop(){ document.getElementById("video-frame").src=""; this.close(); },
+    loadType(t, tab){ 
+        this.view('home', tab);
+        document.getElementById('hero-slider').style.display = "none";
+        this.loadShelf(`discover/${t}`, "row-trending"); 
+        document.getElementById('row-series').innerHTML = "";
+        document.getElementById('shelf-2-title').innerText = "";
+    }
+};
 </script>
-
 </body>
 </html>
