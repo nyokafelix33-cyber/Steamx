@@ -1,322 +1,208 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>FENG WORLD Vision 18 PRO</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        :root { --primary: #d3f243; --bg: #0b0e14; --card: #1c1f26; --text: #ffffff; --radius: 16px; }
-        * { box-sizing: border-box; margin: 0; padding: 0; outline: none; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); overflow-x: hidden; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        /* HEADER */
-        header { padding: 15px 5%; background: rgba(11,14,20,0.95); backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 1000; border-bottom: 1px solid #222; }
-        .logo { font-size: 24px; font-weight: 900; margin-bottom: 10px; }
-        .logo span { color: var(--primary); }
-        .search-box { display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.06); padding: 12px; border-radius: 12px; border: 1px solid #333; }
-        .search-box input { flex: 1; background: none; border: none; color: white; font-size: 16px; }
+<title>FENG WORLD StreamVault</title>
 
-        /* WELCOME BANNER */
-        #welcome-banner { width:100%; background:linear-gradient(90deg,#d3f243,#00ffa6); color:#000; text-align:center; padding:12px; font-weight:900; letter-spacing:2px; text-transform:uppercase; border-bottom:2px solid #000; animation:glow 2s infinite alternate; }
-        @keyframes glow { from { box-shadow:0 0 5px #d3f243;} to { box-shadow:0 0 25px #00ffa6;} }
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icons/feng-logo.png">
 
-        /* HERO SLIDER */
-        #hero-slider { width:100%; height:45vh; position:relative; overflow:hidden; background:#000; }
-        .slide { position:absolute; inset:0; opacity:0; transition:1s; background-size:cover; background-position:center; display:flex; align-items:flex-end; padding:40px 5%; }
-        .slide.active { opacity:1; }
-        .slide::after { content:''; position:absolute; inset:0; background:linear-gradient(to top,var(--bg) 10%,transparent); }
-        .slide-content { position:relative; z-index:2; width:100%; }
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial}
+body{background:#000;color:white}
 
-        /* BADGES */
-        .badge { position:absolute; top:10px; left:10px; padding:4px 8px; border-radius:6px; font-size:10px; font-weight:900; z-index:5; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
-        .hd { background:var(--primary); color:#000; }
-        .cam { background:#ff4757; color:#fff; }
+/* NAVBAR */
+nav{
+position:fixed;top:0;width:100%;
+display:flex;align-items:center;justify-content:space-between;
+padding:15px 20px;background:linear-gradient(#000,#000000aa);
+z-index:999;
+}
+.logo{font-size:22px;font-weight:bold;color:#d3f243}
+nav input{padding:8px;background:#111;border:none;color:white;border-radius:6px}
 
-        /* ROWS */
-        .shelf-title { padding:20px 5% 5px; color:var(--primary); font-weight:900; font-size:14px; text-transform:uppercase; letter-spacing:1px; }
-        .row { display:flex; overflow-x:auto; gap:15px; padding:10px 5% 25px; scrollbar-width:none; }
-        .item { min-width:140px; background:var(--card); border-radius:var(--radius); overflow:hidden; position:relative; transition: 0.3s; }
-        .item:active { transform: scale(0.95); }
-        .item img { width:100%; aspect-ratio:2/3; object-fit:cover; }
-        .item-meta { padding:10px; font-size:12px; }
-        .item-meta b { display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+/* HERO */
+#hero{
+height:90vh;background-size:cover;background-position:center;
+display:flex;flex-direction:column;justify-content:end;padding:50px;
+}
+#hero h1{font-size:45px}
+.hero-btns button{
+padding:12px 20px;margin-right:10px;border:none;font-weight:bold;border-radius:5px;
+cursor:pointer
+}
+.play{background:#d3f243;color:black}
+.info{background:#333;color:white}
 
-        /* DRAWERS */
-        .drawer { position:fixed; inset:0; background:var(--bg); z-index:5000; display:none; flex-direction:column; overflow-y:auto; animation: slideUp 0.3s ease; }
-        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-        .drawer-head { padding:20px 5%; display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid #222; position:sticky; top:0; background:var(--bg); z-index: 10; }
-        .btn-action { background:var(--primary); color:#000; padding:16px; border-radius:12px; border:none; font-weight:900; width:100%; margin: 10px 0; cursor:pointer; }
+/* ROWS */
+.row{padding:20px}
+.row h2{margin-bottom:10px}
+.row-list{display:flex;overflow-x:auto;gap:10px}
+.card{
+min-width:150px;cursor:pointer;transition:.3s;
+}
+.card:hover{transform:scale(1.1)}
+.card img{width:150px;border-radius:8px}
 
-        /* EPISODES & CAST */
-        #season-pills { display:flex; gap:10px; padding:15px 5%; overflow-x:auto; }
-        .pill { padding:10px 20px; background:#222; border-radius:10px; white-space:nowrap; cursor:pointer; }
-        .pill.active { background:var(--primary); color:#000; font-weight:bold; }
-        #ep-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; padding:15px 5%; }
-        .ep-card { background:#222; padding:15px; border-radius:10px; text-align:center; font-weight:bold; }
-        .cast-card { min-width:100px; background:var(--card); border-radius:12px; overflow:hidden; text-align:center; font-size:11px; }
-        .cast-card img { width:100%; height:120px; object-fit:cover; }
+/* MODAL */
+#modal{
+position:fixed;inset:0;background:#000c;
+display:none;align-items:center;justify-content:center;
+}
+.modal-box{
+background:#111;padding:20px;width:90%;max-width:600px;border-radius:12px
+}
+button{cursor:pointer}
 
-        /* FOOTER */
-        footer { position:fixed; bottom:0; width:100%; background:rgba(0,0,0,0.9); backdrop-filter: blur(10px); display:flex; padding:12px 0 30px; border-top:1px solid #222; z-index:4000; }
-        .tab { flex:1; text-align:center; color:#555; font-size:10px; cursor:pointer; transition: 0.3s; }
-        .tab.active { color:var(--primary); }
-        .tab i { font-size:22px; display:block; margin-bottom:5px; }
-
-        #loader { position:fixed; inset:0; background:black; z-index:9999; display:flex; justify-content:center; align-items:center; color:var(--primary); }
-    </style>
+/* WATCHLIST */
+.watch{color:#d3f243;font-size:14px;cursor:pointer}
+</style>
 </head>
 
-<body onload="V18.boot()">
+<body>
 
-<div id="loader"><i class="fas fa-circle-notch fa-spin fa-3x"></i></div>
+<!-- NAVBAR -->
+<nav>
+<div class="logo">FENG WORLD</div>
+<input placeholder="Search movies..." oninput="search(this.value)">
+</nav>
 
-<header>
-    <div class="logo">FE<span>NG</span> WORLD</div>
-    <div class="search-box">
-        <i class="fas fa-search" style="color:var(--primary)"></i>
-        <input type="text" id="searchInput" placeholder="Search movies, series, actors..." oninput="V18.search(this.value)">
-    </div>
-</header>
-
-<main id="pane-home">
-    <div id="welcome-banner">🚀 WELCOME TO FENG WORLD V18 PLATINUM 🚀</div>
-    <div id="hero-slider"></div>
-    <div id="home-content">
-        <div class="shelf-title" id="shelf-1-title">Trending Now</div>
-        <div class="row" id="row-trending"></div>
-        <div class="shelf-title" id="shelf-2-title">Popular Series</div>
-        <div class="row" id="row-series"></div>
-    </div>
-</main>
-
-<div class="drawer" id="pane-categories">
-    <div class="drawer-head"><h2>Genres</h2><i class="fas fa-times fa-2x" onclick="V18.close()"></i></div>
-    <div id="cat-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:15px;padding:20px;"></div>
+<!-- HERO -->
+<div id="hero">
+<h1 id="hero-title"></h1>
+<div class="hero-btns">
+<button class="play" onclick="playHero()">▶ Play</button>
+<button class="info" onclick="openModal(heroData[currentHero].id,heroData[currentHero].media_type)">ℹ Info</button>
+</div>
 </div>
 
-<div class="drawer" id="pane-info">
-    <div class="drawer-head"><h2>Details</h2><i class="fas fa-times fa-2x" onclick="V18.close()"></i></div>
-    <div id="info-backdrop" style="height:250px;background-size:cover;background-position:center;"></div>
-    <div style="padding:20px;">
-        <h1 id="info-name"></h1>
-        <p id="info-overview" style="color:#aaa;margin:15px 0;line-height:1.6;"></p>
-        <div id="info-btns"></div>
-        <h2 style="margin-top:25px;color:var(--primary);font-size:16px;">Top Cast</h2>
-        <div id="cast-grid" style="display:flex;gap:12px;overflow-x:auto;padding:10px 0;"></div>
-    </div>
-</div>
+<!-- CONTENT ROWS -->
+<div class="row"><h2>🔥 Trending Now</h2><div id="trending" class="row-list"></div></div>
+<div class="row"><h2>🎬 Popular Movies</h2><div id="movies" class="row-list"></div></div>
+<div class="row"><h2>📺 TV Shows</h2><div id="series" class="row-list"></div></div>
+<div class="row"><h2>⭐ My Watchlist</h2><div id="watchlist" class="row-list"></div></div>
 
-<div class="drawer" id="pane-episodes">
-    <div class="drawer-head"><h2>Select Episode</h2><i class="fas fa-times fa-2x" onclick="V18.close()"></i></div>
-    <div id="season-pills"></div>
-    <div id="ep-grid"></div>
+<!-- MODAL -->
+<div id="modal">
+<div class="modal-box">
+<h2 id="m-title"></h2>
+<p id="m-desc"></p>
+<p id="m-rate"></p>
+<span class="watch" onclick="addWatchlist()">+ Add to Watchlist</span><br><br>
+<button onclick="watchTrailer()">Watch Trailer</button>
+<button onclick="closeModal()">Close</button>
 </div>
-
-<div class="drawer" id="pane-player">
-    <div class="drawer-head"><span id="play-title" style="font-weight:900;color:var(--primary)"></span><button onclick="V18.stop()" style="background:red;color:white;border:none;padding:8px 15px;border-radius:8px;font-weight:bold;">EXIT</button></div>
-    <iframe id="video-frame" allowfullscreen style="width:100%;height:85vh;border:none;background:#000;"></iframe>
 </div>
-
-<footer>
-    <div class="tab active" onclick="V18.view('home',this)"><i class="fas fa-home"></i>Home</div>
-    <div class="tab" onclick="V18.loadType('movie',this)"><i class="fas fa-film"></i>Movies</div>
-    <div class="tab" onclick="V18.loadType('tv',this)"><i class="fas fa-tv"></i>Series</div>
-    <div class="tab" onclick="V18.view('categories',this)"><i class="fas fa-th-large"></i>Genres</div>
-</footer>
 
 <script>
 const KEY="ea593c3fa4d4942ece315977cd7e32c9";
-let currentSlide=0;
+let heroData=[],currentHero=0,trailerKey="",currentItem=null;
+let watchlist=JSON.parse(localStorage.getItem("watchlist")||"[]");
 
-const V18={
-    boot(){
-        this.loadHero();
-        this.loadShelf("trending/all/week","row-trending");
-        this.loadShelf("tv/popular","row-series");
-        this.loadGenres();
-        document.getElementById("loader").style.display="none";
-    },
+/* HERO */
+async function loadHero(){
+let r=await fetch(`https://api.themoviedb.org/3/trending/all/day?api_key=${KEY}`);
+let d=await r.json();
+heroData=d.results.slice(0,5);
+setHero();
+setInterval(()=>{currentHero=(currentHero+1)%heroData.length;setHero();},6000);
+}
+function setHero(){
+let m=heroData[currentHero];
+document.getElementById("hero").style.backgroundImage=`linear-gradient(#000000aa,#000000aa),url(https://image.tmdb.org/t/p/original${m.backdrop_path})`;
+document.getElementById("hero-title").innerText=m.title||m.name;
+}
+function playHero(){
+alert("Real streaming player coming soon 😎");
+}
 
-    async loadHero(){
-        const r=await fetch(`https://api.themoviedb.org/3/trending/all/day?api_key=${KEY}`);
-        const d=await r.json();
-        const s=document.getElementById("hero-slider");
-        s.innerHTML="";
-        d.results.slice(0,6).forEach((m,i)=>{
-            s.innerHTML+=`
-            <div class="slide ${i==0?'active':''}" style="background-image:url(https://image.tmdb.org/t/p/original${m.backdrop_path})">
-                <div class="slide-content">
-                    <h1 style="font-size:28px;margin-bottom:10px;">${m.title||m.name}</h1>
-                    <button class="btn-action" style="width:auto;padding:10px 25px;" onclick="V18.openInfo('${m.media_type}','${m.id}')">STREAM NOW</button>
-                </div>
-            </div>`;
-        });
-        setInterval(()=>{
-            const slides=document.querySelectorAll(".slide");
-            if(!slides.length) return;
-            slides[currentSlide].classList.remove("active");
-            currentSlide=(currentSlide+1)%slides.length;
-            slides[currentSlide].classList.add("active");
-        },5000);
-    },
+/* ROWS */
+async function loadRow(url,id){
+let r=await fetch(url);
+let d=await r.json();
+let html="";
+d.results.forEach(m=>{
+if(!m.poster_path)return;
+html+=`<div class="card" onclick="openModal(${m.id},'${m.media_type||'movie'}')">
+<img src="https://image.tmdb.org/t/p/w300${m.poster_path}">
+</div>`;
+});
+document.getElementById(id).innerHTML=html;
+}
 
-    async loadShelf(path,id){
-        const r=await fetch(`https://api.themoviedb.org/3/${path}?api_key=${KEY}`);
-        const d=await r.json();
-        const c=document.getElementById(id);
-        c.innerHTML="";
-        d.results.forEach(m=>{
-            if(!m.poster_path) return;
-            const type=m.title?"movie":"tv";
-            const date=new Date(m.release_date||m.first_air_date||"2024-01-01");
-            const isCam=(type=="movie" && date > new Date(Date.now() - 45*24*60*60*1000));
-            c.innerHTML+=`
-            <div class="item" onclick="V18.openInfo('${type}','${m.id}')">
-                <div class="badge ${isCam?'cam':'hd'}">${isCam?'CAM':'HD'}</div>
-                <img src="https://image.tmdb.org/t/p/w500${m.poster_path}">
-                <div class="item-meta"><b>${m.title||m.name}</b></div>
-            </div>`;
-        });
-    },
+/* MODAL */
+async function openModal(id,type){
+currentItem={id,type};
+let r=await fetch(`https://api.themoviedb.org/3/${type}/${id}?api_key=${KEY}&append_to_response=videos`);
+let d=await r.json();
+document.getElementById("m-title").innerText=d.title||d.name;
+document.getElementById("m-desc").innerText=d.overview;
+document.getElementById("m-rate").innerText="⭐ "+d.vote_average;
 
-    async search(q) {
-        const homeContent = document.getElementById('home-content');
-        const slider = document.getElementById('hero-slider');
-        const shelf1 = document.getElementById('row-trending');
-        const shelf2 = document.getElementById('row-series');
-        const title1 = document.getElementById('shelf-1-title');
-        const title2 = document.getElementById('shelf-2-title');
+trailerKey="";
+if(d.videos && d.videos.results.length){
+let t=d.videos.results.find(v=>v.type=="Trailer");
+if(t) trailerKey=t.key;
+}
 
-        if(q.length < 2) {
-            slider.style.display = "block";
-            title1.innerText = "Trending Now";
-            title2.innerText = "Popular Series";
-            this.boot();
-            return;
-        }
+document.getElementById("modal").style.display="flex";
+}
 
-        slider.style.display = "none";
-        title1.innerText = "Search Results: Movies";
-        title2.innerText = "Search Results: Series";
-        
-        const r = await fetch(`https://api.themoviedb.org/3/search/multi?api_key=${KEY}&query=${encodeURIComponent(q)}`);
-        const d = await r.json();
-        
-        shelf1.innerHTML = "";
-        shelf2.innerHTML = "";
-        
-        d.results.forEach(m => {
-            if(!m.poster_path) return;
-            const target = (m.media_type === 'tv') ? shelf2 : shelf1;
-            target.innerHTML += `
-            <div class="item" onclick="V18.openInfo('${m.media_type}','${m.id}')">
-                <img src="https://image.tmdb.org/t/p/w500${m.poster_path}">
-                <div class="item-meta"><b>${m.title||m.name}</b></div>
-            </div>`;
-        });
-    },
+/* WATCHLIST */
+function addWatchlist(){
+if(!watchlist.find(x=>x.id==currentItem.id)){
+watchlist.push(currentItem);
+localStorage.setItem("watchlist",JSON.stringify(watchlist));
+loadWatchlist();
+alert("Added to My List");
+}
+}
+async function loadWatchlist(){
+let html="";
+for(let w of watchlist){
+let r=await fetch(`https://api.themoviedb.org/3/${w.type}/${w.id}?api_key=${KEY}`);
+let d=await r.json();
+html+=`<div class="card"><img src="https://image.tmdb.org/t/p/w300${d.poster_path}"></div>`;
+}
+document.getElementById("watchlist").innerHTML=html;
+}
 
-    loadGenres(){
-        const g=[{id:28,n:"Action"},{id:35,n:"Comedy"},{id:27,n:"Horror"},{id:18,n:"Drama"},{id:878,n:"Sci-Fi"},{id:16,n:"Animation"},{id:10749,n:"Romance"}];
-        const grid=document.getElementById("cat-grid");
-        grid.innerHTML="";
-        g.forEach(x=>{
-            grid.innerHTML+=`<div class="btn-action" style="text-align:center" onclick="V18.filter(${x.id})">${x.n}</div>`;
-        });
-    },
+/* SEARCH */
+async function search(q){
+if(q.length<3)return;
+let r=await fetch(`https://api.themoviedb.org/3/search/multi?api_key=${KEY}&query=${q}`);
+let d=await r.json();
+let html="";
+d.results.forEach(m=>{
+if(m.poster_path){
+html+=`<div class="card" onclick="openModal(${m.id},'${m.media_type}')">
+<img src="https://image.tmdb.org/t/p/w300${m.poster_path}">
+</div>`;
+}
+});
+document.getElementById("movies").innerHTML=html;
+}
 
-    filter(id){
-        this.close();
-        document.getElementById('hero-slider').style.display = "none";
-        document.getElementById('shelf-1-title').innerText = "Genre Results";
-        document.getElementById('shelf-2-title').innerText = "";
-        document.getElementById('row-series').innerHTML = "";
-        this.loadShelf(`discover/movie?with_genres=${id}`,"row-trending");
-        window.scrollTo(0,0);
-    },
+/* TRAILER */
+function watchTrailer(){
+if(trailerKey) window.open(`https://youtube.com/watch?v=${trailerKey}`);
+}
 
-    async openInfo(type,id){
-        const r=await fetch(`https://api.themoviedb.org/3/${type}/${id}?api_key=${KEY}`);
-        const d=await r.json();
-        const cr=await fetch(`https://api.themoviedb.org/3/${type}/${id}/credits?api_key=${KEY}`);
-        const cd=await cr.json();
+/* CLOSE */
+function closeModal(){document.getElementById("modal").style.display="none";}
 
-        document.getElementById("info-name").innerText=d.title||d.name;
-        document.getElementById("info-overview").innerText=d.overview;
-        document.getElementById("info-backdrop").style.backgroundImage=`url(https://image.tmdb.org/t/p/original${d.backdrop_path})`;
-        document.getElementById("info-btns").innerHTML=`
-            <button class="btn-action" onclick="V18.play('${type}','${id}','${d.title||d.name}')">WATCH NOW</button>
-            ${type=="tv"?`<button class="btn-action" style="background:#333;color:#fff" onclick="V18.getSeasons('${id}')">EPISODES</button>`:""}
-        `;
+/* INIT */
+loadHero();
+loadRow(`https://api.themoviedb.org/3/trending/movie/week?api_key=${KEY}`,"trending");
+loadRow(`https://api.themoviedb.org/3/movie/popular?api_key=${KEY}`,"movies");
+loadRow(`https://api.themoviedb.org/3/tv/popular?api_key=${KEY}`,"series");
+loadWatchlist();
 
-        const cast=document.getElementById("cast-grid");
-        cast.innerHTML="";
-        cd.cast.slice(0,10).forEach(c=>{
-            if(!c.profile_path)return;
-            cast.innerHTML+=`
-            <div class="cast-card">
-                <img src="https://image.tmdb.org/t/p/w185${c.profile_path}">
-                <div style="padding:5px;"><b>${c.name}</b></div>
-            </div>`;
-        });
-        this.view("info");
-    },
-
-    async getSeasons(id){
-        const r=await fetch(`https://api.themoviedb.org/3/tv/${id}?api_key=${KEY}`);
-        const d=await r.json();
-        const p=document.getElementById("season-pills");
-        p.innerHTML="";
-        d.seasons.forEach(s=>{
-            if(s.season_number==0)return;
-            const div=document.createElement("div");
-            div.className="pill";
-            div.innerText="Season "+s.season_number;
-            div.onclick=()=>this.getEpisodes(id,s.season_number,div);
-            p.appendChild(div);
-        });
-        this.view("episodes");
-        p.firstChild.click();
-    },
-
-    async getEpisodes(id,s,el){
-        document.querySelectorAll(".pill").forEach(x=>x.classList.remove("active"));
-        el.classList.add("active");
-        const r=await fetch(`https://api.themoviedb.org/3/tv/${id}/season/${s}?api_key=${KEY}`);
-        const d=await r.json();
-        const g=document.getElementById("ep-grid");
-        g.innerHTML="";
-        d.episodes.forEach(e=>{
-            g.innerHTML+=`<div class="ep-card" onclick="V18.play('tv','${id}/${s}/${e.episode_number}','Episode ${e.episode_number}')">E${e.episode_number}</div>`;
-        });
-    },
-
-    play(type,path,title){
-        this.view("player");
-        document.getElementById("play-title").innerText=title;
-        document.getElementById("video-frame").src=`https://vidsrc.to/embed/${type}/${path}`;
-    },
-
-    view(id, tab){
-        this.close();
-        document.getElementById("pane-"+id).style.display="flex";
-        if(tab) {
-            document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
-            tab.classList.add("active");
-        }
-    },
-
-    close(){ document.querySelectorAll(".drawer").forEach(d=>d.style.display="none"); },
-    stop(){ document.getElementById("video-frame").src=""; this.close(); },
-    loadType(t, tab){ 
-        this.view('home', tab);
-        document.getElementById('hero-slider').style.display = "none";
-        this.loadShelf(`discover/${t}`, "row-trending"); 
-        document.getElementById('row-series').innerHTML = "";
-        document.getElementById('shelf-2-title').innerText = "";
-    }
-};
+/* PWA */
+if('serviceWorker' in navigator){navigator.serviceWorker.register("sw.js");}
 </script>
+
 </body>
 </html>
