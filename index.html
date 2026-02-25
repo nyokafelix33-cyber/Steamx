@@ -19,7 +19,6 @@ body {
     padding: 10px;
 }
 
-/* Glow Animation */
 @keyframes glow {
     0% { text-shadow: 0 0 5px #00ff99, 0 0 20px #00ff99; }
     50% { text-shadow: 0 0 20px #00ff99, 0 0 50px #00ff99; }
@@ -28,7 +27,7 @@ body {
 
 .container {
     width: 100%;
-    max-width: 400px; /* Perfect for Android portrait */
+    max-width: 400px;
     padding: 15px;
 }
 
@@ -51,7 +50,6 @@ p {
     animation: glow 1.5s infinite alternate;
 }
 
-/* Button */
 .button {
     display: flex;
     align-items: center;
@@ -93,11 +91,10 @@ p {
 <div class="container">
     <h1>⚠️ FENG WORLD is Unavailable</h1>
     <p>Sorry, FENG WORLD is unavailable right now.</p>
-    <p>The developers are working tirelessly.</p>
+    <p>The developers are working on it. Thanks for your understanding.</p>
 
     <div id="countdown">Loading countdown...</div>
 
-    <!-- Gmail Button -->
     <a class="button" href="mailto:felixnyoka19@gmail.com" target="_blank">
         <img src="https://upload.wikimedia.org/wikipedia/commons/4/4e/Gmail_Icon.png">
         Reach out to us
@@ -107,25 +104,40 @@ p {
 </div>
 
 <script>
-// Countdown time: 2928 hours, 50 minutes, 50 seconds
-let totalSeconds = (2928 * 3600) + (50 * 60) + 50;
+// Countdown end time in seconds: 2928h 50m 50s from the moment page is first opened
+const DURATION_SECONDS = (2928 * 3600) + (50 * 60) + 50;
+
+// Check if we already have a countdownEnd stored in localStorage
+let countdownEnd = localStorage.getItem("fengworld_countdown_end");
+
+if (!countdownEnd) {
+    // If not, calculate the end timestamp (current time + duration)
+    countdownEnd = Date.now() + DURATION_SECONDS * 1000;
+    localStorage.setItem("fengworld_countdown_end", countdownEnd);
+} else {
+    countdownEnd = parseInt(countdownEnd);
+}
 
 function updateCountdown() {
-    let hours = Math.floor(totalSeconds / 3600);
-    let minutes = Math.floor((totalSeconds % 3600) / 60);
-    let seconds = totalSeconds % 60;
+    let remaining = Math.floor((countdownEnd - Date.now()) / 1000);
+    if (remaining < 0) remaining = 0;
+
+    let hours = Math.floor(remaining / 3600);
+    let minutes = Math.floor((remaining % 3600) / 60);
+    let seconds = remaining % 60;
 
     document.getElementById("countdown").innerHTML =
         `Web app will be live in ${hours}:${minutes.toString().padStart(2,'0')}:${seconds.toString().padStart(2,'0')} hrs`;
 
-    if (totalSeconds > 0) {
-        totalSeconds--;
-    } else {
+    if (remaining === 0) {
         document.getElementById("countdown").innerHTML = "🎉 FENG WORLD is LIVE!";
+        localStorage.removeItem("fengworld_countdown_end"); // optional: reset after live
     }
 }
 
+// Run immediately
 updateCountdown();
+// Update every second
 setInterval(updateCountdown, 1000);
 </script>
 
