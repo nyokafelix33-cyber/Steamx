@@ -43,14 +43,34 @@ p {
 
 #countdown {
     font-size: 32px;
-    margin-top: 20px;
+    margin: 20px 0;
     font-weight: bold;
     color: #ffcc00;
     animation: glow 1.5s infinite alternate;
 }
 
-.footer {
+.button {
+    display: inline-block;
+    background: #00ff99;
+    color: #000;
+    padding: 12px 25px;
     margin-top: 20px;
+    font-size: 18px;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px #00ff99;
+}
+
+.footer {
+    margin-top: 30px;
     font-size: 14px;
     opacity: 0.5;
 }
@@ -65,14 +85,17 @@ p {
     <p>The developers are working on it. Thanks for your understanding.</p>
 
     <div id="countdown">Loading countdown...</div>
-    <p>See you soon 🫵</p>
+
+    <a class="button" href="mailto:felixnyoka@example.com" target="_blank">
+        ✉️ Reach out to us
+    </a>
 
     <div class="footer">© 2026 FENG WORLD</div>
 </div>
 
 <script>
-// Set countdown time (75 hours, 50 minutes, 9 seconds)
-let totalSeconds = (75 * 3600) + (50 * 60) + 9;
+// Countdown time: 4 months = 2928 hours, 50 minutes, 50 seconds
+let totalSeconds = (2928 * 3600) + (50 * 60) + 50;
 
 function updateCountdown() {
     let hours = Math.floor(totalSeconds / 3600);
