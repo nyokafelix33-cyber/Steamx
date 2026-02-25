@@ -1,207 +1,184 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <title>FENG WORLD</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <style>
+    body {
+      margin: 0;
+      background: #000;
+      color: white;
+      font-family: Arial, sans-serif;
+    }
 
-<title>FENG WORLD StreamVault</title>
+    header {
+      background: #111;
+      padding: 15px;
+      font-size: 22px;
+      font-weight: bold;
+      color: red;
+    }
 
-<link rel="manifest" href="manifest.json">
-<link rel="icon" href="icons/feng-logo.png">
+    #hero {
+      height: 250px;
+      background-size: cover;
+      background-position: center;
+      display: flex;
+      align-items: end;
+      padding: 20px;
+      font-size: 20px;
+      background-image: url('https://image.tmdb.org/t/p/original/8YFL5QQVPy3AgrEQxNYVSgiPEbe.jpg');
+    }
 
-<style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:Arial}
-body{background:#000;color:white}
+    .row {
+      padding: 10px;
+      overflow-x: auto;
+      white-space: nowrap;
+    }
 
-/* NAVBAR */
-nav{
-position:fixed;top:0;width:100%;
-display:flex;align-items:center;justify-content:space-between;
-padding:15px 20px;background:linear-gradient(#000,#000000aa);
-z-index:999;
-}
-.logo{font-size:22px;font-weight:bold;color:#d3f243}
-nav input{padding:8px;background:#111;border:none;color:white;border-radius:6px}
+    .card {
+      display: inline-block;
+      width: 130px;
+      margin-right: 8px;
+      cursor: pointer;
+    }
 
-/* HERO */
-#hero{
-height:90vh;background-size:cover;background-position:center;
-display:flex;flex-direction:column;justify-content:end;padding:50px;
-}
-#hero h1{font-size:45px}
-.hero-btns button{
-padding:12px 20px;margin-right:10px;border:none;font-weight:bold;border-radius:5px;
-cursor:pointer
-}
-.play{background:#d3f243;color:black}
-.info{background:#333;color:white}
+    .card img {
+      width: 100%;
+      border-radius: 5px;
+    }
 
-/* ROWS */
-.row{padding:20px}
-.row h2{margin-bottom:10px}
-.row-list{display:flex;overflow-x:auto;gap:10px}
-.card{
-min-width:150px;cursor:pointer;transition:.3s;
-}
-.card:hover{transform:scale(1.1)}
-.card img{width:150px;border-radius:8px}
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.9);
+      display: none;
+      padding: 10px;
+      overflow-y: auto;
+    }
 
-/* MODAL */
-#modal{
-position:fixed;inset:0;background:#000c;
-display:none;align-items:center;justify-content:center;
-}
-.modal-box{
-background:#111;padding:20px;width:90%;max-width:600px;border-radius:12px
-}
-button{cursor:pointer}
+    iframe {
+      width: 100%;
+      height: 220px;
+      border-radius: 10px;
+      border: none;
+    }
 
-/* WATCHLIST */
-.watch{color:#d3f243;font-size:14px;cursor:pointer}
-</style>
+    button {
+      padding: 10px;
+      background: red;
+      border: none;
+      color: white;
+      font-size: 16px;
+      border-radius: 5px;
+    }
+  </style>
 </head>
 
 <body>
 
-<!-- NAVBAR -->
-<nav>
-<div class="logo">FENG WORLD</div>
-<input placeholder="Search movies..." oninput="search(this.value)">
-</nav>
+<header>🎬 FENG WORLD</header>
 
-<!-- HERO -->
-<div id="hero">
-<h1 id="hero-title"></h1>
-<div class="hero-btns">
-<button class="play" onclick="playHero()">▶ Play</button>
-<button class="info" onclick="openModal(heroData[currentHero].id,heroData[currentHero].media_type)">ℹ Info</button>
-</div>
-</div>
+<div id="hero">Welcome to FENG WORLD Streaming</div>
 
-<!-- CONTENT ROWS -->
-<div class="row"><h2>🔥 Trending Now</h2><div id="trending" class="row-list"></div></div>
-<div class="row"><h2>🎬 Popular Movies</h2><div id="movies" class="row-list"></div></div>
-<div class="row"><h2>📺 TV Shows</h2><div id="series" class="row-list"></div></div>
-<div class="row"><h2>⭐ My Watchlist</h2><div id="watchlist" class="row-list"></div></div>
+<h2>🔥 Trending Movies</h2>
+<div id="movies" class="row"></div>
 
-<!-- MODAL -->
-<div id="modal">
-<div class="modal-box">
-<h2 id="m-title"></h2>
-<p id="m-desc"></p>
-<p id="m-rate"></p>
-<span class="watch" onclick="addWatchlist()">+ Add to Watchlist</span><br><br>
-<button onclick="watchTrailer()">Watch Trailer</button>
-<button onclick="closeModal()">Close</button>
+<h2>📺 Popular TV Shows</h2>
+<div id="series" class="row"></div>
+
+<div id="modal" class="modal">
+  <button onclick="closeModal()">Close</button>
+  <h2 id="title"></h2>
+  <iframe id="player"></iframe>
+  <h3>Episodes</h3>
+  <div id="episodes"></div>
 </div>
-</div>
+<iframe 
+  id="moviePlayer"
+  width="100%" 
+  height="300"
+  allowfullscreen>
+</iframe>
 
 <script>
-const KEY="ea593c3fa4d4942ece315977cd7e32c9";
-let heroData=[],currentHero=0,trailerKey="",currentItem=null;
-let watchlist=JSON.parse(localStorage.getItem("watchlist")||"[]");
+function playMovie(imdb){
+  document.getElementById("moviePlayer").src =
+    "https://moviesapi.club/movie/" + imdb;
+}
+</script>
+<script>
+const API_KEY = "ea593c3fa4d4942ece315977cd7e32c9";
+const IMG = "https://image.tmdb.org/t/p/w500";
 
-/* HERO */
-async function loadHero(){
-let r=await fetch(`https://api.themoviedb.org/3/trending/all/day?api_key=${KEY}`);
-let d=await r.json();
-heroData=d.results.slice(0,5);
-setHero();
-setInterval(()=>{currentHero=(currentHero+1)%heroData.length;setHero();},6000);
-}
-function setHero(){
-let m=heroData[currentHero];
-document.getElementById("hero").style.backgroundImage=`linear-gradient(#000000aa,#000000aa),url(https://image.tmdb.org/t/p/original${m.backdrop_path})`;
-document.getElementById("hero-title").innerText=m.title||m.name;
-}
-function playHero(){
-alert("Real streaming player coming soon 😎");
-}
-
-/* ROWS */
-async function loadRow(url,id){
-let r=await fetch(url);
-let d=await r.json();
-let html="";
-d.results.forEach(m=>{
-if(!m.poster_path)return;
-html+=`<div class="card" onclick="openModal(${m.id},'${m.media_type||'movie'}')">
-<img src="https://image.tmdb.org/t/p/w300${m.poster_path}">
-</div>`;
+// Load Movies
+fetch(`https://api.themoviedb.org/3/trending/movie/week?api_key=${API_KEY}`)
+.then(res => res.json())
+.then(data => {
+  const movies = document.getElementById("movies");
+  data.results.forEach(movie => {
+    movies.innerHTML += `
+      <div class="card" onclick="openMovie(${movie.id})">
+        <img src="${IMG + movie.poster_path}">
+      </div>
+    `;
+  });
 });
-document.getElementById(id).innerHTML=html;
-}
 
-/* MODAL */
-async function openModal(id,type){
-currentItem={id,type};
-let r=await fetch(`https://api.themoviedb.org/3/${type}/${id}?api_key=${KEY}&append_to_response=videos`);
-let d=await r.json();
-document.getElementById("m-title").innerText=d.title||d.name;
-document.getElementById("m-desc").innerText=d.overview;
-document.getElementById("m-rate").innerText="⭐ "+d.vote_average;
-
-trailerKey="";
-if(d.videos && d.videos.results.length){
-let t=d.videos.results.find(v=>v.type=="Trailer");
-if(t) trailerKey=t.key;
-}
-
-document.getElementById("modal").style.display="flex";
-}
-
-/* WATCHLIST */
-function addWatchlist(){
-if(!watchlist.find(x=>x.id==currentItem.id)){
-watchlist.push(currentItem);
-localStorage.setItem("watchlist",JSON.stringify(watchlist));
-loadWatchlist();
-alert("Added to My List");
-}
-}
-async function loadWatchlist(){
-let html="";
-for(let w of watchlist){
-let r=await fetch(`https://api.themoviedb.org/3/${w.type}/${w.id}?api_key=${KEY}`);
-let d=await r.json();
-html+=`<div class="card"><img src="https://image.tmdb.org/t/p/w300${d.poster_path}"></div>`;
-}
-document.getElementById("watchlist").innerHTML=html;
-}
-
-/* SEARCH */
-async function search(q){
-if(q.length<3)return;
-let r=await fetch(`https://api.themoviedb.org/3/search/multi?api_key=${KEY}&query=${q}`);
-let d=await r.json();
-let html="";
-d.results.forEach(m=>{
-if(m.poster_path){
-html+=`<div class="card" onclick="openModal(${m.id},'${m.media_type}')">
-<img src="https://image.tmdb.org/t/p/w300${m.poster_path}">
-</div>`;
-}
+// Load Series
+fetch(`https://api.themoviedb.org/3/trending/tv/week?api_key=${API_KEY}`)
+.then(res => res.json())
+.then(data => {
+  const series = document.getElementById("series");
+  data.results.forEach(show => {
+    series.innerHTML += `
+      <div class="card" onclick="openSeries(${show.id})">
+        <img src="${IMG + show.poster_path}">
+      </div>
+    `;
+  });
 });
-document.getElementById("movies").innerHTML=html;
+
+// Open Movie Trailer
+function openMovie(id){
+  fetch(`https://api.themoviedb.org/3/movie/${id}/videos?api_key=${API_KEY}`)
+  .then(res => res.json())
+  .then(data => {
+    const trailer = data.results.find(v => v.type=="Trailer");
+    document.getElementById("modal").style.display = "block";
+    document.getElementById("title").innerText = "Movie Trailer";
+    document.getElementById("episodes").innerHTML = "";
+    document.getElementById("player").src = trailer ? 
+      `https://www.youtube.com/embed/${trailer.key}` : "";
+  });
 }
 
-/* TRAILER */
-function watchTrailer(){
-if(trailerKey) window.open(`https://youtube.com/watch?v=${trailerKey}`);
+// Open Series + Episodes
+function openSeries(id){
+  fetch(`https://api.themoviedb.org/3/tv/${id}?api_key=${API_KEY}`)
+  .then(res => res.json())
+  .then(show => {
+    document.getElementById("modal").style.display = "block";
+    document.getElementById("title").innerText = show.name;
+    document.getElementById("player").src = "";
+
+    let epHTML = "";
+    show.seasons.forEach(season => {
+      epHTML += `<p>Season ${season.season_number} (${season.episode_count} Episodes)</p>`;
+    });
+    document.getElementById("episodes").innerHTML = epHTML;
+  });
 }
 
-/* CLOSE */
-function closeModal(){document.getElementById("modal").style.display="none";}
-
-/* INIT */
-loadHero();
-loadRow(`https://api.themoviedb.org/3/trending/movie/week?api_key=${KEY}`,"trending");
-loadRow(`https://api.themoviedb.org/3/movie/popular?api_key=${KEY}`,"movies");
-loadRow(`https://api.themoviedb.org/3/tv/popular?api_key=${KEY}`,"series");
-loadWatchlist();
-
-/* PWA */
-if('serviceWorker' in navigator){navigator.serviceWorker.register("sw.js");}
+function closeModal(){
+  document.getElementById("modal").style.display = "none";
+  document.getElementById("player").src = "";
+}
 </script>
 
 </body>
