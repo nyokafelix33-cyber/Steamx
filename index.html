@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>FENG WORLD - Coming Soon</title>
 
 <style>
@@ -14,8 +14,9 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    min-height: 100vh;
     text-align: center;
+    padding: 10px;
 }
 
 /* Glow Animation */
@@ -26,36 +27,41 @@ body {
 }
 
 .container {
-    max-width: 600px;
-    padding: 20px;
+    width: 100%;
+    max-width: 400px; /* Perfect for Android portrait */
+    padding: 15px;
 }
 
 h1 {
-    font-size: 36px;
+    font-size: 26px;
     color: #00ff99;
     animation: glow 2s infinite alternate;
 }
 
 p {
-    font-size: 18px;
+    font-size: 14px;
     opacity: 0.85;
 }
 
 #countdown {
-    font-size: 32px;
-    margin: 20px 0;
+    font-size: 22px;
+    margin: 15px 0;
     font-weight: bold;
     color: #ffcc00;
     animation: glow 1.5s infinite alternate;
 }
 
+/* Button */
 .button {
-    display: inline-block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
     background: #00ff99;
     color: #000;
-    padding: 12px 25px;
-    margin-top: 20px;
-    font-size: 18px;
+    padding: 12px;
+    width: 100%;
+    font-size: 16px;
     font-weight: bold;
     border: none;
     border-radius: 8px;
@@ -65,13 +71,18 @@ p {
 }
 
 .button:hover {
-    transform: scale(1.05);
+    transform: scale(1.03);
     box-shadow: 0 0 20px #00ff99;
 }
 
+.button img {
+    width: 20px;
+    height: 20px;
+}
+
 .footer {
-    margin-top: 30px;
-    font-size: 14px;
+    margin-top: 20px;
+    font-size: 12px;
     opacity: 0.5;
 }
 </style>
@@ -82,19 +93,21 @@ p {
 <div class="container">
     <h1>⚠️ FENG WORLD is Unavailable</h1>
     <p>Sorry, FENG WORLD is unavailable right now.</p>
-    <p>The developers are working on it. Thanks for your understanding.</p>
+    <p>The developers are working tirelessly.</p>
 
     <div id="countdown">Loading countdown...</div>
 
-    <a class="button" href="mailto:felixnyoka@example.com" target="_blank">
-        ✉️ Reach out to us
+    <!-- Gmail Button -->
+    <a class="button" href="mailto:felixnyoka19@gmail.com" target="_blank">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/4/4e/Gmail_Icon.png">
+        Reach out to us
     </a>
 
     <div class="footer">© 2026 FENG WORLD</div>
 </div>
 
 <script>
-// Countdown time: 4 months = 2928 hours, 50 minutes, 50 seconds
+// Countdown time: 2928 hours, 50 minutes, 50 seconds
 let totalSeconds = (2928 * 3600) + (50 * 60) + 50;
 
 function updateCountdown() {
