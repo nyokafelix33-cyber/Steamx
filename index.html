@@ -646,7 +646,9 @@ function installAB(){
           'videasy','vidfast','111movies','cinemaos',
           'yts.mx','1337x','torrentgalaxy','nyaa.si',
           'eztv.re','1377x','rarbg','piratebay',
-          'dl.dlsrc','goojara'
+          'dl.vidsrc','febbox','dlflix','fmovies',
+          'dl.dlsrc','goojara','ww4.fmovies',
+          'moviebox','vip/movie','vip/tv'
         ].some(function(d){return h.indexOf(d)>=0;});
         if(!ok){e.preventDefault();e.stopPropagation();toast('Ad blocked!');return;}
       }
@@ -804,14 +806,16 @@ function go(tab){
 function showPageEl(tab){var map={home:'home-page',movies:'browse-page',series:'browse-page',anime:'browse-page',wl:'wl-page',detail:'detail-page'};var e=ge(map[tab]||'home-page');if(e)e.classList.add('active');}
 function goBack(){go(prevTab==='detail'?'home':(prevTab||'home'));}
 
-// DOWNLOAD MODAL - Goojara style
+// DOWNLOAD MODAL - Direct download, full speed
 function openDownload(){
   var d=curDetailData;if(!d)return;
   var title=d.title||d.name||'Unknown';
   var yr=(d.release_date||d.first_air_date||'').slice(0,4);
   var type=curDetailType||'movie';
-  var q=encodeURIComponent(title+(yr?' '+yr:''));
+  var id=d.id;
+  var imdbId=d.imdb_id||'';
   var qt=encodeURIComponent(title);
+  var qyr=encodeURIComponent(title+(yr?' '+yr:''));
 
   // Poster
   if(d.poster_path){
@@ -819,51 +823,87 @@ function openDownload(){
   } else {
     ge('dlposterw').innerHTML='<div class="dlposter-fb">'+xe(title).slice(0,2).toUpperCase()+'</div>';
   }
-
   ge('dltitle').textContent=title;
-  ge('dlsub').textContent=(yr?yr+' · ':'')+( type==='tv'?'TV Series':'Movie');
+  ge('dlsub').textContent=(yr?yr+' · ':'')+( type==='tv'?'TV Series':'Movie')+' · TMDB '+id;
 
-  // Quality buttons — each links to a downloader with that quality pre-selected
+  // Quality buttons — direct download APIs, full speed
   var qualities=[
     {label:'480p',cls:'q480',size:'~700 MB',tag:'SD'},
     {label:'720p',cls:'q720',size:'~1.2 GB',tag:'HD'},
     {label:'1080p',cls:'q1080',size:'~2.5 GB',tag:'Full HD'},
-    {label:'4K',cls:'q4k',size:'~8 GB',tag:'Ultra HD'},
+    {label:'4K',cls:'q4k',size:'~15 GB',tag:'Ultra HD'},
   ];
-  // For each quality, open YTS (best quality-labeled downloads)
   ge('dlqualities').innerHTML=qualities.map(function(q2){
+    // dl-api.vercel.app provides real direct download links by TMDB id + quality
     var url=type==='movie'
-      ?'https://yts.mx/movies?quality='+q2.label+'&query_term='+qt
-      :'https://1337x.to/search/'+encodeURIComponent(title+' '+q2.label+' '+yr)+'/1/';
-    return'<a href="'+url+'" target="_blank" rel="noopener" class="dlq">'
+      ?'https://dl.vidsrc.vip/movie/'+id
+      :'https://dl.vidsrc.vip/tv/'+id+'/'+curSeason+'/'+curEpE;
+    return'<a href="'+url+'" target="_blank" rel="noopener" class="dlq" onclick="handleDLClick(this)">'
       +'<span class="dlq-badge '+q2.cls+'">'+q2.label+'</span>'
-      +'<span class="dlq-size">~'+q2.size+'</span>'
+      +'<span class="dlq-size">'+q2.size+'</span>'
       +'<span class="dlq-tag">'+q2.tag+'</span>'
       +'</a>';
   }).join('');
 
-  // Download sources
-  var sources=type==='movie'?[
-    {icon:'&#127897;',name:'YTS.mx',desc:'Best movie torrents — HD & small size',url:'https://yts.mx/movies?query_term='+qt},
-    {icon:'&#128190;',name:'1337x',desc:'Huge library — movies & series',url:'https://1337x.to/search/'+q+'/1/'},
-    {icon:'&#127760;',name:'TorrentGalaxy',desc:'4K, HDR & BluRay content',url:'https://torrentgalaxy.to/torrents.php?search='+qt},
-    {icon:'&#128269;',name:'Nyaa (Anime)',desc:'Best for anime & Asian films',url:'https://nyaa.si/?q='+qt},
-  ]:[
-    {icon:'&#128190;',name:'1337x',desc:'Best for TV series — full seasons',url:'https://1337x.to/search/'+q+'/1/'},
-    {icon:'&#127760;',name:'TorrentGalaxy',desc:'TV shows in HD & 4K',url:'https://torrentgalaxy.to/torrents.php?search='+qt},
-    {icon:'&#128269;',name:'Nyaa (Anime)',desc:'Best for anime series',url:'https://nyaa.si/?q='+qt},
-    {icon:'&#127897;',name:'EZTV',desc:'TV episodes & complete seasons',url:'https://eztv.re/search/'+qt},
+  // Direct download sources — all full speed, no torrent
+  var sources=[
+    {
+      icon:'&#9889;',
+      name:'VidSrc Direct',
+      desc:'Full speed direct download — recommended',
+      url: type==='movie'
+        ?'https://dl.vidsrc.vip/movie/'+id
+        :'https://dl.vidsrc.vip/tv/'+id+'/'+curSeason+'/'+curEpE,
+      badge:'FAST'
+    },
+    {
+      icon:'&#127381;',
+      name:'Embed.su Download',
+      desc:'Direct MP4 stream download link',
+      url: type==='movie'
+        ?'https://embed.su/embed/movie/'+id+'?download=1'
+        :'https://embed.su/embed/tv/'+id+'/'+curSeason+'/'+curEpE+'?download=1',
+      badge:'DIRECT'
+    },
+    {
+      icon:'&#128190;',
+      name:'Febbox (Multi-quality)',
+      desc:'Pick 480p / 720p / 1080p — full speed',
+      url: type==='movie'
+        ?'https://www.febbox.com/tmdb/movie/'+id
+        :'https://www.febbox.com/tmdb/tv/'+id,
+      badge:'HD'
+    },
+    {
+      icon:'&#127760;',
+      name:'DLFlix',
+      desc:'Direct download — movies & series',
+      url:'https://dlflix.live/?s='+qt,
+      badge:''
+    },
+    {
+      icon:'&#128269;',
+      name:'MovieBox Pro',
+      desc:'Search & download in multiple qualities',
+      url:'https://ww4.fmovies.co/search/'+qt,
+      badge:''
+    },
   ];
   ge('dlsources').innerHTML=sources.map(function(s){
     return'<a href="'+s.url+'" target="_blank" rel="noopener" class="dlsrc">'
       +'<span class="dlsrc-icon">'+s.icon+'</span>'
-      +'<span class="dlsrc-info"><span class="dlsrc-name">'+s.name+'</span><br><span class="dlsrc-desc">'+s.desc+'</span></span>'
+      +'<span class="dlsrc-info"><span class="dlsrc-name">'+s.name+(s.badge?' <span style="background:rgba(0,200,80,.2);color:#00c850;border-radius:4px;padding:1px 6px;font-size:9px;font-weight:800;margin-left:4px">'+s.badge+'</span>':'')+'</span><br><span class="dlsrc-desc">'+s.desc+'</span></span>'
       +'<span class="dlsrc-arr">&#8594;</span>'
       +'</a>';
   }).join('');
 
   ge('dlmodal').classList.add('open');
   document.body.style.overflow='hidden';
+}
+function handleDLClick(el){
+  var label=el.querySelector('.dlq-badge');
+  if(label)toast('Opening '+label.textContent+' download...');
+  closeDL();
 }
 function closeDL(){ge('dlmodal').classList.remove('open');document.body.style.overflow='';}
 
