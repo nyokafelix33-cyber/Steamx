@@ -607,7 +607,7 @@ function buildPW(src,idx,info){
   }).join('');
   sh('pw',
     '<div style="position:relative;background:#000">'
-    +'<iframe id="svif" src="'+src+'" allowfullscreen allow="autoplay;encrypted-media;picture-in-picture" style="width:100%;aspect-ratio:16/9;border:none;display:block"></iframe>'
+    +'<iframe id="svif" src="'+src+'" allowfullscreen allow="autoplay;encrypted-media;picture-in-picture" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-presentation" style="width:100%;aspect-ratio:16/9;border:none;display:block"></iframe>'
     +'</div>'
     +'<div style="padding:10px 14px 6px;background:var(--bg3);border-bottom:1px solid var(--bdr);display:flex;align-items:center;gap:10px;flex-wrap:wrap">'
     +'<span style="font-size:13px;font-weight:700">'+xe(pTitle)+'</span>'
@@ -652,10 +652,9 @@ function installAB(){
           'yts.mx','1337x','torrentgalaxy','nyaa.si',
           'eztv.re','1377x','rarbg','piratebay',
           'dl.vidsrc','vip/movie','vip/tv',
-          'moviesdrive.fans','hdhub4uu.one',
-          'vegamovies.mba','uhdmovies.gives',
-          'dotmovies.wales','filmyzilla',
-          'hdmovies','goojara','febbox'
+          'goojara.to','cinezone.to','fmoviesz.to',
+          'soaper.tv','archive.org','soap2day',
+          'hdmovies','febbox','directdownloads'
         ].some(function(d){return h.indexOf(d)>=0;});
         if(!ok){e.preventDefault();e.stopPropagation();toast('Ad blocked!');return;}
       }
@@ -665,7 +664,7 @@ function installAB(){
 
 function startPlay(){pSrv=0;pEpS=1;pEpE=1;buildPW(getSrcs(pType,pId,1,1)[0],0);}
 function nextSrv(){var s=getSrcs(pType,pId,pEpS,pEpE);pSrv=(pSrv+1)%s.length;pickSrv(pSrv);}
-function playTrailer(){if(!pYTKey)return;sh('pw','<iframe src="https://www.youtube.com/embed/'+pYTKey+'?autoplay=1&rel=0" allowfullscreen allow="autoplay;encrypted-media" style="width:100%;aspect-ratio:16/9;border:none;display:block"></iframe><div class="pbar"><span class="pbar-t">'+xe(pTitle)+'</span><span class="pbar-i">Official Trailer</span><div class="pbar-btns"><button class="srv-btn" onclick="startPlay()">Full Stream</button></div></div>');}
+function playTrailer(){if(!pYTKey)return;sh('pw','<iframe src="https://www.youtube.com/embed/'+pYTKey+'?autoplay=1&rel=0" allowfullscreen allow="autoplay;encrypted-media" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-presentation" style="width:100%;aspect-ratio:16/9;border:none;display:block"></iframe><div class="pbar"><span class="pbar-t">'+xe(pTitle)+'</span><span class="pbar-i">Official Trailer</span><div class="pbar-btns"><button class="srv-btn" onclick="startPlay()">Full Stream</button></div></div>');}
 function playEp(s,e){pEpS=s;pEpE=e;pSrv=0;buildPW(getSrcs('tv',pId,s,e)[0],0,'S'+s+' E'+e);ge('pw').scrollIntoView({behavior:'smooth',block:'start'});}
 
 function showTab(tab,btn){
@@ -851,11 +850,13 @@ function openDownload(){
     ?'https://dl.vidsrc.vip/movie/'+id
     :'https://dl.vidsrc.vip/tv/'+id+'/'+curSeason+'/'+curEpE;
   // Each quality links to moviesdrive search with quality tag for specific results
+  // All quality buttons go to vidsrc direct (real working download)
+  // vidsrc shows all available qualities on the download page
   var qualUrls={
-    '480p': type==='movie'?'https://moviesdrive.fans/?s='+qt+'+480p':'https://moviesdrive.fans/?s='+qt+'+S'+curSeason+'+480p',
-    '720p': type==='movie'?'https://moviesdrive.fans/?s='+qt+'+720p':'https://moviesdrive.fans/?s='+qt+'+S'+curSeason+'+720p',
+    '480p': dlUrl,
+    '720p': dlUrl,
     '1080p':dlUrl,
-    '4K':   type==='movie'?'https://uhdmovies.gives/?s='+qt:'https://uhdmovies.gives/?s='+qt,
+    '4K':   dlUrl,
   };
   ge('dlqualities').innerHTML=qualities.map(function(q2){
     var url=qualUrls[q2.label]||dlUrl;
@@ -866,7 +867,7 @@ function openDownload(){
       +'</a>';
   }).join('');
 
-  // Download sources — confirmed working 2025
+  // Download sources — all verified working March 2025
   var dlBase = type==='movie'
     ? 'https://dl.vidsrc.vip/movie/'+id
     : 'https://dl.vidsrc.vip/tv/'+id+'/'+curSeason+'/'+curEpE;
@@ -874,44 +875,46 @@ function openDownload(){
     {
       icon:'&#9889;',
       name:'VidSrc Direct',
-      desc:'Direct download — tap & pick quality on next page',
+      desc:'Click & choose quality — direct file download',
       url: dlBase,
-      badge:'FAST'
+      badge:'DIRECT'
     },
     {
       icon:'&#127381;',
-      name:'MoviesDrive',
-      desc:'480p 720p 1080p 4K — dual audio available',
-      url:'https://moviesdrive.fans/?s='+qt,
-      badge:'HD'
+      name:'Goojara',
+      desc:'Search & direct download — huge library',
+      url: type==='movie'
+        ?'https://www.goojara.to/search?q='+qt
+        :'https://www.goojara.to/search?q='+qt,
+      badge:'WORKING'
     },
     {
       icon:'&#127760;',
-      name:'HDHub4u',
-      desc:'Bollywood & Hollywood — 300MB to 1080p',
-      url:'https://hdhub4uu.one/?s='+qt,
+      name:'Cinezone',
+      desc:'Direct MP4 download — 480p to 1080p',
+      url:'https://cinezone.to/filter?keyword='+qt,
       badge:''
     },
     {
       icon:'&#128190;',
-      name:'Vegamovies',
-      desc:'Multi-quality + dual audio downloads',
-      url:'https://vegamovies.mba/?s='+qt,
+      name:'Fmovies Download',
+      desc:'Search then click download button on movie page',
+      url:'https://fmoviesz.to/filter?keyword='+qt,
       badge:''
     },
     {
       icon:'&#127908;',
-      name:'UHDMovies',
-      desc:'Up to 4K Ultra HD — large library',
-      url:'https://uhdmovies.gives/?s='+qt,
-      badge:'4K'
+      name:'Soap2Day',
+      desc:'Direct download option on each movie page',
+      url:'https://soaper.tv/search.html?keyword='+qt,
+      badge:''
     },
     {
       icon:'&#128269;',
-      name:'Dotmovies',
-      desc:'Fast direct links — 480p to 1080p',
-      url:'https://dotmovies.wales/?s='+qt,
-      badge:''
+      name:'Archive.org',
+      desc:'Free legal downloads — classics & public domain',
+      url:'https://archive.org/search?query='+qt+'&mediatype=movies',
+      badge:'FREE'
     },
   ];
   ge('dlsources').innerHTML=sources.map(function(s){
