@@ -607,7 +607,7 @@ function buildPW(src,idx,info){
   }).join('');
   sh('pw',
     '<div style="position:relative;background:#000">'
-    +'<iframe id="svif" src="'+src+'" allowfullscreen allow="autoplay;encrypted-media;picture-in-picture" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-presentation" style="width:100%;aspect-ratio:16/9;border:none;display:block"></iframe>'
+    +'<iframe id="svif" src="'+src+'" allowfullscreen allow="autoplay;encrypted-media;picture-in-picture" style="width:100%;aspect-ratio:16/9;border:none;display:block"></iframe>'
     +'</div>'
     +'<div style="padding:10px 14px 6px;background:var(--bg3);border-bottom:1px solid var(--bdr);display:flex;align-items:center;gap:10px;flex-wrap:wrap">'
     +'<span style="font-size:13px;font-weight:700">'+xe(pTitle)+'</span>'
@@ -633,29 +633,29 @@ function pickSrv(idx){
 
 function installAB(){
   if(window._abOn)return;window._abOn=true;
+
+  // Block popup ads
   var orig=window.open;
   window.open=function(url){
     if(!url)return null;
-    var safe=['youtube.com','youtu.be','themoviedb','tmdb.org'];
+    var safe=['youtube.com','youtu.be','themoviedb','tmdb.org','vidsrc','vidlink','videasy','vidfast','embed.su','multiembed','111movies','cinemaos','goojara','cinezone','fmoviesz','soaper','archive.org'];
     if(safe.some(function(d){return url.indexOf(d)>=0;}))return orig.apply(window,arguments);
     toast('Ad blocked!');return{closed:false,close:function(){},focus:function(){}};
   };
+
+  // KEY FIX: block page redirect away when iframe tries to navigate top
+  window.addEventListener('beforeunload',function(e){
+    if(window._allowNav)return;
+    e.preventDefault();e.returnValue='';return'';
+  });
+
+  // Block _blank ad links, allow download sites
   document.addEventListener('click',function(e){
     var t=e.target;
     for(var i=0;i<8&&t&&t!==document;i++,t=t.parentElement){
       if(t.tagName==='A'&&t.target==='_blank'){
         var h=t.getAttribute('href')||'';
-        var ok=[
-          'youtube','youtu.be','themoviedb','tmdb',
-          'vidsrc','embed.su','multiembed','vidlink',
-          'videasy','vidfast','111movies','cinemaos',
-          'yts.mx','1337x','torrentgalaxy','nyaa.si',
-          'eztv.re','1377x','rarbg','piratebay',
-          'dl.vidsrc','vip/movie','vip/tv',
-          'goojara.to','cinezone.to','fmoviesz.to',
-          'soaper.tv','archive.org','soap2day',
-          'hdmovies','febbox','directdownloads'
-        ].some(function(d){return h.indexOf(d)>=0;});
+        var ok=['youtube','youtu.be','themoviedb','tmdb','vidsrc','embed.su','multiembed','vidlink','videasy','vidfast','111movies','cinemaos','goojara','cinezone','fmoviesz','soaper','archive.org','dl.vidsrc'].some(function(d){return h.indexOf(d)>=0;});
         if(!ok){e.preventDefault();e.stopPropagation();toast('Ad blocked!');return;}
       }
     }
@@ -664,7 +664,7 @@ function installAB(){
 
 function startPlay(){pSrv=0;pEpS=1;pEpE=1;buildPW(getSrcs(pType,pId,1,1)[0],0);}
 function nextSrv(){var s=getSrcs(pType,pId,pEpS,pEpE);pSrv=(pSrv+1)%s.length;pickSrv(pSrv);}
-function playTrailer(){if(!pYTKey)return;sh('pw','<iframe src="https://www.youtube.com/embed/'+pYTKey+'?autoplay=1&rel=0" allowfullscreen allow="autoplay;encrypted-media" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-presentation" style="width:100%;aspect-ratio:16/9;border:none;display:block"></iframe><div class="pbar"><span class="pbar-t">'+xe(pTitle)+'</span><span class="pbar-i">Official Trailer</span><div class="pbar-btns"><button class="srv-btn" onclick="startPlay()">Full Stream</button></div></div>');}
+function playTrailer(){if(!pYTKey)return;sh('pw','<iframe src="https://www.youtube.com/embed/'+pYTKey+'?autoplay=1&rel=0" allowfullscreen allow="autoplay;encrypted-media" style="width:100%;aspect-ratio:16/9;border:none;display:block"></iframe><div class="pbar"><span class="pbar-t">'+xe(pTitle)+'</span><span class="pbar-i">Official Trailer</span><div class="pbar-btns"><button class="srv-btn" onclick="startPlay()">Full Stream</button></div></div>');}
 function playEp(s,e){pEpS=s;pEpE=e;pSrv=0;buildPW(getSrcs('tv',pId,s,e)[0],0,'S'+s+' E'+e);ge('pw').scrollIntoView({behavior:'smooth',block:'start'});}
 
 function showTab(tab,btn){
@@ -860,7 +860,7 @@ function openDownload(){
   };
   ge('dlqualities').innerHTML=qualities.map(function(q2){
     var url=qualUrls[q2.label]||dlUrl;
-    return'<a href="'+url+'" target="_blank" rel="noopener" class="dlq" onclick="handleDLClick(this)">'
+    return'<a href="'+url+'" target="_blank" rel="noopener" class="dlq" onclick="window._allowNav=true;setTimeout(function(){window._allowNav=false;},2000);handleDLClick(this)">'
       +'<span class="dlq-badge '+q2.cls+'">'+q2.label+'</span>'
       +'<span class="dlq-size">'+q2.size+'</span>'
       +'<span class="dlq-tag">'+q2.tag+'</span>'
@@ -918,7 +918,7 @@ function openDownload(){
     },
   ];
   ge('dlsources').innerHTML=sources.map(function(s){
-    return'<a href="'+s.url+'" target="_blank" rel="noopener" class="dlsrc">'
+    return'<a href="'+s.url+'" target="_blank" rel="noopener" class="dlsrc" onclick="window._allowNav=true;setTimeout(function(){window._allowNav=false;},2000)">'
       +'<span class="dlsrc-icon">'+s.icon+'</span>'
       +'<span class="dlsrc-info"><span class="dlsrc-name">'+s.name+(s.badge?' <span style="background:rgba(0,200,80,.2);color:#00c850;border-radius:4px;padding:1px 6px;font-size:9px;font-weight:800;margin-left:4px">'+s.badge+'</span>':'')+'</span><br><span class="dlsrc-desc">'+s.desc+'</span></span>'
       +'<span class="dlsrc-arr">&#8594;</span>'
