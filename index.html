@@ -413,8 +413,7 @@ function show(id){ var e=el(id); if(e) e.style.display='block'; }
 function hide(id){ var e=el(id); if(e) e.style.display='none'; }
 function html(id,h){ var e=el(id); if(e) e.innerHTML=h; }
 
-window.addEventListener('scroll', function(){ el('nav').classList.toggle('bg', scrollY > 30); });
-document.addEventListener('keydown', function(e){ if(e.key==='Escape' && curTab==='detail') goBack(); });
+// event listeners are set up inside DOMContentLoaded below
 
 // ─── API ───────────────────────────────────────────────────────────────────
 async function tmdb(path) {
@@ -426,35 +425,45 @@ async function tmdb(path) {
 }
 
 // ─── INIT ──────────────────────────────────────────────────────────────────
-(async function init() {
+// Runs after DOM is fully ready
+document.addEventListener('DOMContentLoaded', function() {
+  // Event listeners
+  window.addEventListener('scroll', function(){ el('nav').classList.toggle('bg', scrollY > 30); });
+  document.addEventListener('keydown', function(e){ if(e.key==='Escape' && curTab==='detail') goBack(); });
+
+  // STEP 1: Show seed data INSTANTLY — no API wait
   heroItems = SEED_TRENDING;
   setHero(0);
   renderHome({ trending:SEED_TRENDING, popular:SEED_MOVIES, topRated:SEED_TOP, tv:SEED_TV, anime:SEED_ANIME, animation:SEED_ANIM });
 
-  var results = await Promise.all([
-    tmdb('/trending/all/week'),
-    tmdb('/movie/popular'),
-    tmdb('/movie/top_rated'),
-    tmdb('/tv/popular'),
-    tmdb('/discover/tv?with_genres=16&sort_by=popularity.desc'),
-    tmdb('/movie/upcoming'),
-  ]);
-  var tr=results[0], pop=results[1], top=results[2], tv=results[3], ani=results[4], up=results[5];
-  if (tr && tr.results && tr.results.length) {
-    heroItems = tr.results.filter(function(i){ return i.backdrop_path; }).slice(0,7);
-    setHero(0);
-  }
-  var animLive = await tmdb('/discover/tv?with_genres=16&sort_by=vote_average.desc&vote_count.gte=200');
-  renderHome({
-    trending: (tr&&tr.results) ? tr.results : SEED_TRENDING,
-    popular: (pop&&pop.results) ? pop.results : SEED_MOVIES,
-    topRated: (top&&top.results) ? top.results : SEED_TOP,
-    tv: (tv&&tv.results) ? tv.results : SEED_TV,
-    anime: (ani&&ani.results) ? ani.results : SEED_ANIME,
-    animation: (animLive&&animLive.results) ? animLive.results : SEED_ANIM,
-    upcoming: (up&&up.results) ? up.results : [],
-  });
-})();
+  // STEP 2: Upgrade with live API data in background
+  (async function() {
+    try {
+      var results = await Promise.all([
+        tmdb('/trending/all/week'),
+        tmdb('/movie/popular'),
+        tmdb('/movie/top_rated'),
+        tmdb('/tv/popular'),
+        tmdb('/discover/tv?with_genres=16&sort_by=popularity.desc'),
+        tmdb('/movie/upcoming'),
+      ]);
+      var tr=results[0], pop=results[1], top=results[2], tv=results[3], ani=results[4], up=results[5];
+      if (tr && tr.results && tr.results.length) {
+        heroItems = tr.results.filter(function(i){ return i.backdrop_path; }).slice(0,7);
+        setHero(0);
+      }
+      renderHome({
+        trending: (tr&&tr.results) ? tr.results : SEED_TRENDING,
+        popular: (pop&&pop.results) ? pop.results : SEED_MOVIES,
+        topRated: (top&&top.results) ? top.results : SEED_TOP,
+        tv: (tv&&tv.results) ? tv.results : SEED_TV,
+        anime: (ani&&ani.results) ? ani.results : SEED_ANIME,
+        animation: SEED_ANIM,
+        upcoming: (up&&up.results) ? up.results : [],
+      });
+    } catch(e) { /* seed data already showing, API failed silently */ }
+  })();
+});
 
 // ─── HERO ──────────────────────────────────────────────────────────────────
 function setHero(i) {
@@ -513,11 +522,12 @@ function renderHome(d) {
 
 // ─── WIDE CARD ─────────────────────────────────────────────────────────────
 function wCard(it) {
+  var id = regItem(it);
   var title = it.title||it.name||'';
   var yr = (it.release_date||it.first_air_date||'').slice(0,4);
   var type = it.media_type||(it.first_air_date?'tv':'movie');
   var bgimg = it.backdrop_path ? img(it.backdrop_path,'w780') : img(it.poster_path,'w500');
-  return '<div class="wcard" onclick="openDetail('+it.id+',\''+type+'\',false)">'
+  return '<div class="wcard" onclick="openDetail('+id+',\''+type+'\',false)">'
     + (bgimg ? '<img src="'+bgimg+'" loading="lazy" onerror="this.style.display=\'none\'">' : '')
     + '<div class="wcfade"></div>'
     + '<div class="wcbody"><div class="wctitle">'+esc(title)+'</div>'
@@ -525,8 +535,16 @@ function wCard(it) {
     + '</div></div>';
 }
 
+// ─── ITEM REGISTRY (avoids inline-arg quoting bugs) ───────────────────────
+var ITEM_REG = {};
+function regItem(it) {
+  ITEM_REG[it.id] = it;
+  return it.id;
+}
+
 // ─── POSTER CARD ───────────────────────────────────────────────────────────
 function pCard(it) {
+  var id = regItem(it);
   var title = it.title||it.name||'';
   var yr = (it.release_date||it.first_air_date||'').slice(0,4);
   var rating = it.vote_average ? it.vote_average.toFixed(1) : '';
@@ -534,19 +552,19 @@ function pCard(it) {
   var inWL = WL.find(function(x){ return x.id===it.id; });
   var imgSrc = it.poster_path ? img(it.poster_path,'w500') : '';
   var safeTitle = esc(title);
-  var wlArgs = it.id+",'"+type+"','"+esc(title)+"','"+it.poster_path+"','"+it.backdrop_path+"',"+it.vote_average;
-  return '<div class="card" onclick="openDetail('+it.id+',\''+type+'\',false)">'
+  return '<div class="card" onclick="openDetail('+id+',\''+type+'\',false)">'
     + '<div class="cposter">'
     + (imgSrc ? '<img class="cimg" src="'+imgSrc+'" alt="'+safeTitle+'" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">' : '')
     + '<div class="cfb" style="'+(imgSrc?'display:none':'')+'">'+title.slice(0,2).toUpperCase()+'</div>'
     + (rating ? '<div class="cscore">★ '+rating+'</div>' : '')
-    + '<div class="chov"><button class="cplaybtn" onclick="event.stopPropagation();openDetail('+it.id+',\''+type+'\',true)">▶</button></div>'
-    + '<button class="cwl'+(inWL?' on':'')+'" onclick="event.stopPropagation();wlArgs('+wlArgs+')">'+(inWL?'✓':'＋')+'</button>'
+    + '<div class="chov"><button class="cplaybtn" onclick="event.stopPropagation();openDetail('+id+',\''+type+'\',true)">▶</button></div>'
+    + '<button class="cwl'+(inWL?' on':'')+'" onclick="event.stopPropagation();toggleWLById('+id+')"><span>'+(inWL?'✓':'＋')+'</span></button>'
     + '</div>'
     + '<div class="cname">'+safeTitle+'</div>'
     + (yr ? '<div class="cyr">'+yr+'</div>' : '')
     + '</div>';
 }
+
 
 function esc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 
@@ -868,6 +886,11 @@ function toggleWL(it) {
 
 function wlArgs(id,type,title,poster,backdrop,rating) {
   toggleWL({id:id,media_type:type,title:title,name:title,poster_path:poster,backdrop_path:backdrop,vote_average:parseFloat(rating)||0});
+}
+
+function toggleWLById(id) {
+  var it = ITEM_REG[id];
+  if (it) toggleWL(it);
 }
 
 function toggleDetailWL() {
