@@ -640,7 +640,14 @@ function installAB(){
     for(var i=0;i<8&&t&&t!==document;i++,t=t.parentElement){
       if(t.tagName==='A'&&t.target==='_blank'){
         var h=t.getAttribute('href')||'';
-        var ok=['youtube','youtu.be','themoviedb','tmdb','vidsrc','embed.su','multiembed'].some(function(d){return h.indexOf(d)>=0;});
+        var ok=[
+          'youtube','youtu.be','themoviedb','tmdb',
+          'vidsrc','embed.su','multiembed','vidlink',
+          'videasy','vidfast','111movies','cinemaos',
+          'yts.mx','1337x','torrentgalaxy','nyaa.si',
+          'eztv.re','1377x','rarbg','piratebay',
+          'dl.dlsrc','goojara'
+        ].some(function(d){return h.indexOf(d)>=0;});
         if(!ok){e.preventDefault();e.stopPropagation();toast('Ad blocked!');return;}
       }
     }
