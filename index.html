@@ -352,7 +352,7 @@ var curTab='home',prevTab='home';
 var curBrowse='movies',curFilter='popular',curPage=1;
 var searchTimer,curDetailId,curDetailType,curDetailData,curSeason=1;
 var pYTKey=null,pTitle='',pType='',pId=0,pSrv=0,pEpS=1,pEpE=1;
-var SRVN=['VidSrc.to','VidSrc.xyz','EmbedSU','MultiEmbed'];
+var SRVN=['Vidlink','Videasy','VidSrc.cc','Vidfast','111Movies','VidSrc.wtf','CinemaOS','MultiEmbed','VidSrc.xyz','EmbedSU','VidSrc.to'];
 
 function tmdb(path){
   var sep=path.indexOf('?')>=0?'&':'?';
@@ -492,25 +492,74 @@ function buildDetail(d,type,autoPlay){
   pYTKey=trl?trl.key:null;pTitle=title;pType=type;pId=d.id;pSrv=0;pEpS=1;pEpE=1;
   var ppH='<div class="pph" onclick="startPlay()">';
   if(pYTKey)ppH+='<img class="pthumb" src="https://img.youtube.com/vi/'+pYTKey+'/maxresdefault.jpg" onerror="this.style.display=\'none\'">';
-  ppH+='<div class="pbig" style="position:relative;z-index:2">&#9654;</div><div class="plbl" style="position:relative;z-index:2">Watch '+xe(title)+'</div><div class="psub" style="position:relative;z-index:2">'+(pYTKey?'Trailer available - click to stream':'Click to stream')+'</div></div>';
+  ppH+='<div class="pbig" style="position:relative;z-index:2">&#9654;</div>'
+    +'<div class="plbl" style="position:relative;z-index:2">Watch '+xe(title)+'</div>'
+    +'<div class="psub" style="position:relative;z-index:2">'+(pYTKey?'Trailer available - click to stream':'Click to stream')+'</div>'
+    +'<div style="position:relative;z-index:2;margin-top:4px;font-size:10px;color:rgba(240,240,248,.35);text-align:center">If ads appear, tap Next Server for a cleaner source</div>'
+    +'</div>';
   sh('pw',ppH);
   showTabContent('ov');
   if(autoPlay)startPlay();
 }
 
 function getSrcs(type,id,s,e){
-  if(type==='movie')return['https://vidsrc.to/embed/movie/'+id,'https://vidsrc.xyz/embed/movie?tmdb='+id,'https://embed.su/embed/movie/'+id,'https://multiembed.mov/?video_id='+id+'&tmdb=1'];
-  return['https://vidsrc.to/embed/tv/'+id+'/'+s+'/'+e,'https://vidsrc.xyz/embed/tv?tmdb='+id+'&season='+s+'&episode='+e,'https://embed.su/embed/tv/'+id+'/'+s+'/'+e,'https://multiembed.mov/?video_id='+id+'&tmdb=1&s='+s+'&e='+e];
+  if(type==='movie')return[
+    'https://vidlink.pro/movie/'+id+'?autoplay=true&title=false',
+    'https://player.videasy.net/movie/'+id,
+    'https://vidsrc.cc/v2/embed/movie/'+id,
+    'https://vidfast.pro/movie/'+id+'?autoPlay=true',
+    'https://111movies.com/movie/'+id,
+    'https://vidsrc.wtf/embed/movie?tmdb='+id,
+    'https://cinemaos-v2.vercel.app/embed/movie/'+id,
+    'https://multiembed.mov/?video_id='+id+'&tmdb=1',
+    'https://vidsrc.xyz/embed/movie?tmdb='+id,
+    'https://embed.su/embed/movie/'+id,
+    'https://vidsrc.to/embed/movie/'+id
+  ];
+  return[
+    'https://vidlink.pro/tv/'+id+'/'+s+'/'+e+'?autoplay=true&title=false',
+    'https://player.videasy.net/tv/'+id+'/'+s+'/'+e,
+    'https://vidsrc.cc/v2/embed/tv/'+id+'/'+s+'/'+e,
+    'https://vidfast.pro/tv/'+id+'/'+s+'/'+e+'?autoPlay=true',
+    'https://111movies.com/tv/'+id+'/'+s+'/'+e,
+    'https://vidsrc.wtf/embed/tv?tmdb='+id+'&season='+s+'&episode='+e,
+    'https://cinemaos-v2.vercel.app/embed/tv/'+id+'/'+s+'/'+e,
+    'https://multiembed.mov/?video_id='+id+'&tmdb=1&s='+s+'&e='+e,
+    'https://vidsrc.xyz/embed/tv?tmdb='+id+'&season='+s+'&episode='+e,
+    'https://embed.su/embed/tv/'+id+'/'+s+'/'+e,
+    'https://vidsrc.to/embed/tv/'+id+'/'+s+'/'+e
+  ];
 }
 
 function buildPW(src,idx,info){
   var sn=SRVN[idx]||('Server '+(idx+1));
-  sh('pw','<iframe src="'+src+'" allowfullscreen allow="autoplay;encrypted-media;picture-in-picture" style="width:100%;aspect-ratio:16/9;border:none;display:block"></iframe>'
-    +'<div class="pbar"><span class="pbar-t">'+xe(pTitle)+'</span><span class="adchip">Shield AdBlock ON</span><span class="pbar-i">'+(info||sn)+'</span>'
-    +'<div class="pbar-btns">'+(pYTKey?'<button class="trl-btn" onclick="playTrailer()">Trailer</button>':'')+'<button class="srv-btn" onclick="nextSrv()">Next Server</button></div>'
-    +(pType==='tv'?'<div style="width:100%;font-size:11px;color:var(--red);font-weight:600;margin-top:4px">Pick episodes below</div>':'')
-    +'</div>');
+  var srvBtns=SRVN.map(function(n,i){
+    return'<button onclick="pickSrv('+i+')" style="background:'+(i===idx?'var(--red)':'rgba(255,255,255,.07)')+';border:1px solid '+(i===idx?'var(--red)':'var(--bdr)')+';color:'+(i===idx?'#fff':'var(--muted)')+';border-radius:8px;padding:6px 12px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:Outfit,sans-serif">S'+(i+1)+' '+n+'</button>';
+  }).join('');
+  sh('pw',
+    '<div style="position:relative;background:#000">'
+    +'<iframe id="svif" src="'+src+'" allowfullscreen allow="autoplay;encrypted-media;picture-in-picture" style="width:100%;aspect-ratio:16/9;border:none;display:block"></iframe>'
+    +'</div>'
+    +'<div style="padding:10px 14px 6px;background:var(--bg3);border-bottom:1px solid var(--bdr);display:flex;align-items:center;gap:10px;flex-wrap:wrap">'
+    +'<span style="font-size:13px;font-weight:700">'+xe(pTitle)+'</span>'
+    +'<span style="background:rgba(0,200,80,.15);border:1px solid rgba(0,200,80,.3);color:#00c850;border-radius:6px;padding:2px 7px;font-size:10px;font-weight:700">Shield ON</span>'
+    +'<span style="font-size:11px;color:var(--muted)">Playing on: <b style="color:var(--text)">'+sn+'</b></span>'
+    +(pYTKey?'<button class="trl-btn" onclick="playTrailer()" style="margin-left:auto">Trailer</button>':'<span style="margin-left:auto"></span>')
+    +'</div>'
+    +'<div style="padding:10px 14px;background:var(--bg3);border-bottom:1px solid var(--bdr)">'
+    +'<div style="font-size:11px;font-weight:700;color:var(--muted);margin-bottom:8px;letter-spacing:.5px">SELECT SERVER (try another if ads appear)</div>'
+    +'<div style="display:flex;gap:6px;flex-wrap:wrap" id="srvpicker">'+srvBtns+'</div>'
+    +'</div>'
+    +(pType==='tv'?'<div style="padding:8px 14px;background:var(--bg3);font-size:11px;color:var(--red);font-weight:600">Pick episodes in the Episodes tab below</div>':'')
+  );
   installAB();
+}
+
+function pickSrv(idx){
+  pSrv=idx;
+  var srcs=getSrcs(pType,pId,pEpS,pEpE);
+  buildPW(srcs[idx],idx);
+  toast('Server '+(idx+1)+': '+SRVN[idx]);
 }
 
 function installAB(){
@@ -535,7 +584,7 @@ function installAB(){
 }
 
 function startPlay(){pSrv=0;pEpS=1;pEpE=1;buildPW(getSrcs(pType,pId,1,1)[0],0);}
-function nextSrv(){var s=getSrcs(pType,pId,pEpS,pEpE);pSrv=(pSrv+1)%s.length;buildPW(s[pSrv],pSrv);toast('Switched to '+(SRVN[pSrv]||'Server '+(pSrv+1)));}
+function nextSrv(){var s=getSrcs(pType,pId,pEpS,pEpE);pSrv=(pSrv+1)%s.length;pickSrv(pSrv);}
 function playTrailer(){if(!pYTKey)return;sh('pw','<iframe src="https://www.youtube.com/embed/'+pYTKey+'?autoplay=1&rel=0" allowfullscreen allow="autoplay;encrypted-media" style="width:100%;aspect-ratio:16/9;border:none;display:block"></iframe><div class="pbar"><span class="pbar-t">'+xe(pTitle)+'</span><span class="pbar-i">Official Trailer</span><div class="pbar-btns"><button class="srv-btn" onclick="startPlay()">Full Stream</button></div></div>');}
 function playEp(s,e){pEpS=s;pEpE=e;pSrv=0;buildPW(getSrcs('tv',pId,s,e)[0],0,'S'+s+' E'+e);ge('pw').scrollIntoView({behavior:'smooth',block:'start'});}
 
