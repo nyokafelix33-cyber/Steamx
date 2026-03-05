@@ -388,6 +388,15 @@ const SEED_ANIME = [
   {id:13916,name:'Death Note',poster_path:'/g3Lrq9ILYlRrFiUiQLJzIEtfyD8.jpg',backdrop_path:'/kb3X943WMIJYVg4SOAyK0pmWL5D.jpg',vote_average:8.6,genre_ids:[16,80,9648],first_air_date:'2006-10-03',media_type:'tv'},
 ];
 
+const SEED_ANIM = [
+  {id:129,title:'Spirited Away',poster_path:'/39wmItIWsg5sZMyRUHLkWBcuVCM.jpg',backdrop_path:'/bSXfU4dwZyBA1vMmXvejdRXBvuF.jpg',vote_average:8.5,genre_ids:[16,12,14],release_date:'2001-07-20',media_type:'movie'},
+  {id:149,title:"Princess Mononoke",poster_path:'/jHa6JkFCTlB5jFdOGlxI3OvEpxV.jpg',backdrop_path:'/y9ud7LT4Tg1JJepzY04Dp8FQRiF.jpg',vote_average:8.4,genre_ids:[16,12,14,18],release_date:'1997-07-12',media_type:'movie'},
+  {id:4935,title:"Howl's Moving Castle",poster_path:'/TkP63hxsxQAUMZmyC5KIgLNBRIP.jpg',backdrop_path:'/fVGEMBYrCxiQbLCRqg6fqmGAkj5.jpg',vote_average:8.4,genre_ids:[16,12,14,10749],release_date:'2004-11-19',media_type:'movie'},
+  {id:12477,title:"Grave of the Fireflies",poster_path:'/qG3RYlIVpTYclR9TYIsy8p7m7AT.jpg',backdrop_path:'/2zdLdTMhWqIGUQOT46oN56HBXID.jpg',vote_average:8.5,genre_ids:[16,18,10752],release_date:'1988-04-16',media_type:'movie'},
+  {id:37854,name:'One Piece',poster_path:'/e3NBGiAifW9Xt8xD5tpARskjccO.jpg',backdrop_path:'/2rmK7mnchw9Xr3XdiTFSxTTLXqv.jpg',vote_average:8.8,genre_ids:[16,12,35],first_air_date:'1999-10-20',media_type:'tv'},
+  {id:85937,name:'Demon Slayer',poster_path:'/xUfRZu2mi8jH6SzQEJGP6tjBuYj.jpg',backdrop_path:'/hNuiKqCVQKB9oVqFUXLPVBgR7vc.jpg',vote_average:8.7,genre_ids:[16,28,12],first_air_date:'2019-04-06',media_type:'tv'},
+];
+
 // ─── STATE ─────────────────────────────────────────────────────────────────
 let WL = [];
 let heroItems = [], heroIdx = 0, heroTimer;
@@ -420,7 +429,7 @@ async function tmdb(path) {
 (async function init() {
   heroItems = SEED_TRENDING;
   setHero(0);
-  renderHome({ trending:SEED_TRENDING, popular:SEED_MOVIES, topRated:SEED_TOP, tv:SEED_TV, anime:SEED_ANIME });
+  renderHome({ trending:SEED_TRENDING, popular:SEED_MOVIES, topRated:SEED_TOP, tv:SEED_TV, anime:SEED_ANIME, animation:SEED_ANIM });
 
   var results = await Promise.all([
     tmdb('/trending/all/week'),
@@ -435,12 +444,14 @@ async function tmdb(path) {
     heroItems = tr.results.filter(function(i){ return i.backdrop_path; }).slice(0,7);
     setHero(0);
   }
+  var animLive = await tmdb('/discover/tv?with_genres=16&sort_by=vote_average.desc&vote_count.gte=200');
   renderHome({
     trending: (tr&&tr.results) ? tr.results : SEED_TRENDING,
     popular: (pop&&pop.results) ? pop.results : SEED_MOVIES,
     topRated: (top&&top.results) ? top.results : SEED_TOP,
     tv: (tv&&tv.results) ? tv.results : SEED_TV,
     anime: (ani&&ani.results) ? ani.results : SEED_ANIME,
+    animation: (animLive&&animLive.results) ? animLive.results : SEED_ANIM,
     upcoming: (up&&up.results) ? up.results : [],
   });
 })();
@@ -496,6 +507,7 @@ function renderHome(d) {
     sec('⭐ Top Rated', d.topRated, true) +
     sec('📺 Popular Series', d.tv) +
     sec('⚡ Anime', d.anime) +
+    sec('🎌 Animation', d.animation) +
     (d.upcoming && d.upcoming.length ? sec('📅 Coming Soon', d.upcoming) : '');
 }
 
@@ -641,34 +653,96 @@ function buildDetailPage(d, type, autoPlay) {
   if (autoPlay) startPlay();
 }
 
-// ─── PLAYER ────────────────────────────────────────────────────────────────
-function startPlay() {
+// ─── PLAYER (Multi-server + Ad Blocker) ────────────────────────────────────
+var curSrv = 0, curEpS = 1, curEpE = 1;
+
+function getSrvs(type, id, s, e) {
+  if (type === 'movie') return [
+    'https://vidsrc.to/embed/movie/'+id,
+    'https://vidsrc.xyz/embed/movie?tmdb='+id,
+    'https://embed.su/embed/movie/'+id,
+    'https://multiembed.mov/?video_id='+id+'&tmdb=1',
+  ];
+  return [
+    'https://vidsrc.to/embed/tv/'+id+'/'+s+'/'+e,
+    'https://vidsrc.xyz/embed/tv?tmdb='+id+'&season='+s+'&episode='+e,
+    'https://embed.su/embed/tv/'+id+'/'+s+'/'+e,
+    'https://multiembed.mov/?video_id='+id+'&tmdb=1&s='+s+'&e='+e,
+  ];
+}
+
+var SRV_NAMES = ['VidSrc.to','VidSrc.xyz','EmbedSU','MultiEmbed'];
+
+function buildPlayer(src, srvIdx, extraInfo) {
+  var srvName = SRV_NAMES[srvIdx] || ('Server '+(srvIdx+1));
   html('playerwrap',
-    '<iframe src="'+playerVidsrc+'" allowfullscreen allow="autoplay;encrypted-media;picture-in-picture" style="width:100%;aspect-ratio:16/9;border:none;display:block"></iframe>'
-    + '<div class="pbar">'
+    '<div style="position:relative">'
+    + '<iframe src="'+src+'" allowfullscreen allow="autoplay;encrypted-media;picture-in-picture;fullscreen" referrerpolicy="no-referrer" style="width:100%;aspect-ratio:16/9;border:none;display:block"></iframe>'
+    + '</div>'
+    + '<div class="pbar" style="flex-wrap:wrap;gap:8px">'
     + '<span class="pbar-title">'+esc(playerTitle)+'</span>'
-    + '<span class="pbar-info">Powered by VidSrc.to</span>'
-    + (playerYTKey ? '<button class="btn-ghost" style="font-size:12px;padding:5px 12px" onclick="playTrailer(\''+playerYTKey+'\')">Trailer</button>' : '')
-    + (playerType==='tv' ? '<span class="pbar-ep">▸ Pick episode below</span>' : '')
+    + '<span style="background:rgba(0,200,80,.15);border:1px solid rgba(0,200,80,.3);color:#00c850;border-radius:6px;padding:2px 8px;font-size:10px;font-weight:700">🛡 AdBlock ON</span>'
+    + '<span class="pbar-info">'+(extraInfo||srvName)+'</span>'
+    + '<div style="display:flex;gap:7px;margin-left:auto">'
+    + (playerYTKey ? '<button class="btn-ghost" style="font-size:11px;padding:4px 10px" onclick="playTrailer(''+playerYTKey+'')">🎬 Trailer</button>' : '')
+    + '<button class="btn-ghost" style="font-size:11px;padding:4px 10px;background:rgba(229,9,20,.15);border-color:rgba(229,9,20,.3);color:var(--red)" onclick="nextServer()">⚡ Next Server</button>'
+    + '</div>'
+    + (playerType==='tv' ? '<div style="width:100%;font-size:11px;color:var(--red);font-weight:600">▸ Scroll down to pick episodes</div>' : '')
     + '</div>'
   );
+  installAdBlock();
+}
+
+function installAdBlock() {
+  if (window._adBlockOn) return;
+  window._adBlockOn = true;
+  // Block popup windows
+  var origOpen = window.open.bind(window);
+  window.open = function(url) {
+    if (!url) return null;
+    var safe = ['youtube.com','youtu.be','themoviedb','tmdb.org'];
+    if (safe.some(function(d){ return url.indexOf(d)>=0; })) return origOpen.apply(window, arguments);
+    toast('🛡 Ad blocked!');
+    return { closed:false, close:function(){}, focus:function(){} };
+  };
+  // Block _blank link clicks from ads
+  document.addEventListener('click', function(e) {
+    var t = e.target;
+    for (var i=0; i<8 && t && t!==document; i++, t=t.parentElement) {
+      if (t.tagName==='A' && t.target==='_blank') {
+        var h = t.getAttribute('href')||'';
+        var ok = ['youtube','youtu.be','themoviedb','tmdb.org','vidsrc','embed.su','multiembed'].some(function(d){ return h.indexOf(d)>=0; });
+        if (!ok) { e.preventDefault(); e.stopPropagation(); toast('🛡 Ad blocked!'); return; }
+      }
+    }
+  }, true);
+}
+
+function startPlay(s, e) {
+  curSrv = 0;
+  curEpS = s || 1; curEpE = e || 1;
+  buildPlayer(getSrvs(playerType, playerId, curEpS, curEpE)[0], 0);
+}
+
+function nextServer() {
+  var srcs = getSrvs(playerType, playerId, curEpS, curEpE);
+  curSrv = (curSrv + 1) % srcs.length;
+  buildPlayer(srcs[curSrv], curSrv);
+  toast('Switched to '+( SRV_NAMES[curSrv]||'Server '+(curSrv+1)));
 }
 
 function playTrailer(key) {
   html('playerwrap',
     '<iframe src="https://www.youtube.com/embed/'+key+'?autoplay=1&rel=0" allowfullscreen allow="autoplay;encrypted-media" style="width:100%;aspect-ratio:16/9;border:none;display:block"></iframe>'
-    + '<div class="pbar"><span class="pbar-title">'+esc(playerTitle)+'</span><span class="pbar-info">Official Trailer</span>'
-    + '<button class="btn-ghost" style="font-size:12px;padding:5px 12px" onclick="startPlay()">▶ Full Stream</button>'
+    + '<div class="pbar"><span class="pbar-title">'+esc(playerTitle)+'</span><span class="pbar-info">Official Trailer · YouTube</span>'
+    + '<button class="btn-ghost" style="font-size:11px;padding:4px 10px" onclick="startPlay()">▶ Full Stream</button>'
     + '</div>'
   );
 }
 
 function playEpisode(season, ep) {
-  var src = 'https://vidsrc.to/embed/tv/'+playerId+'/'+season+'/'+ep;
-  html('playerwrap',
-    '<iframe src="'+src+'" allowfullscreen allow="autoplay;encrypted-media;picture-in-picture" style="width:100%;aspect-ratio:16/9;border:none;display:block"></iframe>'
-    + '<div class="pbar"><span class="pbar-title">'+esc(playerTitle)+'</span><span class="pbar-info">Season '+season+' · Episode '+ep+'</span><span class="pbar-ep">VidSrc.to</span></div>'
-  );
+  curEpS = season; curEpE = ep; curSrv = 0;
+  buildPlayer(getSrvs('tv', playerId, season, ep)[0], 0, 'S'+season+' E'+ep);
   el('playerwrap').scrollIntoView({behavior:'smooth', block:'start'});
 }
 
@@ -827,7 +901,7 @@ function renderWLPage() {
 var BROWSE_CFG = {
   movies: {title:'MOVIES', filters:[{v:'popular',l:'Popular'},{v:'top_rated',l:'Top Rated'},{v:'upcoming',l:'Upcoming'},{v:'now_playing',l:'Now Playing'}], path:function(f,p){ return '/movie/'+f+'?page='+p; }},
   series: {title:'TV <span style="color:var(--red)">SERIES</span>', filters:[{v:'popular',l:'Popular'},{v:'top_rated',l:'Top Rated'},{v:'on_the_air',l:'On Air'}], path:function(f,p){ return '/tv/'+f+'?page='+p; }},
-  anime:  {title:'ANIME', filters:[], path:function(f,p){ return '/discover/tv?with_genres=16&sort_by=popularity.desc&page='+p; }},
+  anime:  {title:'⚡ ANIME', filters:[{v:'popular',l:'Popular'},{v:'top_rated',l:'Top Rated'},{v:'airing',l:'Airing Now'}], path:function(f,p){ var q=f==='top_rated'?'vote_count.gte=200&sort_by=vote_average.desc':f==='airing'?'air_date.gte=2024-01-01&sort_by=popularity.desc':'sort_by=popularity.desc'; return '/discover/tv?with_genres=16&'+q+'&page='+p; }},
 };
 
 async function setupBrowse(type) {
