@@ -59,7 +59,7 @@ a{color:inherit;text-decoration:none}
 .hdot.on{background:var(--red);width:20px;border-radius:4px}
 
 /* HOME SECTIONS */
-.secs{padding:0 24px 80px}
+.secs{padding:56px 24px 80px}
 .sec{margin-bottom:4px}
 .shead{padding:22px 0 11px}
 .stitle{font-size:16px;font-weight:800;display:flex;align-items:center;gap:8px}
@@ -99,7 +99,7 @@ a{color:inherit;text-decoration:none}
 .wcmeta{font-size:10px;color:rgba(240,240,248,.5);display:flex;gap:7px}
 
 /* BROWSE */
-#browse-page{padding:80px 24px 80px;min-height:100vh}
+#browse-page{padding:128px 24px 80px;min-height:100vh}
 .bhead{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px}
 .btitle{font-family:'Bebas Neue',sans-serif;font-size:42px;letter-spacing:3px;line-height:1}
 .btitle span{color:var(--red)}
@@ -112,8 +112,8 @@ a{color:inherit;text-decoration:none}
 .pbtn:disabled{opacity:.3;cursor:not-allowed}
 
 /* WL & SEARCH */
-#wl-page{padding:80px 24px 80px;min-height:100vh}
-#search-page{padding:80px 24px 60px;min-height:100vh}
+#wl-page{padding:128px 24px 80px;min-height:100vh}
+#search-page{padding:128px 24px 60px;min-height:100vh}
 .slbl{font-size:13px;color:var(--muted);margin-bottom:16px;font-weight:500}
 
 /* DETAIL */
@@ -190,7 +190,7 @@ a{color:inherit;text-decoration:none}
 .eprt{font-size:10px;color:var(--muted);margin-top:3px}
 
 /* BACK BTN */
-.back-btn{display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,.08);border:1px solid var(--bdr);color:var(--text);border-radius:9px;padding:7px 15px;font-size:13px;font-weight:600;cursor:pointer;margin:74px 0 0 24px;transition:all .2s}
+.back-btn{display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,.08);border:1px solid var(--bdr);color:var(--text);border-radius:9px;padding:7px 15px;font-size:13px;font-weight:600;cursor:pointer;margin:122px 0 0 24px;transition:all .2s}
 .back-btn:hover{background:rgba(255,255,255,.14)}
 .sw{margin-bottom:32px}
 .sw h3{font-size:15px;font-weight:800;margin-bottom:14px}
@@ -252,13 +252,18 @@ a{color:inherit;text-decoration:none}
     <button class="nt"     id="nt-anime"  onclick="go('anime')">Anime</button>
   </div>
   <div class="nav-r">
-    <div class="sbar">
-      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24" style="opacity:.38;flex-shrink:0"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-      <input id="sinput" type="text" placeholder="Search..." oninput="doSearch(this.value)">
-    </div>
     <button class="wlbtn" onclick="go('wl')">&#128278; <span id="wlc">0</span></button>
   </div>
 </nav>
+
+<!-- FULL WIDTH SEARCH BAR -->
+<div id="searchbar-wrap" style="position:fixed;top:62px;left:0;right:0;z-index:490;padding:8px 14px 10px;background:rgba(7,7,15,.97);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.07)">
+  <div style="display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.1);border-radius:14px;padding:11px 16px;transition:all .25s" id="sbwrap">
+    <svg width="16" height="16" fill="none" stroke="rgba(229,9,20,.8)" stroke-width="2.5" viewBox="0 0 24 24" style="flex-shrink:0"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <input id="sinput" type="text" placeholder="&#128269;  Search movies, series, anime..." oninput="doSearch(this.value)" style="background:none;border:none;outline:none;color:#f0f0f8;font-size:15px;font-family:Outfit,sans-serif;width:100%;font-weight:500" onfocus="ge('sbwrap').style.borderColor='var(--red)';ge('sbwrap').style.background='rgba(229,9,20,.07)'" onblur="if(!ge('sinput').value){ge('sbwrap').style.borderColor='rgba(255,255,255,.1)';ge('sbwrap').style.background='rgba(255,255,255,.08)'}">
+    <button onclick="clearSearch()" id="sclr" style="display:none;background:rgba(255,255,255,.12);border:none;color:#fff;font-size:14px;cursor:pointer;padding:0;width:22px;height:22px;border-radius:50%;line-height:22px;text-align:center;flex-shrink:0">&#215;</button>
+  </div>
+</div>
 
 <div id="home-page" class="page active">
   <div id="hero">
@@ -646,9 +651,11 @@ function installAB(){
           'videasy','vidfast','111movies','cinemaos',
           'yts.mx','1337x','torrentgalaxy','nyaa.si',
           'eztv.re','1377x','rarbg','piratebay',
-          'dl.vidsrc','febbox','dlflix','fmovies',
-          'dl.dlsrc','goojara','ww4.fmovies',
-          'moviebox','vip/movie','vip/tv'
+          'dl.vidsrc','vip/movie','vip/tv',
+          'moviesdrive.fans','hdhub4uu.one',
+          'vegamovies.mba','uhdmovies.gives',
+          'dotmovies.wales','filmyzilla',
+          'hdmovies','goojara','febbox'
         ].some(function(d){return h.indexOf(d)>=0;});
         if(!ok){e.preventDefault();e.stopPropagation();toast('Ad blocked!');return;}
       }
@@ -768,7 +775,14 @@ function loadBrowse(){
 function bpage(d){curPage=Math.max(1,curPage+d);loadBrowse();window.scrollTo({top:0,behavior:'smooth'});}
 
 var searchT;
+function clearSearch(){
+  ge('sinput').value='';
+  ge('sclr').style.display='none';
+  doSearch('');
+}
 function doSearch(q){
+  var clr=ge('sclr');
+  if(clr)clr.style.display=q?'block':'none';
   var sp=ge('search-page');
   if(!q||!q.trim()){sp.classList.remove('active');showPageEl(curTab);return;}
   ['home-page','browse-page','wl-page','detail-page'].forEach(function(id){var e=ge(id);if(e)e.classList.remove('active');});
@@ -833,11 +847,18 @@ function openDownload(){
     {label:'1080p',cls:'q1080',size:'~2.5 GB',tag:'Full HD'},
     {label:'4K',cls:'q4k',size:'~15 GB',tag:'Ultra HD'},
   ];
+  var dlUrl=type==='movie'
+    ?'https://dl.vidsrc.vip/movie/'+id
+    :'https://dl.vidsrc.vip/tv/'+id+'/'+curSeason+'/'+curEpE;
+  // Each quality links to moviesdrive search with quality tag for specific results
+  var qualUrls={
+    '480p': type==='movie'?'https://moviesdrive.fans/?s='+qt+'+480p':'https://moviesdrive.fans/?s='+qt+'+S'+curSeason+'+480p',
+    '720p': type==='movie'?'https://moviesdrive.fans/?s='+qt+'+720p':'https://moviesdrive.fans/?s='+qt+'+S'+curSeason+'+720p',
+    '1080p':dlUrl,
+    '4K':   type==='movie'?'https://uhdmovies.gives/?s='+qt:'https://uhdmovies.gives/?s='+qt,
+  };
   ge('dlqualities').innerHTML=qualities.map(function(q2){
-    // dl-api.vercel.app provides real direct download links by TMDB id + quality
-    var url=type==='movie'
-      ?'https://dl.vidsrc.vip/movie/'+id
-      :'https://dl.vidsrc.vip/tv/'+id+'/'+curSeason+'/'+curEpE;
+    var url=qualUrls[q2.label]||dlUrl;
     return'<a href="'+url+'" target="_blank" rel="noopener" class="dlq" onclick="handleDLClick(this)">'
       +'<span class="dlq-badge '+q2.cls+'">'+q2.label+'</span>'
       +'<span class="dlq-size">'+q2.size+'</span>'
@@ -845,47 +866,51 @@ function openDownload(){
       +'</a>';
   }).join('');
 
-  // Direct download sources — all full speed, no torrent
+  // Download sources — confirmed working 2025
+  var dlBase = type==='movie'
+    ? 'https://dl.vidsrc.vip/movie/'+id
+    : 'https://dl.vidsrc.vip/tv/'+id+'/'+curSeason+'/'+curEpE;
   var sources=[
     {
       icon:'&#9889;',
       name:'VidSrc Direct',
-      desc:'Full speed direct download — recommended',
-      url: type==='movie'
-        ?'https://dl.vidsrc.vip/movie/'+id
-        :'https://dl.vidsrc.vip/tv/'+id+'/'+curSeason+'/'+curEpE,
+      desc:'Direct download — tap & pick quality on next page',
+      url: dlBase,
       badge:'FAST'
     },
     {
       icon:'&#127381;',
-      name:'Embed.su Download',
-      desc:'Direct MP4 stream download link',
-      url: type==='movie'
-        ?'https://embed.su/embed/movie/'+id+'?download=1'
-        :'https://embed.su/embed/tv/'+id+'/'+curSeason+'/'+curEpE+'?download=1',
-      badge:'DIRECT'
-    },
-    {
-      icon:'&#128190;',
-      name:'Febbox (Multi-quality)',
-      desc:'Pick 480p / 720p / 1080p — full speed',
-      url: type==='movie'
-        ?'https://www.febbox.com/tmdb/movie/'+id
-        :'https://www.febbox.com/tmdb/tv/'+id,
+      name:'MoviesDrive',
+      desc:'480p 720p 1080p 4K — dual audio available',
+      url:'https://moviesdrive.fans/?s='+qt,
       badge:'HD'
     },
     {
       icon:'&#127760;',
-      name:'DLFlix',
-      desc:'Direct download — movies & series',
-      url:'https://dlflix.live/?s='+qt,
+      name:'HDHub4u',
+      desc:'Bollywood & Hollywood — 300MB to 1080p',
+      url:'https://hdhub4uu.one/?s='+qt,
       badge:''
     },
     {
+      icon:'&#128190;',
+      name:'Vegamovies',
+      desc:'Multi-quality + dual audio downloads',
+      url:'https://vegamovies.mba/?s='+qt,
+      badge:''
+    },
+    {
+      icon:'&#127908;',
+      name:'UHDMovies',
+      desc:'Up to 4K Ultra HD — large library',
+      url:'https://uhdmovies.gives/?s='+qt,
+      badge:'4K'
+    },
+    {
       icon:'&#128269;',
-      name:'MovieBox Pro',
-      desc:'Search & download in multiple qualities',
-      url:'https://ww4.fmovies.co/search/'+qt,
+      name:'Dotmovies',
+      desc:'Fast direct links — 480p to 1080p',
+      url:'https://dotmovies.wales/?s='+qt,
       badge:''
     },
   ];
