@@ -595,9 +595,6 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
 .dub-state{font-size:12px;font-weight:800;min-width:32px;text-align:right}
 .dub-state.on{color:var(--red)}
 .dub-state.off{color:var(--muted)}
-/* Anime servers badge */
-.pm-srv.dub-srv{background:rgba(229,9,26,.15);border-color:rgba(229,9,26,.3);color:#ff7a7a}
-.pm-srv.dub-srv.active{background:var(--red);border-color:var(--red);color:#fff}
 </style>
 </head>
 <body>
@@ -682,17 +679,13 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
         <div class="detail-btns" id="d-btns"></div>
       </div>
     </div>
-    <!-- Dub/Sub toggle — only shows for anime -->
+    <!-- Dub button — only shows for anime -->
     <div class="dub-toggle" id="dub-toggle">
-      <div>
-        <div class="dub-toggle-label">&#127909; English Dub</div>
-        <div class="dub-toggle-sub">Toggle between English dub and Japanese sub</div>
+      <div style="flex:1">
+        <div class="dub-toggle-label">&#127482;&#127480; English Dub Available</div>
+        <div class="dub-toggle-sub">Tap to find this anime dubbed in English on HiAnime</div>
       </div>
-      <span class="dub-state off" id="dub-state-lbl">SUB</span>
-      <label class="dub-switch">
-        <input type="checkbox" id="dub-chk" onchange="toggleDub(this.checked)">
-        <span class="dub-slider"></span>
-      </label>
+      <button onclick="findDub()" style="background:var(--red);border:none;color:#fff;border-radius:10px;padding:8px 14px;font-size:12px;font-weight:800;cursor:pointer;font-family:var(--font);white-space:nowrap">Find Dub &#8594;</button>
     </div>
     <p class="detail-overview" id="d-overview"></p>
     <div class="tabs" id="d-tabs"></div>
@@ -1388,112 +1381,56 @@ function installAB(){
   },true);
 }
 
-// ═══ ANIME DUB/SUB SYSTEM ═══════════════════════════════════════════════
+// ═══ ANIME SYSTEM ════════════════════════════════════════════════════════
 
-// Lookup AniList ID from TMDB ID using mapping API
-function getAnilistId(tmdbId){
-  if(anilistCache[tmdbId]) return Promise.resolve(anilistCache[tmdbId]);
-  // Use AniList GraphQL to search by title
-  return fetch('https://graphql.anilist.co',{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({
-      query:'query($search:String){Media(search:$search,type:ANIME){id title{romaji english}}}',
-      variables:{search:pTitle}
-    })
-  }).then(function(r){return r.json();})
-  .then(function(d){
-    var id=(d.data&&d.data.Media)?d.data.Media.id:0;
-    anilistCache[tmdbId]=id;
-    return id;
-  }).catch(function(){return 0;});
+function getAnilistId(tmdbId){ return Promise.resolve(0); } // stub
+
+// Anime uses exact same servers as TV — they all carry anime
+function getAnimeSrcs(tmdbId,season,episode){
+  return getSrcs('tv', tmdbId, season||1, episode||1);
 }
+var ANIME_SRVN = SRVN; // same server names
 
-// Get anime-specific servers with dub/sub support
-function getAnimeSrcs(tmdbId,episode,isDub){
-  var ep=episode||1;
-  var dubParam=isDub?'true':'false';
-  // VidPlus uses AniList ID — we fetch it async, but also provide TMDB fallbacks
-  var aniId=pAnilistId||tmdbId; // fallback to tmdbId if anilist not yet fetched
-  return [
-    // Server 1 & 2: VidPlus anime with dub param (uses AniList ID)
-    'https://player.vidplus.to/embed/anime/'+aniId+'/'+ep+'?dub='+dubParam+'&autoplay=true&primarycolor=e5091a',
-    // Server 3: Vidlink TV fallback (uses TMDB, has eng audio selector)
-    'https://vidlink.pro/tv/'+tmdbId+'/1/'+ep+'?autoplay=true&title=false&muted=false',
-    // Server 4: VidSrc.cc (has language options in player)
-    'https://vidsrc.cc/v2/embed/tv/'+tmdbId+'/1/'+ep,
-    // Server 5: Embed.su
-    'https://embed.su/embed/tv/'+tmdbId+'/1/'+ep,
-    // Server 6: VidSrc.to
-    'https://vidsrc.to/embed/tv/'+tmdbId+'/1/'+ep,
-    // Server 7: 2embed (good for anime)
-    'https://www.2embed.cc/embedtvfull/'+tmdbId+'&s=1&e='+ep,
-    // Server 8: Multiembed
-    'https://multiembed.mov/directstream.php?video_id='+tmdbId+'&s=1&e='+ep,
-    // Server 9: Videasy
-    'https://player.videasy.net/tv/'+tmdbId+'/1/'+ep,
-  ];
+function findDub(){
+  var q=encodeURIComponent(pTitle||'');
+  window._allowNav=true;
+  setTimeout(function(){window._allowNav=false;},3000);
+  window.open('https://hianime.to/search?keyword='+q,'_blank');
+  toast('Opening HiAnime for English Dub →');
 }
-
-var ANIME_SRVN=['VidPlus (Dub/Sub)','VidPlus Alt','Vidlink','VidSrc.cc','EmbedSU','VidSrc.to','2Embed','MultiEmbed','Videasy'];
 
 function toggleDub(isDub){
   pDubMode=isDub;
   var lbl=ge('dub-state-lbl');
   if(lbl){lbl.textContent=isDub?'DUB':'SUB';lbl.className='dub-state '+(isDub?'on':'off');}
-  // Update server pills label
-  var firstPill=document.querySelector('.pm-srv');
-  if(firstPill)firstPill.textContent='S1 VidPlus ('+(isDub?'DUB':'SUB')+')';
-  toast(isDub?'Switched to English Dub &#127482;&#127480;':'Switched to Japanese Sub');
-  // If player is open, reload with new dub setting
-  var modal=ge('player-modal');
-  if(modal&&modal.classList.contains('open')){
-    pSrv=0;
-    var src=getAnimeSrcs(pId,pEpE,isDub)[0];
-    ge('pm-iframe').src=src;
-    pmShowControls();
+  if(isDub){
+    // Open best dub site search in new tab
+    var q=encodeURIComponent(pTitle||'');
+    window._allowNav=true;
+    setTimeout(function(){window._allowNav=false;},3000);
+    window.open('https://hianime.to/search?keyword='+q,'_blank');
+    toast('Opening HiAnime for English Dub...');
+    // Reset toggle back — we just sent them to the dub site
+    setTimeout(function(){
+      var chk=ge('dub-chk');
+      if(chk)chk.checked=false;
+      if(lbl){lbl.textContent='SUB';lbl.className='dub-state off';}
+      pDubMode=false;
+    },500);
   }
 }
 
 function startAnimePlay(episode){
-  var ep=episode||1;
-  pEpE=ep;pEpS=1;pSrv=0;
-  var srcs=getAnimeSrcs(pId,ep,pDubMode);
-  openAnimePlayer(srcs[0],0,ep>1?'Episode '+ep:null);
+  pEpE=episode||1; pEpS=1; pSrv=0;
+  openPlayer(getSrcs('tv',pId,1,pEpE)[0], 0, pEpE>1?'Episode '+pEpE:null);
 }
 
 function openAnimePlayer(src,srvIdx,epInfo){
-  var modal=ge('player-modal');
-  try{if(screen.orientation&&screen.orientation.lock)screen.orientation.lock('landscape').catch(function(){});}catch(e){}
-  ge('pm-iframe').src=src;
-  ge('pm-title').textContent=pTitle||'Now Playing';
-  var epBadge=ge('pm-ep-badge');
-  if(epInfo){epBadge.textContent=epInfo;epBadge.style.display='block';}
-  else{epBadge.style.display='none';}
-  // Build anime server pills
-  ge('pm-srv-row').innerHTML=ANIME_SRVN.map(function(n,i){
-    var isDubSrv=i<=1;
-    return '<button class="pm-srv'+(i===srvIdx?' active':'')+(isDubSrv?' dub-srv':'')+
-      '" onclick="switchAnimeSrv('+i+')" title="'+(isDubSrv?'Supports English Dub':'')+'">'
-      +'S'+(i+1)+' '+n+(i===0?(' ('+(pDubMode?'DUB':'SUB')+')'):'')+'</button>';
-  }).join('');
-  var epBtn=ge('pm-ep-btn');if(epBtn)epBtn.style.display='inline-flex';
-  var trlBtn=ge('pm-trl-btn');if(trlBtn)trlBtn.style.display=pYTKey?'inline-flex':'none';
-  modal.classList.add('open');
-  document.body.style.overflow='hidden';
-  pmShowControls();
-  var unmuteBtn=ge('pm-unmute-btn');
-  if(unmuteBtn)unmuteBtn.style.display='inline-flex';
-  installAB();
+  openPlayer(src,srvIdx,epInfo);
 }
 
 function switchAnimeSrv(idx){
-  pSrv=idx;
-  var src=getAnimeSrcs(pId,pEpE,pDubMode)[idx];
-  ge('pm-iframe').src=src;
-  document.querySelectorAll('.pm-srv').forEach(function(b,i){b.classList.toggle('active',i===idx);});
-  pmShowControls();
-  toast(ANIME_SRVN[idx]+' loaded');
+  switchSrv(idx);
 }
 
 // ═══ TOAST ═══
