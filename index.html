@@ -605,21 +605,51 @@ function buildPW(src,idx,info){
   var srvBtns=SRVN.map(function(n,i){
     return'<button onclick="pickSrv('+i+')" style="background:'+(i===idx?'var(--red)':'rgba(255,255,255,.07)')+';border:1px solid '+(i===idx?'var(--red)':'var(--bdr)')+';color:'+(i===idx?'#fff':'var(--muted)')+';border-radius:8px;padding:6px 12px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:Outfit,sans-serif">S'+(i+1)+' '+n+'</button>';
   }).join('');
+
+  // Intent URLs to open stream directly in external players
+  // Works on Android Chrome - opens app chooser
+  var intentUrl='intent://'+src.replace('https://','').replace('http://','')+
+    '#Intent;scheme=https;package=com.ttee.leeplayer;'+
+    'S.browser_fallback_url='+encodeURIComponent(src)+';end';
+  var mxUrl='intent://'+src.replace('https://','').replace('http://','')+
+    '#Intent;scheme=https;package=com.mxtech.videoplayer.ad;'+
+    'S.browser_fallback_url='+encodeURIComponent(src)+';end';
+
   sh('pw',
-    '<div style="position:relative;background:#000">'
-    +'<iframe id="svif" src="'+src+'" allowfullscreen allow="autoplay;encrypted-media;picture-in-picture" style="width:100%;aspect-ratio:16/9;border:none;display:block"></iframe>'
+    // Iframe wrapper with pointer-events trick to prevent redirect clicks
+    '<div style="position:relative;background:#000;overflow:hidden">'
+    +'<iframe id="svif" src="'+src+'" allowfullscreen allow="autoplay;encrypted-media;picture-in-picture" referrerpolicy="no-referrer" style="width:100%;aspect-ratio:16/9;border:none;display:block"></iframe>'
+    // Transparent overlay on edges to catch redirect clicks
+    +'<div style="position:absolute;top:0;left:0;width:15%;height:100%;z-index:2;background:transparent" onclick="void(0)"></div>'
+    +'<div style="position:absolute;top:0;right:0;width:15%;height:100%;z-index:2;background:transparent" onclick="void(0)"></div>'
+    +'<div style="position:absolute;top:0;left:0;right:0;height:12%;z-index:2;background:transparent" onclick="void(0)"></div>'
     +'</div>'
-    +'<div style="padding:10px 14px 6px;background:var(--bg3);border-bottom:1px solid var(--bdr);display:flex;align-items:center;gap:10px;flex-wrap:wrap">'
-    +'<span style="font-size:13px;font-weight:700">'+xe(pTitle)+'</span>'
-    +'<span style="background:rgba(0,200,80,.15);border:1px solid rgba(0,200,80,.3);color:#00c850;border-radius:6px;padding:2px 7px;font-size:10px;font-weight:700">Shield ON</span>'
-    +'<span style="font-size:11px;color:var(--muted)">Playing on: <b style="color:var(--text)">'+sn+'</b></span>'
-    +(pYTKey?'<button class="trl-btn" onclick="playTrailer()" style="margin-left:auto">Trailer</button>':'<span style="margin-left:auto"></span>')
+
+    // Player bar
+    +'<div style="padding:10px 14px 8px;background:var(--bg3);border-bottom:1px solid var(--bdr);display:flex;align-items:center;gap:8px;flex-wrap:wrap">'
+    +'<span style="font-size:13px;font-weight:700;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+xe(pTitle)+'</span>'
+    +'<span style="background:rgba(0,200,80,.15);border:1px solid rgba(0,200,80,.3);color:#00c850;border-radius:6px;padding:2px 7px;font-size:10px;font-weight:700;flex-shrink:0">Shield ON</span>'
+    +(pYTKey?'<button class="trl-btn" onclick="playTrailer()">Trailer</button>':'')
     +'</div>'
-    +'<div style="padding:10px 14px;background:var(--bg3);border-bottom:1px solid var(--bdr)">'
-    +'<div style="font-size:11px;font-weight:700;color:var(--muted);margin-bottom:8px;letter-spacing:.5px">SELECT SERVER (try another if ads appear)</div>'
+
+    // Open in external player buttons
+    +'<div style="padding:8px 14px;background:rgba(0,0,0,.4);border-bottom:1px solid var(--bdr);display:flex;gap:8px;align-items:center;flex-wrap:wrap">'
+    +'<span style="font-size:10px;color:var(--muted);font-weight:600;flex-shrink:0">OPEN IN:</span>'
+    +'<a href="'+intentUrl+'" style="display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.08);border:1px solid var(--bdr);color:var(--text);border-radius:7px;padding:5px 10px;font-size:11px;font-weight:700;text-decoration:none;font-family:Outfit,sans-serif">'
+    +'&#9654; SPlayer</a>'
+    +'<a href="'+mxUrl+'" style="display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.08);border:1px solid var(--bdr);color:var(--text);border-radius:7px;padding:5px 10px;font-size:11px;font-weight:700;text-decoration:none;font-family:Outfit,sans-serif">'
+    +'&#9654; MX Player</a>'
+    +'<a href="'+src+'" target="_blank" onclick="window._allowNav=true" style="display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.08);border:1px solid var(--bdr);color:var(--text);border-radius:7px;padding:5px 10px;font-size:11px;font-weight:700;text-decoration:none;font-family:Outfit,sans-serif">'
+    +'&#8599; Full Screen</a>'
+    +'<span style="font-size:10px;color:var(--muted);margin-left:auto">'+sn+'</span>'
+    +'</div>'
+
+    // Server picker
+    +'<div style="padding:8px 14px;background:var(--bg3);border-bottom:1px solid var(--bdr)">'
+    +'<div style="font-size:10px;font-weight:700;color:var(--muted);margin-bottom:7px;letter-spacing:.5px">SWITCH SERVER (if video not playing)</div>'
     +'<div style="display:flex;gap:6px;flex-wrap:wrap" id="srvpicker">'+srvBtns+'</div>'
     +'</div>'
-    +(pType==='tv'?'<div style="padding:8px 14px;background:var(--bg3);font-size:11px;color:var(--red);font-weight:600">Pick episodes in the Episodes tab below</div>':'')
+    +(pType==='tv'?'<div style="padding:7px 14px;background:var(--bg3);font-size:11px;color:var(--red);font-weight:600">&#9660; Pick episodes in the Episodes tab below</div>':'')
   );
   installAB();
 }
