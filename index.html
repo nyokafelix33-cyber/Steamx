@@ -5,6 +5,10 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>Feng World</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <style>
 :root{--red:#e50914;--bg:#07070f;--bg3:#13131f;--bg4:#1a1a28;--text:#f0f0f8;--muted:rgba(240,240,248,.45);--bdr:rgba(255,255,255,.08)}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -236,9 +240,237 @@ a{color:inherit;text-decoration:none}
 .dlsrc-desc{font-size:10px;color:var(--muted)}
 .dlsrc-arr{font-size:14px;opacity:.35}
 .dlnote{font-size:10px;color:rgba(255,255,255,.25);text-align:center;margin-top:14px;line-height:1.6}
+
+/* ═══════════════════════════════════════════
+   AUTH / LOGIN OVERLAY
+═══════════════════════════════════════════ */
+#auth-overlay{
+  position:fixed;inset:0;z-index:99999;
+  background:var(--bg);
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:24px;
+  overflow-y:auto;
+}
+#auth-overlay.hidden{display:none}
+.auth-bg{
+  position:fixed;inset:0;z-index:0;
+  background:radial-gradient(ellipse at 20% 50%,rgba(229,9,20,.18) 0%,transparent 60%),
+             radial-gradient(ellipse at 80% 20%,rgba(229,9,20,.1) 0%,transparent 50%);
+  pointer-events:none;
+}
+.auth-box{
+  position:relative;z-index:1;
+  width:100%;max-width:400px;
+  background:var(--bg3);
+  border:1px solid var(--bdr);
+  border-radius:20px;
+  overflow:hidden;
+  box-shadow:0 30px 80px rgba(0,0,0,.8);
+}
+.auth-top{
+  padding:32px 28px 24px;
+  text-align:center;
+  border-bottom:1px solid var(--bdr);
+  background:linear-gradient(to bottom,rgba(229,9,20,.07),transparent);
+}
+.auth-logo{
+  display:flex;align-items:center;justify-content:center;
+  gap:10px;margin-bottom:20px;
+}
+.auth-logo-icon{
+  width:44px;height:44px;background:var(--red);border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;color:#fff;font-weight:900;
+  box-shadow:0 0 24px rgba(229,9,20,.5);
+}
+.auth-logo-txt{
+  font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:3px;
+}
+.auth-logo-txt b{color:var(--red)}
+.auth-tagline{font-size:13px;color:var(--muted);font-weight:500}
+.auth-body{padding:24px 28px 28px}
+.auth-title{font-size:20px;font-weight:800;margin-bottom:6px;text-align:center}
+.auth-sub{font-size:13px;color:var(--muted);text-align:center;margin-bottom:24px;line-height:1.6}
+
+/* Social buttons */
+.auth-social-btn{
+  display:flex;align-items:center;gap:12px;
+  width:100%;padding:13px 18px;
+  border-radius:12px;font-size:14px;font-weight:700;
+  cursor:pointer;transition:all .2s;margin-bottom:12px;
+  font-family:'Outfit',sans-serif;
+  border:1px solid var(--bdr);
+}
+.auth-social-btn:hover{transform:translateY(-1px)}
+.auth-google{background:#fff;color:#1a1a1a;border-color:#fff}
+.auth-google:hover{background:#f0f0f0}
+.auth-ig{background:linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);color:#fff;border-color:transparent}
+.auth-ig:hover{opacity:.92}
+.auth-social-icon{width:22px;height:22px;flex-shrink:0}
+.auth-social-txt{flex:1;text-align:left}
+.auth-social-badge{font-size:9px;background:rgba(255,255,255,.2);padding:2px 6px;border-radius:4px;margin-left:auto}
+
+.auth-divider{
+  display:flex;align-items:center;gap:10px;
+  margin:16px 0;color:var(--muted);font-size:11px;
+}
+.auth-divider::before,.auth-divider::after{
+  content:'';flex:1;height:1px;background:var(--bdr);
+}
+
+/* Input fields */
+.auth-field{margin-bottom:14px}
+.auth-label{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.5px;margin-bottom:6px;text-transform:uppercase}
+.auth-input{
+  width:100%;background:rgba(255,255,255,.06);
+  border:1px solid var(--bdr);border-radius:10px;
+  padding:12px 14px;color:var(--text);font-size:14px;
+  font-family:'Outfit',sans-serif;outline:none;
+  transition:border-color .2s;
+}
+.auth-input:focus{border-color:rgba(229,9,20,.5);background:rgba(229,9,20,.05)}
+.auth-input::placeholder{color:var(--muted)}
+
+/* OTP boxes */
+.otp-row{display:flex;gap:8px;justify-content:center;margin:16px 0}
+.otp-box{
+  width:46px;height:54px;
+  background:rgba(255,255,255,.06);
+  border:2px solid var(--bdr);border-radius:10px;
+  text-align:center;font-size:22px;font-weight:800;
+  color:var(--text);font-family:'Outfit',sans-serif;
+  outline:none;transition:all .2s;caret-color:var(--red);
+}
+.otp-box:focus{border-color:var(--red);background:rgba(229,9,20,.07)}
+.otp-box.filled{border-color:rgba(0,200,80,.5);background:rgba(0,200,80,.07)}
+
+/* Buttons */
+.auth-btn{
+  width:100%;padding:14px;border:none;border-radius:12px;
+  font-size:15px;font-weight:800;cursor:pointer;
+  font-family:'Outfit',sans-serif;transition:all .2s;
+  margin-top:4px;
+}
+.auth-btn-red{background:var(--red);color:#fff;box-shadow:0 5px 20px rgba(229,9,20,.4)}
+.auth-btn-red:hover{transform:translateY(-1px);box-shadow:0 8px 28px rgba(229,9,20,.5)}
+.auth-btn-red:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.auth-btn-ghost{background:rgba(255,255,255,.07);color:var(--text);border:1px solid var(--bdr)}
+.auth-btn-ghost:hover{background:rgba(255,255,255,.12)}
+
+.auth-msg{font-size:12px;text-align:center;margin-top:12px;padding:10px;border-radius:8px;display:none}
+.auth-msg.error{background:rgba(229,9,20,.12);color:#ff6b6b;border:1px solid rgba(229,9,20,.2);display:block}
+.auth-msg.success{background:rgba(0,200,80,.12);color:#00c850;border:1px solid rgba(0,200,80,.2);display:block}
+.auth-msg.info{background:rgba(255,200,0,.1);color:#ffd700;border:1px solid rgba(255,200,0,.2);display:block}
+
+.auth-back{
+  display:flex;align-items:center;gap:6px;
+  background:none;border:none;color:var(--muted);
+  font-size:13px;font-weight:600;cursor:pointer;
+  margin-bottom:16px;padding:0;font-family:'Outfit',sans-serif;
+}
+.auth-back:hover{color:var(--text)}
+.auth-step{display:none}.auth-step.active{display:block}
+.auth-timer{font-size:12px;color:var(--muted);text-align:center;margin-top:8px}
+.auth-resend{font-size:12px;color:var(--red);cursor:pointer;text-decoration:underline;display:none}
+.auth-footer{font-size:11px;color:rgba(255,255,255,.2);text-align:center;margin-top:16px;line-height:1.6}
+.auth-spinner{width:18px;height:18px;border:2px solid rgba(255,255,255,.2);border-top-color:#fff;border-radius:50%;animation:sp .6s linear infinite;display:inline-block;vertical-align:middle;margin-right:6px}
 </style>
 </head>
 <body>
+
+<!-- ═══════════════════ AUTH OVERLAY ═══════════════════ -->
+<div id="auth-overlay">
+  <div class="auth-bg"></div>
+  <div class="auth-box">
+    <div class="auth-top">
+      <div class="auth-logo">
+        <div class="auth-logo-icon">&#9654;</div>
+        <div class="auth-logo-txt">Feng<b> World</b></div>
+      </div>
+      <div class="auth-tagline">Your world of entertainment</div>
+    </div>
+    <div class="auth-body">
+
+      <!-- STEP 1: Choose login method -->
+      <div class="auth-step active" id="step-choose">
+        <div class="auth-title">Welcome Back</div>
+        <div class="auth-sub">Sign in to access movies, series &amp; anime</div>
+
+        <!-- Google Sign In -->
+        <button class="auth-social-btn auth-google" onclick="signInGoogle()">
+          <svg class="auth-social-icon" viewBox="0 0 48 48">
+            <path fill="#FFC107" d="M43.6 20H24v8h11.3C33.6 32.6 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3 0 5.7 1.1 7.8 2.9l5.7-5.7C34 6.5 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20c11 0 19.7-8 19.7-20 0-1.3-.1-2.7-.1-4z"/>
+            <path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.5 15.1 18.9 12 24 12c3 0 5.7 1.1 7.8 2.9l5.7-5.7C34 6.5 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/>
+            <path fill="#4CAF50" d="M24 44c5.2 0 9.9-1.9 13.5-5l-6.2-5.2C29.4 35.6 26.8 36 24 36c-5.2 0-9.7-3.3-11.4-8l-6.6 5.1C9.5 39.6 16.3 44 24 44z"/>
+            <path fill="#1976D2" d="M43.6 20H24v8h11.3c-.8 2.4-2.4 4.4-4.5 5.8l6.2 5.2C41 35.8 44 30.3 44 24c0-1.3-.1-2.7-.4-4z"/>
+          </svg>
+          <span class="auth-social-txt">Continue with Google</span>
+          <span class="auth-social-badge" style="background:rgba(0,0,0,.08);color:#666">RECOMMENDED</span>
+        </button>
+
+        <!-- Instagram Sign In -->
+        <button class="auth-social-btn auth-ig" onclick="showIGStep()">
+          <svg class="auth-social-icon" viewBox="0 0 48 48" fill="white">
+            <path d="M24 4.3c5.2 0 5.8 0 7.9.1 5.3.2 7.8 2.8 8 8 .1 2.1.1 2.7.1 7.9s0 5.8-.1 7.9c-.2 5.2-2.7 7.8-8 8-2.1.1-2.7.1-7.9.1s-5.8 0-7.9-.1c-5.3-.2-7.8-2.8-8-8C8 25.8 8 25.2 8 24s0-5.8.1-7.9c.2-5.2 2.7-7.8 8-8C18.2 4.3 18.8 4.3 24 4.3zM24 0c-5.3 0-5.9 0-8 .1C8.6.3 3.3 5.6 3.1 13c-.1 2.1-.1 2.7-.1 8s0 5.9.1 8C3.3 36.4 8.6 41.7 16 41.9c2.1.1 2.7.1 8 .1s5.9 0 8-.1c7.4-.2 12.7-5.5 12.9-12.9.1-2.1.1-2.7.1-8s0-5.9-.1-8C44.7 5.6 39.4.3 32 .1 29.9 0 29.3 0 24 0z"/>
+            <path d="M24 11.7c-6.8 0-12.3 5.5-12.3 12.3S17.2 36.3 24 36.3 36.3 30.8 36.3 24 30.8 11.7 24 11.7zm0 20.3c-4.4 0-8-3.6-8-8s3.6-8 8-8 8 3.6 8 8-3.6 8-8 8z"/>
+            <circle cx="36.7" cy="11.3" r="2.9"/>
+          </svg>
+          <span class="auth-social-txt">Continue with Instagram</span>
+        </button>
+
+        <div class="auth-footer">
+          By signing in you agree to our Terms of Service.<br>
+          Verification code will be sent to <b style="color:var(--text)">fengworld8@gmail.com</b>
+        </div>
+      </div>
+
+      <!-- STEP 2: Instagram - enter username -->
+      <div class="auth-step" id="step-ig">
+        <button class="auth-back" onclick="showStep('step-choose')">&#8592; Back</button>
+        <div class="auth-title">Instagram Login</div>
+        <div class="auth-sub">Enter your Instagram username. A verification code will be sent to <b style="color:var(--text)">fengworld8@gmail.com</b></div>
+        <div class="auth-field">
+          <div class="auth-label">Instagram Username</div>
+          <input class="auth-input" id="ig-username" type="text" placeholder="@yourname" autocomplete="off">
+        </div>
+        <button class="auth-btn auth-btn-red" onclick="sendIGCode()" id="ig-send-btn">Send Verification Code</button>
+        <div class="auth-msg" id="ig-msg"></div>
+      </div>
+
+      <!-- STEP 3: Enter OTP -->
+      <div class="auth-step" id="step-otp">
+        <button class="auth-back" onclick="showStep('step-ig')">&#8592; Back</button>
+        <div class="auth-title">Check Your Email</div>
+        <div class="auth-sub" id="otp-sub">A 6-digit code was sent to <b style="color:var(--text)">fengworld8@gmail.com</b></div>
+        <div class="otp-row">
+          <input class="otp-box" id="otp0" type="number" maxlength="1" min="0" max="9" oninput="otpInput(this,0)" onkeydown="otpKey(event,0)">
+          <input class="otp-box" id="otp1" type="number" maxlength="1" min="0" max="9" oninput="otpInput(this,1)" onkeydown="otpKey(event,1)">
+          <input class="otp-box" id="otp2" type="number" maxlength="1" min="0" max="9" oninput="otpInput(this,2)" onkeydown="otpKey(event,2)">
+          <input class="otp-box" id="otp3" type="number" maxlength="1" min="0" max="9" oninput="otpInput(this,3)" onkeydown="otpKey(event,3)">
+          <input class="otp-box" id="otp4" type="number" maxlength="1" min="0" max="9" oninput="otpInput(this,4)" onkeydown="otpKey(event,4)">
+          <input class="otp-box" id="otp5" type="number" maxlength="1" min="0" max="9" oninput="otpInput(this,5)" onkeydown="otpKey(event,5)">
+        </div>
+        <div class="auth-timer" id="otp-timer">Code expires in <b id="timer-val">10:00</b></div>
+        <span class="auth-resend" id="resend-btn" onclick="resendCode()">Resend Code</span>
+        <button class="auth-btn auth-btn-red" onclick="verifyOTP()" id="otp-verify-btn" disabled>Verify &amp; Sign In</button>
+        <div class="auth-msg" id="otp-msg"></div>
+      </div>
+
+      <!-- STEP 4: Success -->
+      <div class="auth-step" id="step-success">
+        <div style="text-align:center;padding:20px 0">
+          <div style="font-size:56px;margin-bottom:12px">&#127881;</div>
+          <div class="auth-title">Welcome to Feng World!</div>
+          <div class="auth-sub" id="success-sub">You are now signed in.</div>
+          <button class="auth-btn auth-btn-red" onclick="enterApp()" style="margin-top:20px">Start Watching &#9654;</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+<!-- ═══════════════════════════════════════════════════ -->
 
 <nav id="nav">
   <div class="logo" onclick="go('home')">
@@ -964,6 +1196,261 @@ function handleDLClick(el){
   closeDL();
 }
 function closeDL(){ge('dlmodal').classList.remove('open');document.body.style.overflow='';}
+
+
+// ═══════════════════════════════════════════════════════════════
+// FIREBASE CONFIG — Feng World
+// ═══════════════════════════════════════════════════════════════
+var firebaseConfig = {
+  apiKey: "AIzaSyDemo_ReplaceWithYourKey",
+  authDomain: "fengworld.firebaseapp.com",
+  projectId: "fengworld",
+  storageBucket: "fengworld.appspot.com",
+  messagingSenderId: "000000000000",
+  appId: "1:000000000000:web:0000000000000000"
+};
+
+var firebaseReady = false;
+var fbAuth = null;
+var fbDb = null;
+
+// Init Firebase safely
+try {
+  if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+  fbAuth = firebase.auth();
+  fbDb   = firebase.firestore();
+  firebaseReady = true;
+} catch(e) {
+  console.warn('Firebase not configured yet:', e.message);
+}
+
+// ── OTP State ──────────────────────────────────────────────────
+var currentOTP = '';
+var otpExpiry  = 0;
+var timerInterval = null;
+var currentIGUser = '';
+var currentLoginMethod = '';
+
+// ── Step navigation ────────────────────────────────────────────
+function showStep(id) {
+  document.querySelectorAll('.auth-step').forEach(function(s){ s.classList.remove('active'); });
+  var el = ge(id);
+  if (el) el.classList.add('active');
+  clearMsg();
+}
+
+function clearMsg() {
+  ['ig-msg','otp-msg'].forEach(function(id){
+    var e=ge(id); if(e){e.className='auth-msg';e.textContent='';}
+  });
+}
+
+function showMsg(id, text, type) {
+  var e = ge(id);
+  if (!e) return;
+  e.textContent = text;
+  e.className = 'auth-msg ' + (type||'error');
+}
+
+function setLoading(btnId, loading, label) {
+  var b = ge(btnId); if (!b) return;
+  b.disabled = loading;
+  b.innerHTML = loading ? '<span class="auth-spinner"></span>Please wait...' : label;
+}
+
+// ── Google Sign In ─────────────────────────────────────────────
+function signInGoogle() {
+  if (!firebaseReady) {
+    // Demo mode - simulate login
+    showStep('step-success');
+    ge('success-sub').textContent = 'Signed in with Google (Demo Mode)';
+    return;
+  }
+  var provider = new firebase.auth.GoogleAuthProvider();
+  fbAuth.signInWithPopup(provider)
+    .then(function(result) {
+      var user = result.user;
+      saveUserAndEnter(user.displayName || user.email, 'google');
+    })
+    .catch(function(err) {
+      showMsg('ig-msg', err.message, 'error');
+    });
+}
+
+// ── Instagram → send OTP via EmailJS ──────────────────────────
+function showIGStep() {
+  currentLoginMethod = 'instagram';
+  showStep('step-ig');
+}
+
+function sendIGCode() {
+  var username = (ge('ig-username').value || '').trim();
+  if (!username) { showMsg('ig-msg','Please enter your Instagram username','error'); return; }
+  if (username.startsWith('@')) username = username.slice(1);
+  currentIGUser = username;
+
+  setLoading('ig-send-btn', true, 'Send Verification Code');
+
+  // Generate 6-digit OTP
+  currentOTP = '';
+  for (var i=0; i<6; i++) currentOTP += Math.floor(Math.random()*10);
+  otpExpiry = Date.now() + 10 * 60 * 1000; // 10 mins
+
+  // Send via EmailJS (free - 200 emails/month)
+  sendOTPEmail(username, currentOTP)
+    .then(function() {
+      setLoading('ig-send-btn', false, 'Send Verification Code');
+      ge('otp-sub').innerHTML = 'Code sent to <b style="color:var(--text)">fengworld8@gmail.com</b><br><small style="color:var(--muted)">for @'+username+'</small>';
+      showStep('step-otp');
+      startTimer();
+    })
+    .catch(function(err) {
+      setLoading('ig-send-btn', false, 'Send Verification Code');
+      showMsg('ig-msg', 'Failed to send code. Check your connection.', 'error');
+      console.error(err);
+    });
+}
+
+// ── Send OTP Email via EmailJS ─────────────────────────────────
+function sendOTPEmail(username, otp) {
+  // Using EmailJS free service — you need to set this up once at emailjs.com
+  // Service ID, Template ID, and Public Key from your EmailJS account
+  var EMAILJS_SERVICE  = 'service_fengworld';
+  var EMAILJS_TEMPLATE = 'template_otp';
+  var EMAILJS_KEY      = 'YOUR_EMAILJS_PUBLIC_KEY';
+
+  var payload = {
+    service_id:  EMAILJS_SERVICE,
+    template_id: EMAILJS_TEMPLATE,
+    user_id:     EMAILJS_KEY,
+    template_params: {
+      to_email:   'fengworld8@gmail.com',
+      username:   '@' + username,
+      otp_code:   otp,
+      expires_in: '10 minutes',
+      login_time: new Date().toLocaleString(),
+    }
+  };
+
+  return fetch('https://api.emailjs.com/api/v1.0/email/send', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify(payload)
+  }).then(function(r){
+    if (!r.ok) throw new Error('EmailJS error: ' + r.status);
+    return r;
+  });
+}
+
+// ── OTP Input handling ─────────────────────────────────────────
+function otpInput(el, idx) {
+  var val = el.value.toString().slice(-1);
+  el.value = val;
+  if (val) {
+    el.classList.add('filled');
+    if (idx < 5) ge('otp'+(idx+1)).focus();
+  } else {
+    el.classList.remove('filled');
+  }
+  // Auto verify when all 6 filled
+  var full = true;
+  for (var i=0; i<6; i++) { if (!ge('otp'+i).value) { full=false; break; } }
+  var vbtn = ge('otp-verify-btn');
+  if (vbtn) vbtn.disabled = !full;
+}
+
+function otpKey(e, idx) {
+  if (e.key==='Backspace' && !ge('otp'+idx).value && idx>0) {
+    ge('otp'+(idx-1)).focus();
+  }
+}
+
+// ── Timer ──────────────────────────────────────────────────────
+function startTimer() {
+  clearInterval(timerInterval);
+  ge('resend-btn').style.display = 'none';
+  timerInterval = setInterval(function() {
+    var left = otpExpiry - Date.now();
+    if (left <= 0) {
+      clearInterval(timerInterval);
+      ge('timer-val').textContent = '0:00';
+      ge('resend-btn').style.display = 'block';
+      ge('otp-timer').textContent = 'Code expired. ';
+      return;
+    }
+    var m = Math.floor(left/60000);
+    var s = Math.floor((left%60000)/1000);
+    ge('timer-val').textContent = m+':'+(s<10?'0':'')+s;
+  }, 1000);
+}
+
+function resendCode() {
+  currentOTP = '';
+  for (var i=0; i<6; i++) currentOTP += Math.floor(Math.random()*10);
+  otpExpiry = Date.now() + 10*60*1000;
+  for (var j=0; j<6; j++) { ge('otp'+j).value=''; ge('otp'+j).classList.remove('filled'); }
+  ge('otp-verify-btn').disabled = true;
+  showMsg('otp-msg','Sending new code...','info');
+  sendOTPEmail(currentIGUser, currentOTP).then(function(){
+    showMsg('otp-msg','New code sent to fengworld8@gmail.com','success');
+    startTimer();
+    ge('resend-btn').style.display='none';
+  }).catch(function(){
+    showMsg('otp-msg','Failed to resend. Try again.','error');
+  });
+}
+
+// ── Verify OTP ─────────────────────────────────────────────────
+function verifyOTP() {
+  var entered = '';
+  for (var i=0; i<6; i++) entered += ge('otp'+i).value;
+  if (entered.length < 6) { showMsg('otp-msg','Enter all 6 digits','error'); return; }
+  if (Date.now() > otpExpiry) { showMsg('otp-msg','Code expired. Please resend.','error'); return; }
+  if (entered !== currentOTP) { showMsg('otp-msg','Incorrect code. Try again.','error'); return; }
+  // OTP matched!
+  clearInterval(timerInterval);
+  saveUserAndEnter('@'+currentIGUser, 'instagram');
+}
+
+// ── Save user session & enter app ─────────────────────────────
+function saveUserAndEnter(displayName, method) {
+  try {
+    localStorage.setItem('fw_user', JSON.stringify({
+      name: displayName,
+      method: method,
+      loginTime: Date.now()
+    }));
+  } catch(e) {}
+  ge('success-sub').textContent = 'Welcome, ' + displayName + '!';
+  showStep('step-success');
+}
+
+// ── Enter App ─────────────────────────────────────────────────
+function enterApp() {
+  ge('auth-overlay').classList.add('hidden');
+  toast('Welcome to Feng World!');
+}
+
+// ── Check if already logged in ────────────────────────────────
+function checkAuth() {
+  try {
+    var stored = localStorage.getItem('fw_user');
+    if (stored) {
+      var user = JSON.parse(stored);
+      // Session valid for 7 days
+      if (user && user.loginTime && (Date.now()-user.loginTime) < 7*24*60*60*1000) {
+        enterApp();
+        return;
+      }
+    }
+  } catch(e) {}
+  // Show login screen
+  ge('auth-overlay').classList.remove('hidden');
+}
+
+// Run auth check on load
+checkAuth();
+
 
 var toastT;
 function toast(msg){var t=ge('toast');t.textContent=msg;t.classList.add('on');clearTimeout(toastT);toastT=setTimeout(function(){t.classList.remove('on');},2400);}
