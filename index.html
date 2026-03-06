@@ -361,45 +361,56 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
 
 /* ── PLAYER MODAL ── */
 #player-modal{
-  display:none;position:fixed;inset:0;z-index:9000;background:#000;
+  display:none;
+  position:fixed;inset:0;z-index:9000;
+  background:#000;
   flex-direction:column;
+  overflow:hidden;
 }
 #player-modal.open{display:flex}
 
-/* Top bar — real DOM, always above iframe */
+/* TOP BAR — fixed height, never hidden, always clickable */
 #pm-topbar{
-  position:relative;z-index:20;flex-shrink:0;
-  padding:10px 14px 8px;
-  background:linear-gradient(to bottom,rgba(0,0,0,.95),rgba(0,0,0,.6));
+  flex:0 0 54px;
+  width:100%;
   display:flex;align-items:center;gap:10px;
-  transition:opacity .3s,max-height .3s;
-  min-height:52px;
+  padding:8px 14px;
+  background:rgba(0,0,0,.92);
+  border-bottom:1px solid rgba(255,255,255,.08);
+  z-index:30;
+  position:relative;
 }
-#pm-topbar.hidden{opacity:0;pointer-events:none;max-height:0;min-height:0;padding:0;overflow:hidden}
 
-/* iframe fills remaining space */
+/* IFRAME fills ALL remaining space between topbar and bottombar */
 #pm-iframe-wrap{
-  flex:1;position:relative;overflow:hidden;min-height:0;
+  flex:1 1 auto;
+  position:relative;
+  overflow:hidden;
   background:#000;
+  /* stretch to fill - no aspect ratio constraint */
+  min-height:0;
+  width:100%;
 }
 #pm-iframe{
-  width:100%;height:100%;border:none;display:block;
-  position:absolute;inset:0;
-}
-/* Tap zone sits INSIDE iframe wrap, above iframe */
-#pm-tap-zone{
-  position:absolute;inset:0;z-index:5;
-  /* Only center region — don't block edges which have controls */
+  position:absolute;
+  top:0;left:0;
+  width:100%;
+  height:100%;
+  border:none;
+  display:block;
+  background:#000;
 }
 
-/* Bottom bar — real DOM, always above iframe */
+/* BOTTOM BAR — fixed height, never hidden, always clickable */
 #pm-bottombar{
-  position:relative;z-index:20;flex-shrink:0;
-  padding:8px 14px 16px;
-  background:linear-gradient(to top,rgba(0,0,0,.97),rgba(0,0,0,.7));
-  transition:opacity .3s,max-height .3s;
+  flex:0 0 auto;
+  width:100%;
+  padding:10px 14px 18px;
+  background:rgba(0,0,0,.92);
+  border-top:1px solid rgba(255,255,255,.08);
+  z-index:30;
+  position:relative;
 }
-#pm-bottombar.hidden{opacity:0;pointer-events:none;max-height:0;overflow:hidden;padding:0}
 .pm-back{
   width:42px;height:42px;border-radius:50%;
   background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);
@@ -417,7 +428,10 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
   padding:3px 8px;font-size:11px;font-weight:700;flex-shrink:0;
 }
 .pm-srv-row{
-  display:flex;gap:6px;overflow-x:auto;padding-bottom:8px;scrollbar-width:none;
+  display:flex;gap:6px;overflow-x:auto;
+  padding-bottom:6px;
+  scrollbar-width:none;
+  -webkit-overflow-scrolling:touch;
 }
 .pm-srv-row::-webkit-scrollbar{display:none}
 .pm-srv{
@@ -664,13 +678,13 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
     <div class="pm-ep-badge" id="pm-ep-badge" style="display:none"></div>
   </div>
   <div id="pm-iframe-wrap">
-    <div id="pm-tap-zone" onclick="pmToggle()"></div>
     <iframe id="pm-iframe" src="" allowfullscreen allow="autoplay;encrypted-media;picture-in-picture" referrerpolicy="no-referrer"></iframe>
   </div>
   <div id="pm-bottombar">
     <div class="pm-srv-row" id="pm-srv-row"></div>
     <div class="pm-actions">
       <button class="pm-btn red" onclick="pmNextSrv()">&#9889; Next Server</button>
+      <button class="pm-btn" id="pm-unmute-btn" onclick="pmUnmute()" style="background:rgba(255,165,0,.7);border-color:orange" title="If sound is off, tap here">&#128266; Unmute</button>
       <button class="pm-btn" id="pm-ep-btn" onclick="pmOpenEps()" style="display:none">&#9776; Episodes</button>
       <button class="pm-btn" id="pm-trl-btn" onclick="pmTrailer()" style="display:none">&#127909; Trailer</button>
       <div class="pm-shield">&#128737; Shield ON</div>
@@ -760,7 +774,7 @@ var SEED_TRENDING = SEED_MOVIES.slice(0,6);
 var SRVN = ['Vidlink','Videasy','VidSrc.cc','Vidfast','111Movies','VidSrc.wtf','CinemaOS','VidSrc.xyz','EmbedSU','VidSrc.to'];
 function getSrcs(type,id,s,e){
   if(type==='movie')return[
-    'https://vidlink.pro/movie/'+id+'?autoplay=true&title=false',
+    'https://vidlink.pro/movie/'+id+'?autoplay=true&title=false&muted=false',
     'https://player.videasy.net/movie/'+id,
     'https://vidsrc.cc/v2/embed/movie/'+id,
     'https://vidfast.pro/movie/'+id+'?autoPlay=true',
@@ -772,7 +786,7 @@ function getSrcs(type,id,s,e){
     'https://vidsrc.to/embed/movie/'+id,
   ];
   return[
-    'https://vidlink.pro/tv/'+id+'/'+s+'/'+e+'?autoplay=true&title=false',
+    'https://vidlink.pro/tv/'+id+'/'+s+'/'+e+'?autoplay=true&title=false&muted=false',
     'https://player.videasy.net/tv/'+id+'/'+s+'/'+e,
     'https://vidsrc.cc/v2/embed/tv/'+id+'/'+s+'/'+e,
     'https://vidfast.pro/tv/'+id+'/'+s+'/'+e+'?autoPlay=true',
@@ -1090,7 +1104,10 @@ function openPlayer(src,srvIdx,epInfo){
   var trlBtn=ge('pm-trl-btn');if(trlBtn)trlBtn.style.display=pYTKey?'inline-flex':'none';
   modal.classList.add('open');
   document.body.style.overflow='hidden';
-  pmShowControls();pmAutoHide();
+  pmShowControls(); // always visible, no auto-hide
+  // Show unmute button for servers that mute by default
+  var unmuteBtn=ge('pm-unmute-btn');
+  if(unmuteBtn)unmuteBtn.style.display='inline-flex';
   installAB();
 }
 
@@ -1113,21 +1130,41 @@ function switchSrv(idx){
 function pmNextSrv(){var n=(pSrv+1)%SRVN.length;switchSrv(n);}
 function pmTrailer(){if(pYTKey)openPlayer('https://www.youtube.com/embed/'+pYTKey+'?autoplay=1&rel=0',-1,'Trailer');}
 
-function pmToggle(){if(pmVisible)pmHideControls();else pmShowControls();}
+function pmUnmute(){
+  // Try to unmute via postMessage to iframe
+  var iframe=ge('pm-iframe');
+  if(iframe&&iframe.contentWindow){
+    try{
+      iframe.contentWindow.postMessage({action:'unmute'},'*');
+      iframe.contentWindow.postMessage(JSON.stringify({type:'playerUnmute'}),'*');
+    }catch(e){}
+  }
+  // Also reload current server — some servers unmute on reload
+  var src=ge('pm-iframe').src;
+  if(src){
+    // Strip muted param and re-add muted=false
+    src=src.replace(/[?&]muted=[^&]*/g,'');
+    var sep=src.indexOf('?')>=0?'&':'?';
+    src+=sep+'muted=false&autoplay=true';
+    ge('pm-iframe').src='';
+    setTimeout(function(){ge('pm-iframe').src=src;},100);
+  }
+  // Hide the unmute button after tapping
+  var btn=ge('pm-unmute-btn');
+  if(btn)btn.style.display='none';
+  toast('Sound enabled! If still muted, try Next Server');
+}
+
+// Controls are ALWAYS visible — no auto-hide
+function pmToggle(){} // tap zone does nothing now — prevents accidental hide
 function pmShowControls(){
   pmVisible=true;
   var tb=ge('pm-topbar'),bb=ge('pm-bottombar');
   if(tb)tb.classList.remove('hidden');
   if(bb)bb.classList.remove('hidden');
-  pmAutoHide();
 }
-function pmHideControls(){
-  pmVisible=false;
-  var tb=ge('pm-topbar'),bb=ge('pm-bottombar');
-  if(tb)tb.classList.add('hidden');
-  if(bb)bb.classList.add('hidden');
-}
-function pmAutoHide(){clearTimeout(pmHideT);pmHideT=setTimeout(pmHideControls,4000);}
+function pmHideControls(){} // disabled — controls never hide
+function pmAutoHide(){} // disabled
 
 // Episode panel in player
 function pmOpenEps(){
