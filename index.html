@@ -665,6 +665,74 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
   animation:blink 1s infinite;flex-shrink:0;
 }
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+
+/* ── HOME LIVESTREAM STRIP ── */
+.live-strip{padding:0 0 4px}
+.live-strip-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:18px 16px 12px;
+}
+.live-strip-title{
+  font-size:20px;font-weight:900;display:flex;align-items:center;gap:8px;
+}
+.live-strip-dot{
+  width:10px;height:10px;border-radius:50%;background:#ff4444;
+  animation:blink 1s infinite;flex-shrink:0;
+}
+.live-strip-more{
+  font-size:13px;color:var(--muted);cursor:pointer;
+  display:flex;align-items:center;gap:4px;
+  background:none;border:none;color:rgba(255,255,255,.5);
+  font-family:var(--font);
+}
+.live-strip-more:hover{color:#fff}
+.live-strip-row{
+  display:flex;gap:12px;
+  padding:0 16px 16px;
+  overflow-x:auto;
+  scrollbar-width:none;
+  -webkit-overflow-scrolling:touch;
+}
+.live-strip-row::-webkit-scrollbar{display:none}
+.live-strip-card{
+  flex-shrink:0;
+  width:160px;
+  border-radius:14px;
+  overflow:hidden;
+  cursor:pointer;
+  background:var(--card);
+  border:1px solid var(--bdr);
+  transition:.2s;
+  position:relative;
+}
+.live-strip-card:active{transform:scale(.95)}
+.live-strip-card-thumb{
+  width:160px;height:90px;
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;position:relative;
+}
+.live-strip-card-thumb img{
+  width:100%;height:100%;object-fit:cover;
+}
+.live-strip-card-thumb .ls-live-badge{
+  position:absolute;top:6px;left:6px;
+  background:#ff4444;color:#fff;
+  font-size:9px;font-weight:900;
+  padding:2px 7px;border-radius:8px;
+  letter-spacing:.5px;
+  display:flex;align-items:center;gap:4px;
+}
+.ls-live-badge-dot{
+  width:5px;height:5px;border-radius:50%;
+  background:#fff;animation:blink 1s infinite;
+}
+.live-strip-card-name{
+  padding:7px 9px 9px;
+  font-size:11px;font-weight:700;
+  color:rgba(255,255,255,.75);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  text-transform:uppercase;letter-spacing:.3px;
+}
 </style>
 </head>
 <body>
@@ -712,6 +780,19 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
     </div>
     <div class="hero-dots" id="hero-dots"></div>
   </div>
+  <!-- LIVESTREAM STRIP -->
+  <div class="live-strip" id="home-live-strip">
+    <div class="live-strip-header">
+      <div class="live-strip-title">
+        <div class="live-strip-dot"></div>
+        Livestream
+        <span style="font-size:13px;color:var(--muted);font-weight:500">&#x1F4F6;</span>
+      </div>
+      <button class="live-strip-more" onclick="go('live')">View All &rsaquo;</button>
+    </div>
+    <div class="live-strip-row" id="home-live-row"></div>
+  </div>
+
   <div id="home-sections"></div>
 </div>
 
@@ -986,6 +1067,7 @@ function loadHome(){
   heroItems=SEED_TRENDING;
   setHero(0);startHeroTimer();
   renderHome({trending:SEED_TRENDING,popular:SEED_MOVIES,tv:SEED_TV,anime:SEED_ANIME});
+  renderHomeLiveStrip(); // populate live strip immediately
   // Async upgrade
   Promise.all([
     tmdb('/trending/all/week'),
@@ -999,13 +1081,199 @@ function loadHome(){
   }).catch(function(){});
 }
 
+// ═══ LIVE TV ══════════════════════════════════════════════════════════════
+
+var LIVE_CHANNELS = [
+  // ── SPORTS ──
+  {name:'SS Premier League', cat:'sports', bg:'#1a0a2e',
+   logo:'https://upload.wikimedia.org/wikipedia/en/thumb/f/f2/Premier_League_Logo.svg/1200px-Premier_League_Logo.svg.png',
+   src:'https://vidsrc.to/embed/tv/34307'},
+  {name:'SS Football', cat:'sports', bg:'#0d1b2a',
+   logo:'https://i.imgur.com/SzO59xK.png',
+   src:'https://www.youtube.com/embed/videoseries?list=PLmgjFGEMGMH_bT2HhW_eLLF8XgKDN7Zxq&autoplay=1'},
+  {name:'SS PSL', cat:'sports', bg:'#006633',
+   logo:'https://upload.wikimedia.org/wikipedia/en/3/31/Premier_Soccer_League_logo.png',
+   src:'https://vidsrc.to/embed/tv/34307'},
+  {name:'SS Rugby', cat:'sports', bg:'#8b1a1a',
+   logo:'https://i.imgur.com/wZPJs9M.png',
+   src:'https://vidsrc.to/embed/tv/34307'},
+  {name:'SS Cricket', cat:'sports', bg:'#003580',
+   logo:'https://upload.wikimedia.org/wikipedia/en/5/5b/Cricket_South_Africa_logo.png',
+   src:'https://vidsrc.to/embed/tv/34307'},
+  {name:'SS Action', cat:'sports', bg:'#1a0a00',
+   logo:'https://i.imgur.com/QWxzLMV.png',
+   src:'https://vidsrc.to/embed/tv/34307'},
+  {name:'SS Grandstand', cat:'sports', bg:'#0d2137',
+   logo:'https://i.imgur.com/QWxzLMV.png',
+   src:'https://vidsrc.to/embed/tv/34307'},
+  {name:'SS Variety 1', cat:'sports', bg:'#f05a28',
+   logo:'https://i.imgur.com/QWxzLMV.png',
+   src:'https://vidsrc.to/embed/tv/34307'},
+  {name:'SS Variety 2', cat:'sports', bg:'#f05a28',
+   logo:'https://i.imgur.com/QWxzLMV.png',
+   src:'https://vidsrc.to/embed/tv/34307'},
+  {name:'SS Variety 3', cat:'sports', bg:'#f05a28',
+   logo:'https://i.imgur.com/QWxzLMV.png',
+   src:'https://vidsrc.to/embed/tv/34307'},
+  {name:'SS Variety 4', cat:'sports', bg:'#f05a28',
+   logo:'https://i.imgur.com/QWxzLMV.png',
+   src:'https://vidsrc.to/embed/tv/34307'},
+  {name:'Azam Sports 1', cat:'sports', bg:'#f5a623',
+   logo:'https://i.imgur.com/fG8WCIN.png',
+   src:'https://vidsrc.to/embed/tv/34307'},
+  {name:'Azam Sports 2', cat:'sports', bg:'#f5a623',
+   logo:'https://i.imgur.com/fG8WCIN.png',
+   src:'https://vidsrc.to/embed/tv/34307'},
+  {name:'Azam Sports 3', cat:'sports', bg:'#f5a623',
+   logo:'https://i.imgur.com/fG8WCIN.png',
+   src:'https://vidsrc.to/embed/tv/34307'},
+  // ── SABC ──
+  {name:'SABC 1', cat:'sabc', bg:'#00843D',
+   logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/SABC1_logo.svg/200px-SABC1_logo.svg.png',
+   src:'https://www.youtube.com/embed/live_stream?channel=UCIf5JFKNwXMIRKHMNnEFbXA&autoplay=1'},
+  {name:'SABC 2', cat:'sabc', bg:'#0033A0',
+   logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/5/54/SABC2_logo.svg/200px-SABC2_logo.svg.png',
+   src:'https://www.youtube.com/embed/live_stream?channel=UCz8QiqNPMJFdHmol9E6Biow&autoplay=1'},
+  {name:'SABC 3', cat:'sabc', bg:'#E4002B',
+   logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/SABC3_logo.svg/200px-SABC3_logo.svg.png',
+   src:'https://www.youtube.com/embed/live_stream?channel=UC6ScMG0KGo8kBMnJnvCHKJg&autoplay=1'},
+  // ── ENTERTAINMENT ──
+  {name:'M-Net', cat:'entertainment', bg:'#c8102e',
+   logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/4/42/M-Net_logo.svg/200px-M-Net_logo.svg.png',
+   src:'https://vidsrc.to/embed/tv/1403'},
+  {name:'M-Net Movies 1', cat:'entertainment', bg:'#1b1b2f',
+   logo:'https://i.imgur.com/W3cOzOy.png',
+   src:'https://vidsrc.to/embed/movie/550'},
+  {name:'Big Brother Mzansi', cat:'entertainment', bg:'#6a0dad',
+   logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Big_Brother_Eye_Logo.svg/200px-Big_Brother_Eye_Logo.svg.png',
+   src:'https://vidsrc.to/embed/tv/17754'},
+  {name:'E.TV', cat:'entertainment', bg:'#e4002b',
+   logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Etv_logo.svg/200px-Etv_logo.svg.png',
+   src:'https://www.youtube.com/embed/live_stream?channel=UCZ5VFKPFbXMBnANGnQEqq5A&autoplay=1'},
+  {name:'E.TV Extra', cat:'entertainment', bg:'#c0392b',
+   logo:'https://i.imgur.com/W3cOzOy.png',
+   src:'https://vidsrc.to/embed/tv/1403'},
+  {name:'Star Life', cat:'entertainment', bg:'#e91e8c',
+   logo:'https://i.imgur.com/ZGKUOPF.png',
+   src:'https://vidsrc.to/embed/tv/2190'},
+  {name:'Moja Love', cat:'entertainment', bg:'#6b0f1a',
+   logo:'https://i.imgur.com/W3cOzOy.png',
+   src:'https://vidsrc.to/embed/tv/1403'},
+  {name:'Universal TV', cat:'entertainment', bg:'#111',
+   logo:'https://i.imgur.com/W3cOzOy.png',
+   src:'https://vidsrc.to/embed/tv/1399'},
+  {name:'Colors TV', cat:'entertainment', bg:'#e05c0a',
+   logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/2/28/Colors_TV_logo.svg/200px-Colors_TV_logo.svg.png',
+   src:'https://vidsrc.to/embed/tv/2190'},
+  {name:'Zee World', cat:'entertainment', bg:'#9b1b82',
+   logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/Zee_World_Logo.svg/200px-Zee_World_Logo.svg.png',
+   src:'https://vidsrc.to/embed/tv/2190'},
+  {name:'KykNET', cat:'entertainment', bg:'#004b8d',
+   logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/KykNET_logo.svg/200px-KykNET_logo.svg.png',
+   src:'https://vidsrc.to/embed/tv/1403'},
+  {name:'MTV Live Intl', cat:'entertainment', bg:'#000',
+   logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/0/03/MTV_2021_logo.svg/200px-MTV_2021_logo.svg.png',
+   src:'https://www.youtube.com/embed/live_stream?channel=UCkfIKVWMOdQNFCPHxHxEh1A&autoplay=1'},
+  {name:'Discovery Channel', cat:'entertainment', bg:'#003087',
+   logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/2/22/Discovery_Channel_logo.svg/200px-Discovery_Channel_logo.svg.png',
+   src:'https://vidsrc.to/embed/tv/1816'},
+  {name:'Discovery Science', cat:'entertainment', bg:'#0077cc',
+   logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Discovery_Science_logo.svg/200px-Discovery_Science_logo.svg.png',
+   src:'https://vidsrc.to/embed/tv/1816'},
+  {name:'History Channel', cat:'entertainment', bg:'#6b5c3e',
+   logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/History_Channel_logo.svg/200px-History_Channel_logo.svg.png',
+   src:'https://vidsrc.to/embed/tv/326333'},
+  {name:'Nat Geo Wild', cat:'entertainment', bg:'#f5a623',
+   logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/5/54/Nat_Geo_Wild.svg/200px-Nat_Geo_Wild.svg.png',
+   src:'https://vidsrc.to/embed/tv/1816'},
+  {name:'Trace Africa', cat:'entertainment', bg:'#009e60',
+   logo:'https://i.imgur.com/W3cOzOy.png',
+   src:'https://vidsrc.to/embed/tv/2190'},
+  {name:'Bloomberg TV', cat:'news', bg:'#111',
+   logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Bloomberg_Television_logo_2022.svg/200px-Bloomberg_Television_logo_2022.svg.png',
+   src:'https://www.youtube.com/embed/live_stream?channel=UCIALMKvObZNtJ6AmdCLP7Lg&autoplay=1'},
+  // ── NEWS ──
+  {name:'Al Jazeera', cat:'news', bg:'#1a1a1a',
+   logo:'https://upload.wikimedia.org/wikipedia/en/thumb/f/f2/Al_Jazeera_Logo.svg/200px-Al_Jazeera_Logo.svg.png',
+   src:'https://www.youtube.com/embed/live_stream?channel=UCNye-wNBqNL5ZzHSJj3l8Bg&autoplay=1'},
+  {name:'CNBC Africa', cat:'news', bg:'#003087',
+   logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/CNBC_Africa_logo.svg/200px-CNBC_Africa_logo.svg.png',
+   src:'https://www.youtube.com/embed/live_stream?channel=UCkMmZYkgOVFNWNE0fJ3jH6A&autoplay=1'},
+  {name:'Newzroom Afrika', cat:'news', bg:'#c8102e',
+   logo:'https://i.imgur.com/W3cOzOy.png',
+   src:'https://www.youtube.com/embed/live_stream?channel=UCFTkdV8CBBdxFH1LKApNu4A&autoplay=1'},
+  {name:'NHK World', cat:'news', bg:'#003087',
+   logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/NHK_World_logo.svg/200px-NHK_World_logo.svg.png',
+   src:'https://www.youtube.com/embed/live_stream?channel=UCFTkdV8CBBdxFH1LKApNu4A&autoplay=1'},
+  // ── KIDS ──
+  {name:'Nickelodeon', cat:'kids', bg:'#ff6600',
+   logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/Nickelodeon_2023_logo_%28outline%29.svg/200px-Nickelodeon_2023_logo_%28outline%29.svg.png',
+   src:'https://vidsrc.to/embed/tv/1553'},
+  {name:'Nick Jr', cat:'kids', bg:'#ff8800',
+   logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Nick_Jr._Logo_2023.svg/200px-Nick_Jr._Logo_2023.svg.png',
+   src:'https://vidsrc.to/embed/tv/1553'},
+  {name:'Disney Junior', cat:'kids', bg:'#003087',
+   logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Disney_Junior_logo.svg/200px-Disney_Junior_logo.svg.png',
+   src:'https://vidsrc.to/embed/tv/4057'},
+  {name:'Canal+ Kids', cat:'kids', bg:'#1a1a2e',
+   logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/Canal%2B_logo.svg/200px-Canal%2B_logo.svg.png',
+   src:'https://vidsrc.to/embed/tv/4057'},
+]
+
+var liveFilter = 'all';
+
 function renderHome(d){
+  // Populate live strip on home page
+  renderHomeLiveStrip();
   var h='';
   h+=makeSection('&#128293; Trending',d.trending||[],'movie','',false);
   h+=makeSection('&#127916; Popular Movies',d.popular||[],'movie','',false);
   h+=makeSection('&#128250; Top Series',d.tv||[],'tv','',false);
   h+=makeSection('&#127981; Anime',d.anime||[],'tv','',false);
   ge('home-sections').innerHTML=h;
+}
+
+function renderHomeLiveStrip(){
+  var row = ge('home-live-row');
+  if(!row || row.children.length > 0) return; // already rendered
+  // Show first 10 channels in the strip
+  var featured = LIVE_CHANNELS.slice(0, 12);
+  featured.forEach(function(ch){
+    var idx = LIVE_CHANNELS.indexOf(ch);
+    var card = document.createElement('div');
+    card.className = 'live-strip-card';
+    card.onclick = function(){ openLive(idx); };
+
+    // Thumb
+    var thumb = document.createElement('div');
+    thumb.className = 'live-strip-card-thumb';
+    thumb.style.background = ch.bg || '#111';
+
+    // LIVE badge
+    var badge = document.createElement('div');
+    badge.className = 'ls-live-badge';
+    badge.innerHTML = '<div class="ls-live-badge-dot"></div> LIVE';
+
+    // Logo img
+    var img = document.createElement('img');
+    img.src = ch.logo;
+    img.alt = ch.name;
+    img.loading = 'lazy';
+    img.style.cssText = 'width:100%;height:100%;object-fit:contain;padding:12%';
+    img.onerror = function(){ this.style.display='none'; };
+
+    thumb.appendChild(badge);
+    thumb.appendChild(img);
+
+    // Name
+    var name = document.createElement('div');
+    name.className = 'live-strip-card-name';
+    name.textContent = ch.name;
+
+    card.appendChild(thumb);
+    card.appendChild(name);
+    row.appendChild(card);
+  });
 }
 
 function makeSection(title,items,type,genre,wide){
@@ -1620,107 +1888,7 @@ updateWLCount();
 loadHome();
 
 
-// ═══ LIVE TV ══════════════════════════════════════════════════════════════
 
-var LIVE_CHANNELS = [
-  // ── SPORTS ──
-  {name:'SS Premier League', cat:'sports', logo:'https://upload.wikimedia.org/wikipedia/en/thumb/f/f2/Premier_League_Logo.svg/1200px-Premier_League_Logo.svg.png', bg:'#3d1152',
-   src:'https://vidsrc.to/embed/tv/34307'},
-  {name:'SS Football', cat:'sports', logo:'https://i.imgur.com/QWxzLMV.png', bg:'#1a1a2e',
-   src:'https://www.dailymotion.com/embed/video/x8jyytk?autoplay=1'},
-  {name:'SS PSL', cat:'sports', logo:'https://upload.wikimedia.org/wikipedia/en/3/31/Premier_Soccer_League_logo.png', bg:'#006633',
-   src:'https://www.dailymotion.com/embed/video/x8jyytk?autoplay=1'},
-  {name:'SS Rugby', cat:'sports', logo:'https://i.imgur.com/wZPJs9M.png', bg:'#ff6600',
-   src:'https://www.dailymotion.com/embed/video/x8jyytk?autoplay=1'},
-  {name:'SS Cricket', cat:'sports', logo:'https://upload.wikimedia.org/wikipedia/en/5/5b/Cricket_South_Africa_logo.png', bg:'#003580',
-   src:'https://www.dailymotion.com/embed/video/x8jyytk?autoplay=1'},
-  {name:'SS Action', cat:'sports', logo:'https://i.imgur.com/QWxzLMV.png', bg:'#1a0a00',
-   src:'https://www.dailymotion.com/embed/video/x8jyytk?autoplay=1'},
-  {name:'SS Grandstand', cat:'sports', logo:'https://i.imgur.com/QWxzLMV.png', bg:'#0d2137',
-   src:'https://www.dailymotion.com/embed/video/x8jyytk?autoplay=1'},
-  {name:'SS Variety 1', cat:'sports', logo:'https://i.imgur.com/QWxzLMV.png', bg:'#f05a28',
-   src:'https://www.dailymotion.com/embed/video/x8jyytk?autoplay=1'},
-  {name:'SS Variety 2', cat:'sports', logo:'https://i.imgur.com/QWxzLMV.png', bg:'#f05a28',
-   src:'https://www.dailymotion.com/embed/video/x8jyytk?autoplay=1'},
-  {name:'SS Variety 3', cat:'sports', logo:'https://i.imgur.com/QWxzLMV.png', bg:'#f05a28',
-   src:'https://www.dailymotion.com/embed/video/x8jyytk?autoplay=1'},
-  {name:'SS Variety 4', cat:'sports', logo:'https://i.imgur.com/QWxzLMV.png', bg:'#f05a28',
-   src:'https://www.dailymotion.com/embed/video/x8jyytk?autoplay=1'},
-  {name:'Azam Sports 1', cat:'sports', logo:'https://i.imgur.com/fG8WCIN.png', bg:'#f5a623',
-   src:'https://www.dailymotion.com/embed/video/x8jyytk?autoplay=1'},
-  {name:'Azam Sports 2', cat:'sports', logo:'https://i.imgur.com/fG8WCIN.png', bg:'#f5a623',
-   src:'https://www.dailymotion.com/embed/video/x8jyytk?autoplay=1'},
-  {name:'Azam Sports 3', cat:'sports', logo:'https://i.imgur.com/fG8WCIN.png', bg:'#f5a623',
-   src:'https://www.dailymotion.com/embed/video/x8jyytk?autoplay=1'},
-
-  // ── SABC ──
-  {name:'SABC 1', cat:'sabc', logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/SABC1_logo.svg/1200px-SABC1_logo.svg.png', bg:'#00843D',
-   src:'https://www.dailymotion.com/embed/video/x8jyytk?autoplay=1'},
-  {name:'SABC 2', cat:'sabc', logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/5/54/SABC2_logo.svg/1200px-SABC2_logo.svg.png', bg:'#0033A0',
-   src:'https://www.dailymotion.com/embed/video/x8jyytk?autoplay=1'},
-  {name:'SABC 3', cat:'sabc', logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/SABC3_logo.svg/1200px-SABC3_logo.svg.png', bg:'#E4002B',
-   src:'https://www.dailymotion.com/embed/video/x8jyytk?autoplay=1'},
-
-  // ── ENTERTAINMENT ──
-  {name:'M-Net', cat:'entertainment', logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/4/42/M-Net_logo.svg/1200px-M-Net_logo.svg.png', bg:'#c8102e',
-   src:'https://www.dailymotion.com/embed/video/x8jyytk?autoplay=1'},
-  {name:'M-Net Movies 1', cat:'entertainment', logo:'https://i.imgur.com/W3cOzOy.png', bg:'#1b1b2f',
-   src:'https://www.dailymotion.com/embed/video/x8jyytk?autoplay=1'},
-  {name:'Big Brother Mzansi', cat:'entertainment', logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Big_Brother_Eye_Logo.svg/800px-Big_Brother_Eye_Logo.svg.png', bg:'#6a0dad',
-   src:'https://www.dailymotion.com/embed/video/x8jyytk?autoplay=1'},
-  {name:'E.TV', cat:'entertainment', logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Etv_logo.svg/1200px-Etv_logo.svg.png', bg:'#e4002b',
-   src:'https://www.dailymotion.com/embed/video/x8jyytk?autoplay=1'},
-  {name:'E.TV Extra', cat:'entertainment', logo:'https://i.imgur.com/W3cOzOy.png', bg:'#c0392b',
-   src:'https://www.dailymotion.com/embed/video/x8jyytk?autoplay=1'},
-  {name:'Star Life', cat:'entertainment', logo:'https://i.imgur.com/ZGKUOPF.png', bg:'#e91e8c',
-   src:'https://www.dailymotion.com/embed/video/x8jyytk?autoplay=1'},
-  {name:'Moja Love', cat:'entertainment', logo:'https://i.imgur.com/moja.png', bg:'#6b0f1a',
-   src:'https://www.dailymotion.com/embed/video/x8jyytk?autoplay=1'},
-  {name:'Universal TV', cat:'entertainment', logo:'https://i.imgur.com/W3cOzOy.png', bg:'#111',
-   src:'https://www.dailymotion.com/embed/video/x8jyytk?autoplay=1'},
-  {name:'Colors TV', cat:'entertainment', logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/2/28/Colors_TV_logo.svg/1200px-Colors_TV_logo.svg.png', bg:'#e05c0a',
-   src:'https://www.dailymotion.com/embed/video/x8jyytk?autoplay=1'},
-  {name:'Zee World', cat:'entertainment', logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/Zee_World_Logo.svg/1200px-Zee_World_Logo.svg.png', bg:'#9b1b82',
-   src:'https://www.dailymotion.com/embed/video/x8jyytk?autoplay=1'},
-  {name:'KykNET', cat:'entertainment', logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/KykNET_logo.svg/1200px-KykNET_logo.svg.png', bg:'#004b8d',
-   src:'https://www.dailymotion.com/embed/video/x8jyytk?autoplay=1'},
-  {name:'MTV Live Intl', cat:'entertainment', logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/0/03/MTV_2021_logo.svg/800px-MTV_2021_logo.svg.png', bg:'#000',
-   src:'https://www.dailymotion.com/embed/video/x8jyytk?autoplay=1'},
-  {name:'Discovery Channel', cat:'entertainment', logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/2/22/Discovery_Channel_logo.svg/1200px-Discovery_Channel_logo.svg.png', bg:'#003087',
-   src:'https://www.dailymotion.com/embed/video/x8jyytk?autoplay=1'},
-  {name:'Discovery Science', cat:'entertainment', logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Discovery_Science_logo.svg/1200px-Discovery_Science_logo.svg.png', bg:'#0077cc',
-   src:'https://www.dailymotion.com/embed/video/x8jyytk?autoplay=1'},
-  {name:'History Channel', cat:'entertainment', logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/History_Channel_logo.svg/1200px-History_Channel_logo.svg.png', bg:'#6b5c3e',
-   src:'https://www.dailymotion.com/embed/video/x8jyytk?autoplay=1'},
-  {name:'Nat Geo Wild', cat:'entertainment', logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/5/54/Nat_Geo_Wild.svg/1200px-Nat_Geo_Wild.svg.png', bg:'#f5a623',
-   src:'https://www.dailymotion.com/embed/video/x8jyytk?autoplay=1'},
-  {name:'Trace Africa', cat:'entertainment', logo:'https://i.imgur.com/W3cOzOy.png', bg:'#009e60',
-   src:'https://www.dailymotion.com/embed/video/x8jyytk?autoplay=1'},
-  {name:'Bloomberg TV', cat:'news', logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Bloomberg_Television_logo_2022.svg/1200px-Bloomberg_Television_logo_2022.svg.png', bg:'#111',
-   src:'https://www.bloomberg.com/media-manifest/streams/us.m3u8'},
-
-  // ── NEWS ──
-  {name:'Al Jazeera', cat:'news', logo:'https://upload.wikimedia.org/wikipedia/en/thumb/f/f2/Al_Jazeera_Logo.svg/1200px-Al_Jazeera_Logo.svg.png', bg:'#333',
-   src:'https://www.dailymotion.com/embed/video/x8jyytk?autoplay=1'},
-  {name:'CNBC Africa', cat:'news', logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/CNBC_Africa_logo.svg/1200px-CNBC_Africa_logo.svg.png', bg:'#003087',
-   src:'https://www.dailymotion.com/embed/video/x8jyytk?autoplay=1'},
-  {name:'Newzroom Afrika', cat:'news', logo:'https://i.imgur.com/W3cOzOy.png', bg:'#c8102e',
-   src:'https://www.dailymotion.com/embed/video/x8jyytk?autoplay=1'},
-  {name:'NHK World', cat:'news', logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/NHK_World_logo.svg/1200px-NHK_World_logo.svg.png', bg:'#003087',
-   src:'https://nhkworldlive-nhkw.akamaized.net/hls/live/2003458/nhkw/index_3M.m3u8'},
-
-  // ── KIDS ──
-  {name:'Nickelodeon', cat:'kids', logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/Nickelodeon_2023_logo_%28outline%29.svg/1200px-Nickelodeon_2023_logo_%28outline%29.svg.png', bg:'#ff6600',
-   src:'https://www.dailymotion.com/embed/video/x8jyytk?autoplay=1'},
-  {name:'Nick Jr', cat:'kids', logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Nick_Jr._Logo_2023.svg/1200px-Nick_Jr._Logo_2023.svg.png', bg:'#ff6600',
-   src:'https://www.dailymotion.com/embed/video/x8jyytk?autoplay=1'},
-  {name:'Disney Junior', cat:'kids', logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Disney_Junior_logo.svg/1200px-Disney_Junior_logo.svg.png', bg:'#003087',
-   src:'https://www.dailymotion.com/embed/video/x8jyytk?autoplay=1'},
-  {name:'Canal+ Kids', cat:'kids', logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/Canal%2B_logo.svg/800px-Canal%2B_logo.svg.png', bg:'#1a1a2e',
-   src:'https://www.dailymotion.com/embed/video/x8jyytk?autoplay=1'},
-];
-
-var liveFilter = 'all';
 
 function renderLiveGrid(filter) {
   var grid = ge('live-grid');
@@ -1765,7 +1933,7 @@ function closeLive() {
 </script>
 
 <!-- ═══ LIVE TV PAGE ═══ -->
-<div id="pg-live" class="page" style="display:none;padding-top:70px">
+<div id="live-page" class="page" style="padding-top:70px">
   <div style="padding:20px 16px 10px">
     <h2 style="font-size:22px;font-weight:900;margin:0 0 4px">&#128308; Live TV</h2>
     <p style="font-size:13px;color:var(--muted);margin:0">Stream live channels — Sports, News, Entertainment</p>
