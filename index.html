@@ -387,7 +387,6 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
   position:relative;
   overflow:hidden;
   background:#000;
-  /* stretch to fill - no aspect ratio constraint */
   min-height:0;
   width:100%;
 }
@@ -400,6 +399,18 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
   display:block;
   background:#000;
 }
+/* Ad-shield: invisible strips on all 4 edges block ad banner clicks
+   Only the center 60% wide x 70% tall passes clicks through to iframe */
+.ad-shield{
+  position:absolute;
+  z-index:6;
+  background:transparent;
+  pointer-events:all;
+}
+#as-top{top:0;left:0;right:0;height:8%}
+#as-left{top:8%;left:0;width:12%;bottom:8%}
+#as-right{top:8%;right:0;width:12%;bottom:8%}
+#as-bottom{bottom:0;left:0;right:0;height:8%}
 
 /* BOTTOM BAR — fixed height, never hidden, always clickable */
 #pm-bottombar{
@@ -723,6 +734,11 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
   </div>
   <div id="pm-iframe-wrap">
     <iframe id="pm-iframe" src="" allowfullscreen allow="autoplay;encrypted-media;picture-in-picture" referrerpolicy="no-referrer"></iframe>
+    <!-- Ad-shield strips: block clicks on iframe edges where ads live -->
+    <div class="ad-shield" id="as-top"    onclick="pmShowControls()"></div>
+    <div class="ad-shield" id="as-left"   onclick="pmShowControls()"></div>
+    <div class="ad-shield" id="as-right"  onclick="pmShowControls()"></div>
+    <div class="ad-shield" id="as-bottom" onclick="pmShowControls()"></div>
   </div>
   <div id="pm-bottombar">
     <div class="pm-srv-row" id="pm-srv-row"></div>
@@ -815,31 +831,42 @@ var SEED_ANIME=[
 var SEED_TRENDING = SEED_MOVIES.slice(0,6);
 
 // ═══ SERVERS ═══
-var SRVN = ['Vidlink','Videasy','VidSrc.cc','Vidfast','111Movies','VidSrc.wtf','CinemaOS','VidSrc.xyz','EmbedSU','VidSrc.to'];
+// Cleanest sources first — fewest ads, no redirect-on-click
+var SRVN = ['Vidlink','Videasy','VidSrc.cc','VidSrc.to','EmbedSU','VidSrc.xyz','Vidfast','2Embed','MultiEmbed','VidSrc.wtf'];
 function getSrcs(type,id,s,e){
   if(type==='movie')return[
-    'https://vidlink.pro/movie/'+id+'?autoplay=true&title=false&muted=false',
-    'https://player.videasy.net/movie/'+id,
-    'https://vidsrc.cc/v2/embed/movie/'+id,
-    'https://vidfast.pro/movie/'+id+'?autoPlay=true',
-    'https://111movies.com/movie/'+id,
-    'https://vidsrc.wtf/embed/movie?tmdb='+id,
-    'https://cinemaos-v2.vercel.app/embed/movie/'+id,
-    'https://vidsrc.xyz/embed/movie?tmdb='+id,
-    'https://embed.su/embed/movie/'+id,
+    // S1: Vidlink — cleanest, no click-ads
+    'https://vidlink.pro/movie/'+id+'?autoplay=true&title=false&muted=false&primaryColor=e5091a',
+    // S2: Videasy — very clean player
+    'https://player.videasy.net/movie/'+id+'?color=e5091a&autoplay=true',
+    // S3: VidSrc.cc — reliable, minimal ads
+    'https://vidsrc.cc/v2/embed/movie/'+id+'?autoPlay=true',
+    // S4: VidSrc.to — popular, stable
     'https://vidsrc.to/embed/movie/'+id,
+    // S5: EmbedSU
+    'https://embed.su/embed/movie/'+id,
+    // S6: VidSrc.xyz
+    'https://vidsrc.xyz/embed/movie?tmdb='+id,
+    // S7: Vidfast
+    'https://vidfast.pro/movie/'+id+'?autoPlay=true&theme=e5091a',
+    // S8: 2Embed
+    'https://www.2embed.cc/embed/'+id,
+    // S9: MultiEmbed
+    'https://multiembed.mov/?video_id='+id+'&tmdb=1',
+    // S10: VidSrc.wtf
+    'https://vidsrc.wtf/embed/movie?tmdb='+id,
   ];
   return[
-    'https://vidlink.pro/tv/'+id+'/'+s+'/'+e+'?autoplay=true&title=false&muted=false',
-    'https://player.videasy.net/tv/'+id+'/'+s+'/'+e,
-    'https://vidsrc.cc/v2/embed/tv/'+id+'/'+s+'/'+e,
-    'https://vidfast.pro/tv/'+id+'/'+s+'/'+e+'?autoPlay=true',
-    'https://111movies.com/tv/'+id+'/'+s+'/'+e,
-    'https://vidsrc.wtf/embed/tv?tmdb='+id+'&season='+s+'&episode='+e,
-    'https://cinemaos-v2.vercel.app/embed/tv/'+id+'/'+s+'/'+e,
-    'https://vidsrc.xyz/embed/tv?tmdb='+id+'&season='+s+'&episode='+e,
-    'https://embed.su/embed/tv/'+id+'/'+s+'/'+e,
+    'https://vidlink.pro/tv/'+id+'/'+s+'/'+e+'?autoplay=true&title=false&muted=false&primaryColor=e5091a',
+    'https://player.videasy.net/tv/'+id+'/'+s+'/'+e+'?color=e5091a&autoplay=true',
+    'https://vidsrc.cc/v2/embed/tv/'+id+'/'+s+'/'+e+'?autoPlay=true',
     'https://vidsrc.to/embed/tv/'+id+'/'+s+'/'+e,
+    'https://embed.su/embed/tv/'+id+'/'+s+'/'+e,
+    'https://vidsrc.xyz/embed/tv?tmdb='+id+'&season='+s+'&episode='+e,
+    'https://vidfast.pro/tv/'+id+'/'+s+'/'+e+'?autoPlay=true&theme=e5091a',
+    'https://www.2embed.cc/embedtv/'+id+'&s='+s+'&e='+e,
+    'https://multiembed.mov/?video_id='+id+'&tmdb=1&s='+s+'&e='+e,
+    'https://vidsrc.wtf/embed/tv?tmdb='+id+'&season='+s+'&episode='+e,
   ];
 }
 
@@ -1368,27 +1395,53 @@ function openDL(){
 }
 function closeDL(){ge('dl-modal').classList.remove('open');document.body.style.overflow='';}
 
-// ═══ AD BLOCKER ═══
+// ═══ AD BLOCKER ═══════════════════════════════════════════════
 function installAB(){
   if(window._abOn)return;window._abOn=true;
-  var orig=window.open;
-  window.open=function(url){
+
+  // 1. Nuke window.open — kill all popup ads
+  var _origOpen=window.open;
+  window.open=function(url,name,features){
     if(!url)return null;
-    var safe=['youtube','youtu.be','tmdb','vidsrc','vidlink','videasy','vidfast','embed.su','multiembed','111movies','cinemaos','goojara','soaper','archive.org','dl.vidsrc'];
-    if(safe.some(function(d){return url.indexOf(d)>=0;}))return orig.apply(window,arguments);
-    toast('Ad blocked!');return{closed:false,close:function(){},focus:function(){}};
+    var allowed=['youtube.com','youtu.be','tmdb.org','dl.vidsrc','goojara','soaper','archive.org','hianime'];
+    if(allowed.some(function(d){return url.indexOf(d)>=0;})){
+      return _origOpen.apply(window,arguments);
+    }
+    console.log('Popup blocked:',url);
+    return{closed:true,close:function(){},focus:function(){},location:{href:''}};
   };
-  // beforeunload removed — was causing "Leave site?" popups
+
+  // 2. Block all new tab link clicks that aren't whitelisted
   document.addEventListener('click',function(e){
     var t=e.target;
-    for(var i=0;i<8&&t&&t!==document;i++,t=t.parentElement){
-      if(t.tagName==='A'&&t.target==='_blank'){
-        var h=t.getAttribute('href')||'';
-        var ok=['youtube','youtu.be','tmdb','vidsrc','vidlink','videasy','vidfast','embed.su','111movies','cinemaos','goojara','soaper','archive.org','dl.vidsrc','vip/movie','vip/tv'].some(function(d){return h.indexOf(d)>=0;});
-        if(!ok){e.preventDefault();e.stopPropagation();toast('Ad blocked!');return;}
+    for(var i=0;i<10&&t&&t!==document;i++,t=t.parentElement){
+      if(t.tagName==='A'){
+        var href=t.getAttribute('href')||'';
+        var isExternal=t.target==='_blank'||href.startsWith('http');
+        var isSafe=[
+          'dl.vidsrc','goojara','soaper','archive.org','hianime',
+          'youtube.com','youtu.be','themoviedb','github.io'
+        ].some(function(d){return href.indexOf(d)>=0;});
+        // Allow clicks on OUR page elements (no href or relative href)
+        var isOurs=!href||href.startsWith('#')||href.startsWith('/')||href.startsWith('javascript');
+        if(isExternal&&!isSafe&&!isOurs){
+          e.preventDefault();e.stopPropagation();
+          console.log('Ad link blocked:',href);
+          return false;
+        }
       }
     }
   },true);
+
+  // 3. Block iframe navigation attempts every 2 seconds
+  setInterval(function(){
+    var iframe=ge('pm-iframe');
+    if(!iframe||!iframe.contentWindow)return;
+    try{
+      // Re-inject ad blocker into iframe if same-origin (won't work cross-origin but worth trying)
+      iframe.contentWindow.open=function(){return null;};
+    }catch(e){}
+  },2000);
 }
 
 // ═══ ANIME SYSTEM ════════════════════════════════════════════════════════
