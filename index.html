@@ -1378,10 +1378,7 @@ function installAB(){
     if(safe.some(function(d){return url.indexOf(d)>=0;}))return orig.apply(window,arguments);
     toast('Ad blocked!');return{closed:false,close:function(){},focus:function(){}};
   };
-  window.addEventListener('beforeunload',function(e){
-    if(window._allowNav)return;
-    e.preventDefault();e.returnValue='';return'';
-  });
+  // beforeunload removed — was causing "Leave site?" popups
   document.addEventListener('click',function(e){
     var t=e.target;
     for(var i=0;i<8&&t&&t!==document;i++,t=t.parentElement){
