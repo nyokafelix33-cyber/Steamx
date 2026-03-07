@@ -617,122 +617,60 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
   cursor:pointer;transition:.2s;white-space:nowrap;
 }
 .live-cat.active,.live-cat:hover{background:var(--red);border-color:var(--red);color:#fff}
-.live-grid{
-  display:grid;grid-template-columns:repeat(2,1fr);gap:12px;
-  padding:0 16px 100px;
+/* ── ANIMATED FLAME ── */
+@keyframes flicker {
+  0%,100% { transform: scaleY(1) rotate(-2deg); filter: brightness(1); }
+  20%      { transform: scaleY(1.06) rotate(1deg); filter: brightness(1.15); }
+  40%      { transform: scaleY(0.95) rotate(-1deg); filter: brightness(0.9); }
+  60%      { transform: scaleY(1.08) rotate(2deg); filter: brightness(1.2); }
+  80%      { transform: scaleY(0.98) rotate(-2deg); filter: brightness(1.05); }
 }
-.live-card{
-  background:var(--card);border:1px solid var(--bdr);border-radius:14px;
-  overflow:hidden;cursor:pointer;transition:.2s;position:relative;
+@keyframes flickerGlow {
+  0%,100% { text-shadow: 0 0 8px #ff6b00, 0 0 16px #ff3300; }
+  33%      { text-shadow: 0 0 14px #ff9000, 0 0 28px #ff5500, 0 0 40px #ff2200; }
+  66%      { text-shadow: 0 0 6px #ff4400, 0 0 12px #ff2200; }
 }
-.live-card:hover,.live-card:active{transform:scale(.97);border-color:rgba(229,9,26,.4)}
-.live-card-thumb{
-  width:100%;aspect-ratio:16/9;background:#111;
-  display:flex;align-items:center;justify-content:center;
-  overflow:hidden;position:relative;
+.flame-icon {
+  display:inline-block;
+  animation: flicker 1.4s ease-in-out infinite;
+  transform-origin: bottom center;
+  font-size: 18px;
 }
-.live-card-thumb img{width:100%;height:100%;object-fit:cover}
-.live-badge{
-  position:absolute;top:7px;left:7px;
-  background:var(--red);color:#fff;font-size:9px;font-weight:900;
-  padding:2px 7px;border-radius:8px;letter-spacing:.5px;
+.section-trending .sec-title {
+  animation: flickerGlow 1.4s ease-in-out infinite;
+  color: #fff;
+  font-size: 17px;
+  letter-spacing: .5px;
 }
-.live-card-name{
-  padding:8px 10px 10px;font-size:11px;font-weight:700;
-  color:var(--muted);text-transform:uppercase;letter-spacing:.3px;
+.section-trending .sec-title::before {
+  background: linear-gradient(to bottom, #ff6b00, #ff2200);
+  box-shadow: 0 0 8px rgba(255,80,0,.7);
 }
-/* Live player modal — reuse player modal style */
-#live-modal{
-  display:none;position:fixed;inset:0;z-index:9100;
-  background:#000;flex-direction:column;
-}
-#live-modal.open{display:flex}
-#lm-topbar{
-  flex:0 0 54px;width:100%;display:flex;align-items:center;gap:10px;
-  padding:8px 14px;background:rgba(0,0,0,.92);
-  border-bottom:1px solid rgba(255,255,255,.08);z-index:30;
-}
-#lm-iframe-wrap{flex:1 1 auto;position:relative;background:#000;min-height:0;}
-#lm-iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:none;}
-#lm-back{
-  width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.12);
-  border:none;color:#fff;font-size:18px;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;flex-shrink:0;
-}
-#lm-title{font-size:14px;font-weight:800;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.lm-live-dot{
-  width:8px;height:8px;border-radius:50%;background:#ff4444;
-  animation:blink 1s infinite;flex-shrink:0;
-}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
 
-/* ── HOME LIVESTREAM STRIP ── */
-.live-strip{padding:0 0 4px}
-.live-strip-header{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:18px 16px 12px;
+/* ── POLISH: Section title bar ── */
+.sec-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
-.live-strip-title{
-  font-size:20px;font-weight:900;display:flex;align-items:center;gap:8px;
+
+/* ── POLISH: Card hover glow ── */
+.card:hover .card-img-wrap {
+  box-shadow: 0 8px 28px rgba(229,9,26,.35);
 }
-.live-strip-dot{
-  width:10px;height:10px;border-radius:50%;background:#ff4444;
-  animation:blink 1s infinite;flex-shrink:0;
+
+/* ── POLISH: Hero badge glow ── */
+.hero-badge:first-child {
+  box-shadow: 0 0 12px rgba(229,9,26,.5);
 }
-.live-strip-more{
-  font-size:13px;color:var(--muted);cursor:pointer;
-  display:flex;align-items:center;gap:4px;
-  background:none;border:none;color:rgba(255,255,255,.5);
-  font-family:var(--font);
+
+/* ── POLISH: Section spacing ── */
+.section { margin-bottom: 36px; }
+.section-trending { margin-bottom: 40px; }
+.section-trending .cards-row .card-img-wrap {
+  border: 1px solid rgba(255,80,0,.15);
 }
-.live-strip-more:hover{color:#fff}
-.live-strip-row{
-  display:flex;gap:12px;
-  padding:0 16px 16px;
-  overflow-x:auto;
-  scrollbar-width:none;
-  -webkit-overflow-scrolling:touch;
-}
-.live-strip-row::-webkit-scrollbar{display:none}
-.live-strip-card{
-  flex-shrink:0;
-  width:160px;
-  border-radius:14px;
-  overflow:hidden;
-  cursor:pointer;
-  background:var(--card);
-  border:1px solid var(--bdr);
-  transition:.2s;
-  position:relative;
-}
-.live-strip-card:active{transform:scale(.95)}
-.live-strip-card-thumb{
-  width:160px;height:90px;
-  display:flex;align-items:center;justify-content:center;
-  overflow:hidden;position:relative;
-}
-.live-strip-card-thumb img{
-  width:100%;height:100%;object-fit:cover;
-}
-.live-strip-card-thumb .ls-live-badge{
-  position:absolute;top:6px;left:6px;
-  background:#ff4444;color:#fff;
-  font-size:9px;font-weight:900;
-  padding:2px 7px;border-radius:8px;
-  letter-spacing:.5px;
-  display:flex;align-items:center;gap:4px;
-}
-.ls-live-badge-dot{
-  width:5px;height:5px;border-radius:50%;
-  background:#fff;animation:blink 1s infinite;
-}
-.live-strip-card-name{
-  padding:7px 9px 9px;
-  font-size:11px;font-weight:700;
-  color:rgba(255,255,255,.75);
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-  text-transform:uppercase;letter-spacing:.3px;
-}
+
 </style>
 </head>
 <body>
@@ -748,7 +686,6 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
     <button class="nav-link" onclick="go('movies')" id="nl-movies">Movies</button>
     <button class="nav-link" onclick="go('series')" id="nl-series">Series</button>
     <button class="nav-link" onclick="go('anime')" id="nl-anime">Anime</button>
-    <button class="nav-link" onclick="go('live')" id="nl-live" style="color:#ff5555">&#128308; Live</button>
   </div>
   <div class="nav-r">
     <button class="wl-btn" onclick="go('wl')">&#128278; <span id="wlc">0</span></button>
@@ -780,19 +717,6 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
     </div>
     <div class="hero-dots" id="hero-dots"></div>
   </div>
-  <!-- LIVESTREAM STRIP -->
-  <div class="live-strip" id="home-live-strip">
-    <div class="live-strip-header">
-      <div class="live-strip-title">
-        <div class="live-strip-dot"></div>
-        Livestream
-        <span style="font-size:13px;color:var(--muted);font-weight:500">&#x1F4F6;</span>
-      </div>
-      <button class="live-strip-more" onclick="go('live')">View All &rsaquo;</button>
-    </div>
-    <div class="live-strip-row" id="home-live-row"></div>
-  </div>
-
   <div id="home-sections"></div>
 </div>
 
@@ -923,7 +847,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
 
 <script>
 // ═══════════════════════════════════════════════════════════════
-// FENG WORLD — Complete App
+// FENG WORLD — Complete App  (Live TV removed, polished)
 // ═══════════════════════════════════════════════════════════════
 var API = 'https://api.themoviedb.org/3';
 var KEY = 'ea593c3fa4d4942ece315977cd7e32c9';
@@ -969,12 +893,6 @@ var SEED_ANIME=[
 var SEED_TRENDING = SEED_MOVIES.slice(0,6);
 
 // ═══ SERVERS ═══
-// Cleanest sources first — fewest ads, no redirect-on-click
-// S1=Videasy (cleanest — zero click-redirect ads)
-// S2=VidSrc.cc (reliable, minimal popups)
-// S3=VidSrc.to (stable)
-// S4=Vidlink (good quality but has click ads)
-// S5-S10 = fallbacks
 var SRVN = ['Videasy','VidSrc.cc','VidSrc.to','Vidlink','EmbedSU','VidSrc.xyz','Vidfast','2Embed','MultiEmbed','VidSrc.wtf'];
 function getSrcs(type,id,s,e){
   if(type==='movie')return[
@@ -1010,14 +928,10 @@ var pType='movie', pId=0, pTitle='', pYTKey='', pSrv=0, pEpS=1, pEpE=1;
 var curDetail=null, curDetailType='movie';
 var watchlist=[];
 var pmVisible=true, pmHideT=null, pmSeason=1;
-// Anime state
-var pIsAnime=false, pAnilistId=0, pDubMode=false;
-var anilistCache={};
 try{watchlist=JSON.parse(localStorage.getItem('fw_wl')||'[]');}catch(e){}
 
 // ═══ NAVIGATION ═══
 function go(page, noHistory){
-  if(page==='live'){ renderLiveGrid(liveFilter); }
   if(!noHistory && curPage!==page) prevPage=curPage;
   curPage=page;
   document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
@@ -1027,7 +941,6 @@ function go(page, noHistory){
   var nl=ge('nl-'+page);
   if(nl)nl.classList.add('active');
   var sb=ge('searchbar');
-  // Hide search bar on detail page
   if(sb)sb.style.display=page==='detail'?'none':'block';
   window.scrollTo(0,0);
   if(page==='home')loadHome();
@@ -1063,12 +976,9 @@ function startHeroTimer(){clearInterval(heroTimer);heroTimer=setInterval(functio
 
 // ═══ HOME ═══
 function loadHome(){
-  // Instant seed
   heroItems=SEED_TRENDING;
   setHero(0);startHeroTimer();
   renderHome({trending:SEED_TRENDING,popular:SEED_MOVIES,tv:SEED_TV,anime:SEED_ANIME});
-  renderHomeLiveStrip(); // populate live strip immediately
-  // Async upgrade
   Promise.all([
     tmdb('/trending/all/week'),
     tmdb('/movie/popular'),
@@ -1081,206 +991,27 @@ function loadHome(){
   }).catch(function(){});
 }
 
-// ═══ LIVE TV ══════════════════════════════════════════════════════════════
-
-var LIVE_CHANNELS = [
-  // ── SPORTS ──
-  {name:'SS Premier League', cat:'sports', bg:'#1a0a2e',
-   logo:'https://upload.wikimedia.org/wikipedia/en/thumb/f/f2/Premier_League_Logo.svg/1200px-Premier_League_Logo.svg.png',
-   src:'https://vidsrc.to/embed/tv/34307'},
-  {name:'SS Football', cat:'sports', bg:'#0d1b2a',
-   logo:'https://i.imgur.com/SzO59xK.png',
-   src:'https://www.youtube.com/embed/videoseries?list=PLmgjFGEMGMH_bT2HhW_eLLF8XgKDN7Zxq&autoplay=1'},
-  {name:'SS PSL', cat:'sports', bg:'#006633',
-   logo:'https://upload.wikimedia.org/wikipedia/en/3/31/Premier_Soccer_League_logo.png',
-   src:'https://vidsrc.to/embed/tv/34307'},
-  {name:'SS Rugby', cat:'sports', bg:'#8b1a1a',
-   logo:'https://i.imgur.com/wZPJs9M.png',
-   src:'https://vidsrc.to/embed/tv/34307'},
-  {name:'SS Cricket', cat:'sports', bg:'#003580',
-   logo:'https://upload.wikimedia.org/wikipedia/en/5/5b/Cricket_South_Africa_logo.png',
-   src:'https://vidsrc.to/embed/tv/34307'},
-  {name:'SS Action', cat:'sports', bg:'#1a0a00',
-   logo:'https://i.imgur.com/QWxzLMV.png',
-   src:'https://vidsrc.to/embed/tv/34307'},
-  {name:'SS Grandstand', cat:'sports', bg:'#0d2137',
-   logo:'https://i.imgur.com/QWxzLMV.png',
-   src:'https://vidsrc.to/embed/tv/34307'},
-  {name:'SS Variety 1', cat:'sports', bg:'#f05a28',
-   logo:'https://i.imgur.com/QWxzLMV.png',
-   src:'https://vidsrc.to/embed/tv/34307'},
-  {name:'SS Variety 2', cat:'sports', bg:'#f05a28',
-   logo:'https://i.imgur.com/QWxzLMV.png',
-   src:'https://vidsrc.to/embed/tv/34307'},
-  {name:'SS Variety 3', cat:'sports', bg:'#f05a28',
-   logo:'https://i.imgur.com/QWxzLMV.png',
-   src:'https://vidsrc.to/embed/tv/34307'},
-  {name:'SS Variety 4', cat:'sports', bg:'#f05a28',
-   logo:'https://i.imgur.com/QWxzLMV.png',
-   src:'https://vidsrc.to/embed/tv/34307'},
-  {name:'Azam Sports 1', cat:'sports', bg:'#f5a623',
-   logo:'https://i.imgur.com/fG8WCIN.png',
-   src:'https://vidsrc.to/embed/tv/34307'},
-  {name:'Azam Sports 2', cat:'sports', bg:'#f5a623',
-   logo:'https://i.imgur.com/fG8WCIN.png',
-   src:'https://vidsrc.to/embed/tv/34307'},
-  {name:'Azam Sports 3', cat:'sports', bg:'#f5a623',
-   logo:'https://i.imgur.com/fG8WCIN.png',
-   src:'https://vidsrc.to/embed/tv/34307'},
-  // ── SABC ──
-  {name:'SABC 1', cat:'sabc', bg:'#00843D',
-   logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/SABC1_logo.svg/200px-SABC1_logo.svg.png',
-   src:'https://www.youtube.com/embed/live_stream?channel=UCIf5JFKNwXMIRKHMNnEFbXA&autoplay=1'},
-  {name:'SABC 2', cat:'sabc', bg:'#0033A0',
-   logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/5/54/SABC2_logo.svg/200px-SABC2_logo.svg.png',
-   src:'https://www.youtube.com/embed/live_stream?channel=UCz8QiqNPMJFdHmol9E6Biow&autoplay=1'},
-  {name:'SABC 3', cat:'sabc', bg:'#E4002B',
-   logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/SABC3_logo.svg/200px-SABC3_logo.svg.png',
-   src:'https://www.youtube.com/embed/live_stream?channel=UC6ScMG0KGo8kBMnJnvCHKJg&autoplay=1'},
-  // ── ENTERTAINMENT ──
-  {name:'M-Net', cat:'entertainment', bg:'#c8102e',
-   logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/4/42/M-Net_logo.svg/200px-M-Net_logo.svg.png',
-   src:'https://vidsrc.to/embed/tv/1403'},
-  {name:'M-Net Movies 1', cat:'entertainment', bg:'#1b1b2f',
-   logo:'https://i.imgur.com/W3cOzOy.png',
-   src:'https://vidsrc.to/embed/movie/550'},
-  {name:'Big Brother Mzansi', cat:'entertainment', bg:'#6a0dad',
-   logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Big_Brother_Eye_Logo.svg/200px-Big_Brother_Eye_Logo.svg.png',
-   src:'https://vidsrc.to/embed/tv/17754'},
-  {name:'E.TV', cat:'entertainment', bg:'#e4002b',
-   logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Etv_logo.svg/200px-Etv_logo.svg.png',
-   src:'https://www.youtube.com/embed/live_stream?channel=UCZ5VFKPFbXMBnANGnQEqq5A&autoplay=1'},
-  {name:'E.TV Extra', cat:'entertainment', bg:'#c0392b',
-   logo:'https://i.imgur.com/W3cOzOy.png',
-   src:'https://vidsrc.to/embed/tv/1403'},
-  {name:'Star Life', cat:'entertainment', bg:'#e91e8c',
-   logo:'https://i.imgur.com/ZGKUOPF.png',
-   src:'https://vidsrc.to/embed/tv/2190'},
-  {name:'Moja Love', cat:'entertainment', bg:'#6b0f1a',
-   logo:'https://i.imgur.com/W3cOzOy.png',
-   src:'https://vidsrc.to/embed/tv/1403'},
-  {name:'Universal TV', cat:'entertainment', bg:'#111',
-   logo:'https://i.imgur.com/W3cOzOy.png',
-   src:'https://vidsrc.to/embed/tv/1399'},
-  {name:'Colors TV', cat:'entertainment', bg:'#e05c0a',
-   logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/2/28/Colors_TV_logo.svg/200px-Colors_TV_logo.svg.png',
-   src:'https://vidsrc.to/embed/tv/2190'},
-  {name:'Zee World', cat:'entertainment', bg:'#9b1b82',
-   logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/Zee_World_Logo.svg/200px-Zee_World_Logo.svg.png',
-   src:'https://vidsrc.to/embed/tv/2190'},
-  {name:'KykNET', cat:'entertainment', bg:'#004b8d',
-   logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/KykNET_logo.svg/200px-KykNET_logo.svg.png',
-   src:'https://vidsrc.to/embed/tv/1403'},
-  {name:'MTV Live Intl', cat:'entertainment', bg:'#000',
-   logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/0/03/MTV_2021_logo.svg/200px-MTV_2021_logo.svg.png',
-   src:'https://www.youtube.com/embed/live_stream?channel=UCkfIKVWMOdQNFCPHxHxEh1A&autoplay=1'},
-  {name:'Discovery Channel', cat:'entertainment', bg:'#003087',
-   logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/2/22/Discovery_Channel_logo.svg/200px-Discovery_Channel_logo.svg.png',
-   src:'https://vidsrc.to/embed/tv/1816'},
-  {name:'Discovery Science', cat:'entertainment', bg:'#0077cc',
-   logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Discovery_Science_logo.svg/200px-Discovery_Science_logo.svg.png',
-   src:'https://vidsrc.to/embed/tv/1816'},
-  {name:'History Channel', cat:'entertainment', bg:'#6b5c3e',
-   logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/History_Channel_logo.svg/200px-History_Channel_logo.svg.png',
-   src:'https://vidsrc.to/embed/tv/326333'},
-  {name:'Nat Geo Wild', cat:'entertainment', bg:'#f5a623',
-   logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/5/54/Nat_Geo_Wild.svg/200px-Nat_Geo_Wild.svg.png',
-   src:'https://vidsrc.to/embed/tv/1816'},
-  {name:'Trace Africa', cat:'entertainment', bg:'#009e60',
-   logo:'https://i.imgur.com/W3cOzOy.png',
-   src:'https://vidsrc.to/embed/tv/2190'},
-  {name:'Bloomberg TV', cat:'news', bg:'#111',
-   logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Bloomberg_Television_logo_2022.svg/200px-Bloomberg_Television_logo_2022.svg.png',
-   src:'https://www.youtube.com/embed/live_stream?channel=UCIALMKvObZNtJ6AmdCLP7Lg&autoplay=1'},
-  // ── NEWS ──
-  {name:'Al Jazeera', cat:'news', bg:'#1a1a1a',
-   logo:'https://upload.wikimedia.org/wikipedia/en/thumb/f/f2/Al_Jazeera_Logo.svg/200px-Al_Jazeera_Logo.svg.png',
-   src:'https://www.youtube.com/embed/live_stream?channel=UCNye-wNBqNL5ZzHSJj3l8Bg&autoplay=1'},
-  {name:'CNBC Africa', cat:'news', bg:'#003087',
-   logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/CNBC_Africa_logo.svg/200px-CNBC_Africa_logo.svg.png',
-   src:'https://www.youtube.com/embed/live_stream?channel=UCkMmZYkgOVFNWNE0fJ3jH6A&autoplay=1'},
-  {name:'Newzroom Afrika', cat:'news', bg:'#c8102e',
-   logo:'https://i.imgur.com/W3cOzOy.png',
-   src:'https://www.youtube.com/embed/live_stream?channel=UCFTkdV8CBBdxFH1LKApNu4A&autoplay=1'},
-  {name:'NHK World', cat:'news', bg:'#003087',
-   logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/NHK_World_logo.svg/200px-NHK_World_logo.svg.png',
-   src:'https://www.youtube.com/embed/live_stream?channel=UCFTkdV8CBBdxFH1LKApNu4A&autoplay=1'},
-  // ── KIDS ──
-  {name:'Nickelodeon', cat:'kids', bg:'#ff6600',
-   logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/Nickelodeon_2023_logo_%28outline%29.svg/200px-Nickelodeon_2023_logo_%28outline%29.svg.png',
-   src:'https://vidsrc.to/embed/tv/1553'},
-  {name:'Nick Jr', cat:'kids', bg:'#ff8800',
-   logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Nick_Jr._Logo_2023.svg/200px-Nick_Jr._Logo_2023.svg.png',
-   src:'https://vidsrc.to/embed/tv/1553'},
-  {name:'Disney Junior', cat:'kids', bg:'#003087',
-   logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Disney_Junior_logo.svg/200px-Disney_Junior_logo.svg.png',
-   src:'https://vidsrc.to/embed/tv/4057'},
-  {name:'Canal+ Kids', cat:'kids', bg:'#1a1a2e',
-   logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/Canal%2B_logo.svg/200px-Canal%2B_logo.svg.png',
-   src:'https://vidsrc.to/embed/tv/4057'},
-]
-
-var liveFilter = 'all';
-
 function renderHome(d){
-  // Populate live strip on home page
-  renderHomeLiveStrip();
   var h='';
-  h+=makeSection('&#128293; Trending',d.trending||[],'movie','',false);
-  h+=makeSection('&#127916; Popular Movies',d.popular||[],'movie','',false);
-  h+=makeSection('&#128250; Top Series',d.tv||[],'tv','',false);
-  h+=makeSection('&#127981; Anime',d.anime||[],'tv','',false);
+  h+=makeSection('TRENDING',d.trending||[],'movie',true);
+  h+=makeSection('POPULAR MOVIES',d.popular||[],'movie',false);
+  h+=makeSection('TOP SERIES',d.tv||[],'tv',false);
+  h+=makeSection('ANIME',d.anime||[],'tv',false);
   ge('home-sections').innerHTML=h;
 }
 
-function renderHomeLiveStrip(){
-  var row = ge('home-live-row');
-  if(!row || row.children.length > 0) return; // already rendered
-  // Show first 10 channels in the strip
-  var featured = LIVE_CHANNELS.slice(0, 12);
-  featured.forEach(function(ch){
-    var idx = LIVE_CHANNELS.indexOf(ch);
-    var card = document.createElement('div');
-    card.className = 'live-strip-card';
-    card.onclick = function(){ openLive(idx); };
-
-    // Thumb
-    var thumb = document.createElement('div');
-    thumb.className = 'live-strip-card-thumb';
-    thumb.style.background = ch.bg || '#111';
-
-    // LIVE badge
-    var badge = document.createElement('div');
-    badge.className = 'ls-live-badge';
-    badge.innerHTML = '<div class="ls-live-badge-dot"></div> LIVE';
-
-    // Logo img
-    var img = document.createElement('img');
-    img.src = ch.logo;
-    img.alt = ch.name;
-    img.loading = 'lazy';
-    img.style.cssText = 'width:100%;height:100%;object-fit:contain;padding:12%';
-    img.onerror = function(){ this.style.display='none'; };
-
-    thumb.appendChild(badge);
-    thumb.appendChild(img);
-
-    // Name
-    var name = document.createElement('div');
-    name.className = 'live-strip-card-name';
-    name.textContent = ch.name;
-
-    card.appendChild(thumb);
-    card.appendChild(name);
-    row.appendChild(card);
-  });
-}
-
-function makeSection(title,items,type,genre,wide){
+function makeSection(title,items,type,isTrending){
   if(!items||!items.length)return'';
-  var cards=items.slice(0,12).map(function(d){return makeCard(d,type,wide);}).join('');
-  return '<div class="section"><div class="sec-head"><div class="sec-title">'+title+'</div></div>'
-    +'<div class="cards-row">'+cards+'</div></div>';
+  var cards=items.slice(0,12).map(function(d){return makeCard(d,type,false);}).join('');
+  var icon = isTrending
+    ? '<span class="flame-icon" aria-hidden="true">&#128293;</span>'
+    : (title==='POPULAR MOVIES'?'&#127916; ':title==='TOP SERIES'?'&#128250; ':'&#127981; ');
+  return '<div class="section'+(isTrending?' section-trending':'')+'">'+
+    '<div class="sec-head">'+
+      '<div class="sec-title">'+(isTrending?'<span class="flame-wrap">'+icon+'</span> ':icon)+title+'</div>'+
+    '</div>'+
+    '<div class="cards-row">'+cards+'</div>'+
+  '</div>';
 }
 
 function makeCard(d,type,wide){
@@ -1307,7 +1038,7 @@ var GENRES_MV=[{id:'',n:'All'},{id:'28',n:'Action'},{id:'35',n:'Comedy'},{id:'18
 var GENRES_TV=[{id:'',n:'All'},{id:'10759',n:'Action'},{id:'35',n:'Comedy'},{id:'18',n:'Drama'},{id:'9648',n:'Mystery'},{id:'10765',n:'Sci-Fi'},{id:'10764',n:'Reality'},{id:'10762',n:'Kids'}];
 
 function loadBrowse(pg){
-  var isMv=pg==='movies', isAn=pg==='anime';
+  var isMv=pg==='movies';
   var genres=isMv?GENRES_MV:GENRES_TV;
   var fid=pg==='movies'?'mv-filters':pg==='series'?'sr-filters':'an-filters';
   var gid=pg==='movies'?'mv-grid':pg==='series'?'sr-grid':'an-grid';
@@ -1359,18 +1090,13 @@ function openDetail(id,type){
   tmdb(path,{append_to_response:'credits,videos,similar,seasons'}).then(function(d){
     curDetail=d;curDetailType=type;
     pTitle=d.title||d.name||'';
-    // Videos
     var vids=d.videos&&d.videos.results?d.videos.results:[];
     var trailer=vids.find(function(v){return v.site==='YouTube'&&v.type==='Trailer';});
     pYTKey=trailer?trailer.key:'';
-    // Backdrop
     if(d.backdrop_path)ge('d-backdrop').src=iurl(d.backdrop_path,'w1280');
-    // Poster
     if(d.poster_path)ge('d-poster').src=iurl(d.poster_path,'w342');
     else ge('d-poster').parentElement.style.display='none';
-    // Title
     ge('d-title').textContent=pTitle;
-    // Chips
     var yr=(d.release_date||d.first_air_date||'').slice(0,4);
     var runtime=d.runtime?d.runtime+'m':d.episode_run_time?d.episode_run_time[0]+'m':'';
     var chips='';
@@ -1380,47 +1106,21 @@ function openDetail(id,type){
     if(d.status)chips+='<span class="chip">'+d.status+'</span>';
     (d.genres||[]).slice(0,3).forEach(function(g){chips+='<span class="chip">'+xe(g.name)+'</span>';});
     ge('d-chips').innerHTML=chips;
-    // Tagline
     if(d.tagline){ge('d-tagline').textContent='\u201c'+d.tagline+'\u201d';}
-    // Overview
     ge('d-overview').textContent=d.overview||'No description available.';
-    // Watchlist state
     var inWL=watchlist.some(function(w){return w.id===id;});
-    // Buttons
     ge('d-btns').innerHTML=
       '<button class="btn btn-red" onclick="startPlay()">&#9654; Watch Now</button>'
-      +'<button class="btn btn-ghost" id="wlbtn" onclick="toggleWL()">'+( inWL?'&#10003; Saved':'+ Watchlist')+'</button>'
+      +'<button class="btn btn-ghost" id="wlbtn" onclick="toggleWL()">'+(inWL?'&#10003; Saved':'+ Watchlist')+'</button>'
       +'<button class="btn btn-green" onclick="openDL()">&#11123; Download</button>'
       +(d.homepage?'<a href="'+d.homepage+'" target="_blank" class="btn btn-ghost btn-sm" rel="noopener">Official Site</a>':'');
-    // Detect anime
-    var genres=d.genres||[];
-    var isAnime=(d.original_language==='ja'&&type==='tv')
-      ||(genres.some(function(g){return g.name==='Animation';})&&d.original_language==='ja');
-    pIsAnime=isAnime;pDubMode=false;
-    var dubEl=ge('dub-toggle');if(dubEl)dubEl.className='dub-toggle'+(isAnime?' show':'');
-    var dubChk=ge('dub-chk');if(dubChk)dubChk.checked=false;
-    var dubLbl=ge('dub-state-lbl');if(dubLbl){dubLbl.textContent='SUB';dubLbl.className='dub-state off';}
-    if(isAnime){
-      pAnilistId=0;
-      var subTxt=ge('dub-sub-txt');
-      if(subTxt)subTxt.textContent='Checking dub availability...';
-      getAnilistId(id, d.name||d.title||'').then(function(aid){
-        pAnilistId=aid;
-        if(subTxt){
-          subTxt.textContent = aid
-            ? 'Dub available via VidPlus (S1/S2). Toggle ON for English.'
-            : 'Try S1 VidPlus — if no dub, use S3+ for Japanese sub.';
-        }
-      });
-    }
-    // Tabs
     var tabs='<button class="tab active" onclick="switchTab(\'overview\',this)">Overview</button>';
     if(type==='tv')tabs+='<button class="tab" onclick="switchTab(\'episodes\',this)">Episodes</button>';
     if(d.credits&&d.credits.cast&&d.credits.cast.length)tabs+='<button class="tab" onclick="switchTab(\'cast\',this)">Cast</button>';
     if(d.similar&&d.similar.results&&d.similar.results.length)tabs+='<button class="tab" onclick="switchTab(\'similar\',this)">Similar</button>';
     ge('d-tabs').innerHTML=tabs;
     showDetailTab('overview',d);
-  }).catch(function(e){
+  }).catch(function(){
     ge('d-title').textContent='Failed to load';
     ge('d-tab-content').innerHTML='<div class="empty">Could not load details. Please try again.</div>';
   });
@@ -1495,36 +1195,22 @@ function loadSeasonEps(season,btn){
 }
 
 // ═══ PLAY ═══
-function startPlay(){
-  pSrv=0;pEpS=1;pEpE=1;
-  if(pIsAnime){
-    startAnimePlay(1);
-  } else {
-    openPlayer(getSrcs(pType,pId,1,1)[0],0,null);
-  }
-}
+function startPlay(){pSrv=0;pEpS=1;pEpE=1;openPlayer(getSrcs(pType,pId,1,1)[0],0,null);}
 function playEp(s,e){
   pEpS=s;pEpE=e;pSrv=0;
   pmCloseEps();
-  if(pIsAnime){
-    // For anime, episode number is absolute (AniList uses absolute ep numbers)
-    startAnimePlay(e);
-  } else {
-    openPlayer(getSrcs('tv',pId,s,e)[0],0,'S'+s+' E'+e);
-  }
+  openPlayer(getSrcs('tv',pId,s,e)[0],0,'S'+s+' E'+e);
 }
 
 // ═══ PLAYER MODAL ═══
 function openPlayer(src,srvIdx,epInfo){
   var modal=ge('player-modal');
-  // Landscape on mobile
   try{if(screen.orientation&&screen.orientation.lock)screen.orientation.lock('landscape').catch(function(){});}catch(e){}
   ge('pm-iframe').src=src;
   ge('pm-title').textContent=pTitle||'Now Playing';
   var epBadge=ge('pm-ep-badge');
   if(epInfo){epBadge.textContent=epInfo;epBadge.style.display='block';}
   else{epBadge.style.display='none';}
-  // Server pills
   ge('pm-srv-row').innerHTML=SRVN.map(function(n,i){
     return '<button class="pm-srv'+(i===srvIdx?' active':'')+'" onclick="switchSrv('+i+')">S'+(i+1)+' '+n+'</button>';
   }).join('');
@@ -1532,10 +1218,7 @@ function openPlayer(src,srvIdx,epInfo){
   var trlBtn=ge('pm-trl-btn');if(trlBtn)trlBtn.style.display=pYTKey?'inline-flex':'none';
   modal.classList.add('open');
   document.body.style.overflow='hidden';
-  pmShowControls(); // always visible, no auto-hide
-  // Show unmute button for servers that mute by default
-  var unmuteBtn=ge('pm-unmute-btn');
-  if(unmuteBtn)unmuteBtn.style.display='inline-flex';
+  pmShowControls();
   installAB();
 }
 
@@ -1553,48 +1236,25 @@ function switchSrv(idx){
   ge('pm-iframe').src=src;
   document.querySelectorAll('.pm-srv').forEach(function(b,i){b.classList.toggle('active',i===idx);});
   pmShowControls();
-  toast(SRVN[idx]+' loaded');
+  toast(SRVN[idx]+' loading...');
 }
-// pmNextSrv defined in anime block
+function pmNextSrv(){var n=(pSrv+1)%SRVN.length;switchSrv(n);}
 function pmTrailer(){if(pYTKey)openPlayer('https://www.youtube.com/embed/'+pYTKey+'?autoplay=1&rel=0',-1,'Trailer');}
 
-function pmUnmute(){
-  // Try to unmute via postMessage to iframe
-  var iframe=ge('pm-iframe');
-  if(iframe&&iframe.contentWindow){
-    try{
-      iframe.contentWindow.postMessage({action:'unmute'},'*');
-      iframe.contentWindow.postMessage(JSON.stringify({type:'playerUnmute'}),'*');
-    }catch(e){}
-  }
-  // Also reload current server — some servers unmute on reload
-  var src=ge('pm-iframe').src;
-  if(src){
-    // Strip muted param and re-add muted=false
-    src=src.replace(/[?&]muted=[^&]*/g,'');
-    var sep=src.indexOf('?')>=0?'&':'?';
-    src+=sep+'muted=false&autoplay=true';
-    ge('pm-iframe').src='';
-    setTimeout(function(){ge('pm-iframe').src=src;},100);
-  }
-  // Hide the unmute button after tapping
-  var btn=ge('pm-unmute-btn');
-  if(btn)btn.style.display='none';
-  toast('Sound enabled! If still muted, try Next Server');
-}
-
-// Controls are ALWAYS visible — no auto-hide
-function pmToggle(){} // tap zone does nothing now — prevents accidental hide
+function pmToggle(){if(pmVisible)pmHideControls();else pmShowControls();}
 function pmShowControls(){
   pmVisible=true;
   var tb=ge('pm-topbar'),bb=ge('pm-bottombar');
   if(tb)tb.classList.remove('hidden');
   if(bb)bb.classList.remove('hidden');
 }
-function pmHideControls(){} // disabled — controls never hide
-function pmAutoHide(){} // disabled
+function pmHideControls(){
+  pmVisible=false;
+  var tb=ge('pm-topbar'),bb=ge('pm-bottombar');
+  if(tb)tb.classList.add('hidden');
+  if(bb)bb.classList.add('hidden');
+}
 
-// Episode panel in player
 function pmOpenEps(){
   var panel=ge('pm-ep-panel');
   if(!panel)return;
@@ -1656,7 +1316,7 @@ function renderWL(){
 var searchDebounce=null;
 function doSearch(q){
   var clr=ge('sclr');
-  if(clr)clr.className='btn'+( q?' show':'');
+  if(clr)clr.className='btn'+(q?' show':'');
   clearTimeout(searchDebounce);
   if(!q){if(curPage==='search')go('home',true);return;}
   searchDebounce=setTimeout(function(){
@@ -1679,13 +1339,11 @@ function openDL(){
   var yr=(d.release_date||d.first_air_date||'').slice(0,4);
   var qt=encodeURIComponent(title);
   var type=curDetailType;
-  // Poster
   var pw=ge('dl-poster-wrap');
   if(d.poster_path){pw.innerHTML='<img class="dl-poster" src="'+iurl(d.poster_path,'w92')+'" alt="">';}
   else{pw.innerHTML='<div class="dl-poster-fb">'+xe(title).slice(0,2).toUpperCase()+'</div>';}
   ge('dl-title').textContent=title;
-  ge('dl-sub').textContent=(yr||'')+(yr?' · ':'')+( type==='tv'?'TV Series':'Movie');
-  // Quality buttons — all go to vidsrc direct
+  ge('dl-sub').textContent=(yr||'')+(yr?' \u00b7 ':'')+( type==='tv'?'TV Series':'Movie');
   var dlUrl=type==='movie'?'https://dl.vidsrc.vip/movie/'+d.id:'https://dl.vidsrc.vip/tv/'+d.id;
   ge('dl-qualities').innerHTML=[
     {label:'480p',cls:'q480',size:'~700 MB'},
@@ -1697,12 +1355,11 @@ function openDL(){
       +'<span class="dl-q-label '+q2.cls+'">'+q2.label+'</span>'
       +'<span class="dl-q-size">'+q2.size+'</span></a>';
   }).join('');
-  // Sources
   ge('dl-sources').innerHTML=[
-    {icon:'&#9889;',name:'VidSrc Direct',desc:'Direct file download — recommended',url:dlUrl,badge:'FAST',bc:'fast'},
-    {icon:'&#127381;',name:'Goojara',desc:'Search & download — huge library',url:'https://www.goojara.to/search?q='+qt,badge:'',bc:''},
-    {icon:'&#127760;',name:'Soaper.tv',desc:'Movies & series — direct download option',url:'https://soaper.tv/search.html?keyword='+qt,badge:'',bc:''},
-    {icon:'&#128190;',name:'Archive.org',desc:'Free legal downloads — classics',url:'https://archive.org/search?query='+qt+'&mediatype=movies',badge:'FREE',bc:'hd'},
+    {icon:'&#9889;',name:'VidSrc Direct',desc:'Direct file download \u2014 recommended',url:dlUrl,badge:'FAST',bc:'fast'},
+    {icon:'&#127381;',name:'Goojara',desc:'Search & download \u2014 huge library',url:'https://www.goojara.to/search?q='+qt,badge:'',bc:''},
+    {icon:'&#127760;',name:'Soaper.tv',desc:'Movies & series \u2014 direct download option',url:'https://soaper.tv/search.html?keyword='+qt,badge:'',bc:''},
+    {icon:'&#128190;',name:'Archive.org',desc:'Free legal downloads \u2014 classics',url:'https://archive.org/search?query='+qt+'&mediatype=movies',badge:'FREE',bc:'hd'},
   ].map(function(s){
     return '<a href="'+s.url+'" target="_blank" rel="noopener" class="dl-src" onclick="window._allowNav=true;setTimeout(function(){window._allowNav=false;},2000)">'
       +'<span class="dl-src-icon">'+s.icon+'</span>'
@@ -1716,167 +1373,16 @@ function openDL(){
 }
 function closeDL(){ge('dl-modal').classList.remove('open');document.body.style.overflow='';}
 
-// ═══ AD BLOCKER ═══════════════════════════════════════════════
+// ═══ AD BLOCKER ═══
 function installAB(){
   if(window._abOn)return;window._abOn=true;
-
-  // Kill popup windows only — do NOT intercept clicks (breaks player controls)
-  var _origOpen=window.open;
-  window.open=function(url,name,features){
+  var orig=window.open;
+  window.open=function(url){
     if(!url)return null;
-    var allowed=[
-      'youtube.com','youtu.be','tmdb.org',
-      'dl.vidsrc','goojara','soaper','archive.org','hianime'
-    ];
-    if(allowed.some(function(d){return(url+'').indexOf(d)>=0;})){
-      return _origOpen.apply(window,arguments);
-    }
-    // Silently block popup — no toast, no redirect
-    return{closed:true,close:function(){},focus:function(){},document:{write:function(){}}};
+    var safe=['youtube','youtu.be','tmdb','vidsrc','vidlink','videasy','vidfast','embed.su','multiembed','goojara','soaper','archive.org','dl.vidsrc'];
+    if(safe.some(function(d){return url.indexOf(d)>=0;}))return orig.apply(window,arguments);
+    toast('Ad blocked!');return{closed:false,close:function(){},focus:function(){}};
   };
-
-  // Kill window.location changes from iframe via blur trick
-  window.addEventListener('blur',function(){
-    // If page loses focus while player is open, an ad redirect may have triggered
-    // Immediately refocus our page
-    var modal=ge('player-modal');
-    if(modal&&modal.classList.contains('open')){
-      setTimeout(function(){
-        try{window.focus();}catch(e){}
-      },100);
-    }
-  });
-}
-
-// ═══ ANIME SYSTEM ════════════════════════════════════════════════════════
-// VidPlus uses AniList IDs with ?dub=true for English dub
-// We map TMDB ID → AniList ID via the AniList GraphQL API
-
-var anilistCache = {};
-
-function getAnilistId(tmdbId, titleStr) {
-  var key = 'al_' + tmdbId;
-  if (anilistCache[key]) return Promise.resolve(anilistCache[key]);
-  // Search AniList by title
-  var gql = JSON.stringify({
-    query: 'query($s:String){Media(search:$s,type:ANIME){id}}',
-    variables: { s: titleStr || pTitle }
-  });
-  return fetch('https://graphql.anilist.co', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-    body: gql
-  })
-  .then(function(r){ return r.json(); })
-  .then(function(d){
-    var id = d && d.data && d.data.Media ? d.data.Media.id : 0;
-    anilistCache[key] = id;
-    console.log('AniList ID for "' + (titleStr||pTitle) + '":', id);
-    return id;
-  })
-  .catch(function(){ return 0; });
-}
-
-// Build anime server list — VidPlus (dub/sub) + fallbacks
-function getAnimeSrcs(tmdbId, season, episode, isDub, aniId) {
-  var ep  = episode || 1;
-  var s   = season  || 1;
-  var aid = aniId   || tmdbId; // AniList ID preferred, TMDB as fallback
-  var dub = isDub ? 'true' : 'false';
-  return [
-    // S1 VidPlus — uses AniList ID, real dub/sub toggle
-    'https://player.vidplus.to/embed/anime/' + aid + '/' + ep + '?dub=' + dub + '&autoplay=true',
-    // S2 VidPlus alt episode path
-    'https://player.vidplus.to/embed/anime/' + aid + '?episode=' + ep + '&dub=' + dub + '&autoplay=true',
-    // S3 Vidlink (language selector built in)
-    'https://vidlink.pro/tv/' + tmdbId + '/' + s + '/' + ep + '?autoplay=true&muted=false',
-    // S4 VidSrc.cc
-    'https://vidsrc.cc/v2/embed/tv/' + tmdbId + '/' + s + '/' + ep,
-    // S5 VidSrc.to
-    'https://vidsrc.to/embed/tv/' + tmdbId + '/' + s + '/' + ep,
-    // S6 EmbedSU
-    'https://embed.su/embed/tv/' + tmdbId + '/' + s + '/' + ep,
-    // S7 Videasy
-    'https://player.videasy.net/tv/' + tmdbId + '/' + s + '/' + ep,
-    // S8 MultiEmbed
-    'https://multiembed.mov/directstream.php?video_id=' + tmdbId + '&s=' + s + '&e=' + ep,
-    // S9 2Embed
-    'https://www.2embed.cc/embedtvfull/' + tmdbId + '&s=' + s + '&e=' + ep,
-  ];
-}
-
-var ANIME_SRVN = ['VidPlus ★','VidPlus Alt','Vidlink','VidSrc.cc','VidSrc.to','EmbedSU','Videasy','MultiEmbed','2Embed'];
-
-// Called when dub toggle changes
-function toggleDub(isDub) {
-  pDubMode = isDub;
-  var lbl = ge('dub-state-lbl');
-  if (lbl) { lbl.textContent = isDub ? 'DUB' : 'SUB'; lbl.className = 'dub-state ' + (isDub ? 'on' : 'off'); }
-  toast(isDub ? '🇺🇸 English Dub — loading...' : '🇯🇵 Japanese Sub — loading...');
-  // If player already open, reload S1 with new dub setting
-  var modal = ge('player-modal');
-  if (modal && modal.classList.contains('open')) {
-    pSrv = 0;
-    var src = getAnimeSrcs(pId, pEpS, pEpE, isDub, pAnilistId)[0];
-    ge('pm-iframe').src = src;
-    rebuildAnimePills(0);
-  }
-}
-
-function findDub() {
-  // Update toggle state visually and trigger dub load
-  var chk = ge('dub-chk');
-  if (chk) { chk.checked = true; }
-  toggleDub(true);
-  // Also open player immediately
-  startAnimePlay(pEpE || 1);
-}
-
-function startAnimePlay(episode) {
-  pEpE = episode || 1; pEpS = 1; pSrv = 0;
-  var srcs = getAnimeSrcs(pId, 1, pEpE, pDubMode, pAnilistId);
-  openAnimePlayer(srcs[0], 0, pEpE > 1 ? 'Episode ' + pEpE : null);
-}
-
-function openAnimePlayer(src, srvIdx, epInfo) {
-  var modal = ge('player-modal');
-  try { if (screen.orientation && screen.orientation.lock) screen.orientation.lock('landscape').catch(function(){}); } catch(e) {}
-  ge('pm-iframe').src = src;
-  ge('pm-title').textContent = pTitle || 'Now Playing';
-  var epBadge = ge('pm-ep-badge');
-  if (epInfo) { epBadge.textContent = epInfo; epBadge.style.display = 'block'; }
-  else { epBadge.style.display = 'none'; }
-  rebuildAnimePills(srvIdx);
-  var epBtn = ge('pm-ep-btn'); if (epBtn) epBtn.style.display = 'inline-flex';
-  var trlBtn = ge('pm-trl-btn'); if (trlBtn) trlBtn.style.display = pYTKey ? 'inline-flex' : 'none';
-  modal.classList.add('open');
-  document.body.style.overflow = 'hidden';
-  pmShowControls();
-  var unmuteBtn = ge('pm-unmute-btn'); if (unmuteBtn) unmuteBtn.style.display = 'inline-flex';
-  installAB();
-}
-
-function rebuildAnimePills(activeIdx) {
-  ge('pm-srv-row').innerHTML = ANIME_SRVN.map(function(n, i) {
-    var isDubSrv = i <= 1;
-    var label = 'S'+(i+1)+' '+n + (isDubSrv ? ' ['+(pDubMode?'DUB':'SUB')+']' : '');
-    return '<button class="pm-srv' + (i===activeIdx?' active':'') + (isDubSrv?' dub-srv':'') +
-      '" onclick="switchAnimeSrv('+i+')">' + label + '</button>';
-  }).join('');
-}
-
-function switchAnimeSrv(idx) {
-  pSrv = idx;
-  var src = getAnimeSrcs(pId, pEpS, pEpE, pDubMode, pAnilistId)[idx];
-  ge('pm-iframe').src = src;
-  document.querySelectorAll('.pm-srv').forEach(function(b,i){ b.classList.toggle('active', i===idx); });
-  pmShowControls();
-  toast(ANIME_SRVN[idx] + ' loading...');
-}
-
-function pmNextSrv() {
-  if (pIsAnime) { var n=(pSrv+1)%ANIME_SRVN.length; switchAnimeSrv(n); }
-  else { var n=(pSrv+1)%SRVN.length; switchSrv(n); }
 }
 
 // ═══ TOAST ═══
@@ -1886,82 +1392,7 @@ function toast(msg){var t=ge('toast');t.textContent=msg;t.classList.add('on');cl
 // ═══ INIT ═══
 updateWLCount();
 loadHome();
-
-
-
-
-function renderLiveGrid(filter) {
-  var grid = ge('live-grid');
-  if (!grid) return;
-  var list = filter === 'all' ? LIVE_CHANNELS : LIVE_CHANNELS.filter(function(ch){ return ch.cat === filter; });
-  grid.innerHTML = list.map(function(ch, i) {
-    var idx = LIVE_CHANNELS.indexOf(ch);
-    return '<div class="live-card" onclick="openLive('+idx+')">'
-      + '<div class="live-card-thumb" style="background:'+ch.bg+'">'
-      + '<div class="live-badge">&#128308; LIVE</div>'
-
-      + '</div>'
-      + '<div class="live-card-name">'+ch.name+'</div>'
-      + '</div>';
-  }).join('');
-}
-
-function filterLive(cat, btn) {
-  liveFilter = cat;
-  document.querySelectorAll('.live-cat').forEach(function(b){ b.classList.remove('active'); });
-  if (btn) btn.classList.add('active');
-  renderLiveGrid(cat);
-}
-
-function openLive(idx) {
-  var ch = LIVE_CHANNELS[idx];
-  if (!ch) return;
-  ge('lm-title').textContent = ch.name;
-  ge('lm-iframe').src = ch.src;
-  ge('live-modal').classList.add('open');
-  document.body.style.overflow = 'hidden';
-  try { if(screen.orientation&&screen.orientation.lock)screen.orientation.lock('landscape').catch(function(){}); } catch(e) {}
-}
-
-function closeLive() {
-  ge('lm-iframe').src = '';
-  ge('live-modal').classList.remove('open');
-  document.body.style.overflow = '';
-  try { if(screen.orientation&&screen.orientation.unlock)screen.orientation.unlock(); } catch(e) {}
-}
-
 </script>
 
-<!-- ═══ LIVE TV PAGE ═══ -->
-<div id="live-page" class="page" style="padding-top:70px">
-  <div style="padding:20px 16px 10px">
-    <h2 style="font-size:22px;font-weight:900;margin:0 0 4px">&#128308; Live TV</h2>
-    <p style="font-size:13px;color:var(--muted);margin:0">Stream live channels — Sports, News, Entertainment</p>
-  </div>
-  <!-- Category filter -->
-  <div class="live-cats" id="live-cats">
-    <div class="live-cat active" onclick="filterLive('all',this)">All</div>
-    <div class="live-cat" onclick="filterLive('sports',this)">⚽ Sports</div>
-    <div class="live-cat" onclick="filterLive('entertainment',this)">🎭 Entertainment</div>
-    <div class="live-cat" onclick="filterLive('news',this)">📰 News</div>
-    <div class="live-cat" onclick="filterLive('kids',this)">🧒 Kids</div>
-    <div class="live-cat" onclick="filterLive('sabc',this)">🇿🇦 SABC</div>
-  </div>
-  <!-- Channel grid -->
-  <div class="live-grid" id="live-grid"></div>
-</div>
-
-<!-- ═══ LIVE PLAYER MODAL ═══ -->
-<div id="live-modal">
-  <div id="lm-topbar">
-    <button id="lm-back" onclick="closeLive()">&#8592;</button>
-    <div id="lm-title">Live TV</div>
-    <div class="lm-live-dot"></div>
-    <span style="font-size:11px;color:#ff4444;font-weight:800">LIVE</span>
-  </div>
-  <div id="lm-iframe-wrap">
-    <iframe id="lm-iframe" src="" allowfullscreen allow="autoplay;encrypted-media;picture-in-picture" referrerpolicy="no-referrer"></iframe>
-  </div>
-</div>
 </body>
 </html>
