@@ -227,6 +227,28 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
   background:var(--red);border-radius:5px;
   padding:2px 5px;font-size:9px;font-weight:800;letter-spacing:.3px;
 }
+/* ── QUALITY BADGES ── */
+.card-quality{
+  position:absolute;bottom:6px;left:6px;z-index:2;
+  border-radius:5px;padding:2px 7px;
+  font-size:9px;font-weight:900;letter-spacing:.6px;
+  backdrop-filter:blur(6px);
+}
+.card-quality.cam{
+  background:rgba(255,140,0,.88);
+  color:#fff;
+  box-shadow:0 2px 8px rgba(255,100,0,.5);
+  animation:camPulse 2s ease-in-out infinite;
+}
+.card-quality.hd{
+  background:rgba(0,180,80,.85);
+  color:#fff;
+  box-shadow:0 2px 8px rgba(0,180,80,.4);
+}
+@keyframes camPulse{
+  0%,100%{ box-shadow:0 2px 8px rgba(255,100,0,.4); }
+  50%    { box-shadow:0 2px 16px rgba(255,100,0,.85); }
+}
 .card-title{font-size:12px;font-weight:600;line-height:1.3;color:var(--text)}
 .card-meta{font-size:10px;color:var(--muted);margin-top:2px}
 
@@ -890,7 +912,15 @@ var SEED_ANIME=[
   {id:72636,name:'Death Note',poster_path:'/iigTCiDsLFBNDEaMkTzWiMkLfNL.jpg',vote_average:8.7,first_air_date:'2006-10-03',media_type:'tv'},
   {id:65930,name:'My Hero Academia',poster_path:'/oGP90IG0xCcXO25yhfCH1MEJHlO.jpg',vote_average:8.4,first_air_date:'2016-04-03',media_type:'tv'},
 ];
-var SEED_TRENDING = SEED_MOVIES.slice(0,6);
+// Recent releases used as hero seed before API responds
+var SEED_TRENDING = [
+  {id:1022789,title:'Inside Out 2',poster_path:'/vpnVM9B6NMmQpWeZvzLvDESb2QY.jpg',backdrop_path:'/xg27NrXi7VXCGUr7MG75UqLl6Vg.jpg',vote_average:7.7,release_date:'2024-06-14',media_type:'movie'},
+  {id:519182,title:'Despicable Me 4',poster_path:'/wWba3TkhjnHgdnbLSBBPV1g6exq.jpg',backdrop_path:'/lgkgCITtqVCEfQ4Gz4GC1Hx1Gmf.jpg',vote_average:7.1,release_date:'2024-07-03',media_type:'movie'},
+  {id:1064028,title:'Alien: Romulus',poster_path:'/b33nnKl1GSFbao4l3fZDDqsMx0F.jpg',backdrop_path:'/9SSEUrSqhljBMzRe4aBTh17rUaC.jpg',vote_average:7.3,release_date:'2024-08-14',media_type:'movie'},
+  {id:533535,title:'Deadpool & Wolverine',poster_path:'/8cdWjvZQUExUUTzyp4t6EDMubfO.jpg',backdrop_path:'/yDHYTfA3R0jFYba16jBB1ef8oIt.jpg',vote_average:7.7,release_date:'2024-07-24',media_type:'movie'},
+  {id:94997,name:'House of the Dragon',poster_path:'/z2yahl2uefxDCl0nogcRBstwruJ.jpg',backdrop_path:'/suopoADq0k8YZr4dQXcU6pToj6s.jpg',vote_average:8.4,first_air_date:'2024-06-16',media_type:'tv'},
+  {id:202555,name:'The Acolyte',poster_path:'/mCFE9eFVGg3fQ0Qsm3PYPgGEWM4.jpg',backdrop_path:'/iiAhJFNNpYTAVIALXPAc8TodPzB.jpg',vote_average:5.5,first_air_date:'2024-06-04',media_type:'tv'},
+];
 
 // ═══ SERVERS ═══
 var SRVN = ['Videasy','VidSrc.cc','VidSrc.to','Vidlink','EmbedSU','VidSrc.xyz','Vidfast','2Embed','MultiEmbed','VidSrc.wtf'];
@@ -980,14 +1010,23 @@ function loadHome(){
   setHero(0);startHeroTimer();
   renderHome({trending:SEED_TRENDING,popular:SEED_MOVIES,tv:SEED_TV,anime:SEED_ANIME});
   Promise.all([
-    tmdb('/trending/all/week'),
+    tmdb('/movie/now_playing'),           // latest movies in cinemas
+    tmdb('/tv/on_the_air'),               // series currently airing
     tmdb('/movie/popular'),
     tmdb('/trending/tv/week'),
     tmdb('/discover/tv',{with_genres:'16',with_keywords:'210024|287501'})
   ]).then(function(rs){
-    heroItems=(rs[0].results||SEED_TRENDING).slice(0,10);
+    // Merge now-playing movies + on-air series, sort by date descending
+    var nowMovies = (rs[0].results||[]).map(function(m){ m.media_type='movie'; return m; });
+    var onAirTV   = (rs[1].results||[]).map(function(t){ t.media_type='tv';    return t; });
+    var combined  = nowMovies.concat(onAirTV).sort(function(a,b){
+      var da = new Date(a.release_date||a.first_air_date||0);
+      var db = new Date(b.release_date||b.first_air_date||0);
+      return db - da;
+    });
+    heroItems = combined.slice(0,10);
     setHero(0);startHeroTimer();
-    renderHome({trending:rs[0].results||SEED_TRENDING,popular:rs[1].results||SEED_MOVIES,tv:rs[2].results||SEED_TV,anime:rs[3].results||SEED_ANIME});
+    renderHome({trending:rs[0].results||SEED_MOVIES,popular:rs[2].results||SEED_MOVIES,tv:rs[3].results||SEED_TV,anime:rs[4].results||SEED_ANIME});
   }).catch(function(){});
 }
 
@@ -1014,17 +1053,37 @@ function makeSection(title,items,type,isTrending){
   '</div>';
 }
 
+function getQualityBadge(d){
+  // Only for movies
+  var mt = d.media_type || '';
+  if(mt === 'tv') return '';
+  var rel = d.release_date || '';
+  if(!rel) return '';
+  var relMs = new Date(rel).getTime();
+  var now = Date.now();
+  var daysSince = (now - relMs) / 86400000;
+  if(daysSince < 0) return ''; // future release, no badge
+  // CAM: released in last 0-45 days (likely still in cinema or just left)
+  if(daysSince <= 45){
+    return '<div class="card-quality cam">&#127909; CAM</div>';
+  }
+  // HD: released 45+ days ago — home release window open
+  return '<div class="card-quality hd">&#9654; HD</div>';
+}
+
 function makeCard(d,type,wide){
   var id=d.id,title=xe(d.title||d.name||''),
       poster=iurl(d.poster_path||(wide?d.backdrop_path:''),'w342'),
       yr=(d.release_date||d.first_air_date||'').slice(0,4),
       rating=d.vote_average?d.vote_average.toFixed(1):'';
   var mt=d.media_type||(type==='tv'?'tv':'movie');
+  var qBadge = mt==='movie' ? getQualityBadge(d) : '';
   return '<div class="card'+(wide?' card-wide':'')+'" onclick="openDetail('+id+',\''+mt+'\')">'
     +'<div class="card-img-wrap">'
     +(poster?'<img class="card-img" src="'+poster+'" loading="lazy" alt="'+title+'">'
       :'<div class="card-img" style="background:var(--bg4);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--muted);padding:8px;text-align:center">'+title+'</div>')
     +(rating?'<div class="card-rating">&#9733; '+rating+'</div>':'')
+    +qBadge
     +'<div class="card-play"><div class="card-play-icon">&#9654;</div></div>'
     +'</div>'
     +'<div class="card-title">'+title+'</div>'
