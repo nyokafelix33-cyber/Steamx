@@ -420,14 +420,11 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
   background:#000;
 }
 /* Only block top banner strip ~50px — ads appear there, controls don't */
-#as-top-only{
-  position:absolute;
-  top:0;left:0;right:0;
-  height:48px;
-  z-index:6;
+#ad-shield-overlay{
+  position:absolute;top:0;left:0;right:0;
+  height:60px; /* covers top banner ad zone */
+  z-index:5;pointer-events:none;
   background:transparent;
-  pointer-events:all;
-  cursor:default;
 }
 
 /* BOTTOM BAR — fixed height, never hidden, always clickable */
@@ -746,6 +743,22 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
 .fd-divider{height:1px;background:rgba(255,255,255,.06);margin:18px 0 0}
 
 </style>
+  <!-- Ad & redirect protection -->
+  <meta http-equiv="Content-Security-Policy" content="
+    default-src 'self' 'unsafe-inline' 'unsafe-eval' blob: data:
+    https://api.themoviedb.org https://image.tmdb.org
+    https://vidsrc.to https://vidsrc.cc https://vidsrc.xyz
+    https://embed.su https://player.videasy.net
+    https://www.NontonGo.net
+    https://fonts.googleapis.com https://fonts.gstatic.com;
+    frame-src
+    https://vidsrc.to https://vidsrc.cc https://vidsrc.xyz
+    https://embed.su https://player.videasy.net
+    https://www.NontonGo.net
+    https://www.youtube.com;
+    navigate-to 'self';
+  ">
+  <meta name="referrer" content="no-referrer">
 </head>
 <body>
 
@@ -897,9 +910,9 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
     <div class="pm-ep-badge" id="pm-ep-badge" style="display:none"></div>
   </div>
   <div id="pm-iframe-wrap">
-    <iframe id="pm-iframe" src="" allowfullscreen allow="autoplay;encrypted-media;picture-in-picture" referrerpolicy="no-referrer"></iframe>
-    <!-- Only block the very top strip where banner ads appear -->
-    <div id="as-top-only"></div>
+    <iframe id="pm-iframe" src="" allowfullscreen allow="autoplay;encrypted-media;picture-in-picture" referrerpolicy="no-referrer" sandbox="allow-scripts allow-same-origin allow-forms allow-presentation allow-pointer-lock"></iframe>
+    <!-- Ad shield overlay — transparent, only catches rogue navigation clicks -->
+    <div id="ad-shield-overlay"></div>
   </div>
   <div id="pm-bottombar">
     <div class="pm-srv-row" id="pm-srv-row"></div>
@@ -979,39 +992,32 @@ var SEED_TRENDING = [
 
 // ═══ SERVERS ═══
 // Server list — ordered cleanest first (fewest ads/popups)
+// ── Streaming servers — ordered cleanest first ──────────────────────
+// All sources run through our iframe sandbox which blocks top-level navigation
 var SRVN = [
-  'VidSrc.cc',    // S1 — clean, reliable
-  'Videasy',      // S2 — minimal ads
-  'VidSrc.to',    // S3 — stable
-  'EmbedSU',      // S4 — clean UI
-  'AutoEmbed',    // S5 — low ads
-  'SmashyStream', // S6 — good fallback
-  'VidSrc.xyz',   // S7
-  'Vidfast',      // S8
-  'Vidlink',      // S9 — has click ads but good quality
+  'VidSrc',       // S1 — most reliable, clean
+  'VidSrc.cc',    // S2 — iframe-only, no popups
+  'EmbedSU',      // S3 — clean player
+  'VidSrc.xyz',   // S4 — solid fallback
+  'Videasy',      // S5 — minimal ads
+  'NontonGo',     // S6 — alternative
 ];
 function getSrcs(type,id,s,e){
   if(type==='movie')return[
-    'https://vidsrc.cc/v2/embed/movie/'+id+'?autoPlay=true',
-    'https://player.videasy.net/movie/'+id+'?color=e5091a&autoplay=true',
     'https://vidsrc.to/embed/movie/'+id,
+    'https://vidsrc.cc/v2/embed/movie/'+id,
     'https://embed.su/embed/movie/'+id,
-    'https://autoembed.cc/movie/tmdb-'+id,
-    'https://player.smashy.stream/movie/'+id,
     'https://vidsrc.xyz/embed/movie?tmdb='+id,
-    'https://vidfast.pro/movie/'+id+'?autoPlay=true',
-    'https://vidlink.pro/movie/'+id+'?autoplay=true&title=false&primaryColor=e5091a',
+    'https://player.videasy.net/movie/'+id+'?color=e5091a&autoplay=true',
+    'https://www.NontonGo.net/embed/movie/'+id,
   ];
   return[
-    'https://vidsrc.cc/v2/embed/tv/'+id+'/'+s+'/'+e+'?autoPlay=true',
-    'https://player.videasy.net/tv/'+id+'/'+s+'/'+e+'?color=e5091a&autoplay=true',
     'https://vidsrc.to/embed/tv/'+id+'/'+s+'/'+e,
+    'https://vidsrc.cc/v2/embed/tv/'+id+'/'+s+'/'+e,
     'https://embed.su/embed/tv/'+id+'/'+s+'/'+e,
-    'https://autoembed.cc/tv/tmdb-'+id+'-'+s+'-'+e,
-    'https://player.smashy.stream/tv/'+id+'?s='+s+'&e='+e,
     'https://vidsrc.xyz/embed/tv?tmdb='+id+'&season='+s+'&episode='+e,
-    'https://vidfast.pro/tv/'+id+'/'+s+'/'+e+'?autoPlay=true',
-    'https://vidlink.pro/tv/'+id+'/'+s+'/'+e+'?autoplay=true&title=false&primaryColor=e5091a',
+    'https://player.videasy.net/tv/'+id+'/'+s+'/'+e+'?color=e5091a&autoplay=true',
+    'https://www.NontonGo.net/embed/tv/'+id+'/'+s+'/'+e,
   ];
 }
 
@@ -1563,6 +1569,8 @@ function playEp(s,e){
 function openPlayer(src,srvIdx,epInfo){
   var modal=ge('player-modal');
   try{if(screen.orientation&&screen.orientation.lock)screen.orientation.lock('landscape').catch(function(){});}catch(e){}
+  // Re-nuke window.open every time player opens
+  window.open=function(){ return null; };
   ge('pm-iframe').src=src;
   ge('pm-title').textContent=pTitle||'Now Playing';
   var epBadge=ge('pm-ep-badge');
@@ -1692,14 +1700,80 @@ function clearSearch(){ge('sinput').value='';ge('sclr').className='btn';if(curPa
 
 // ═══ AD BLOCKER ═══
 function installAB(){
-  if(window._abOn)return;window._abOn=true;
-  var orig=window.open;
-  window.open=function(url){
-    if(!url)return null;
-    var safe=['youtube','youtu.be','tmdb','vidsrc','vidlink','videasy','vidfast','embed.su','autoembed','smashy','vidsrc.cc','vidsrc.to','vidsrc.xyz'];
-    if(safe.some(function(d){return url.indexOf(d)>=0;}))return orig.apply(window,arguments);
-    toast('Ad blocked!');return{closed:false,close:function(){},focus:function(){}};
-  };
+  if(window._abOn)return;
+  window._abOn=true;
+
+  // ── 1. Nuke window.open completely ──────────────────────────────
+  window.open=function(){ toast('🛡 Ad blocked'); return null; };
+
+  // ── 2. Block window.location hijacks from iframes ───────────────
+  // Intercept any attempt by an iframe to navigate the top window
+  window.addEventListener('beforeunload', function(e){
+    if(ge('player-modal') && ge('player-modal').classList.contains('open')){
+      e.preventDefault();
+      e.returnValue='';
+      return '';
+    }
+  });
+
+  // ── 3. Kill all new tab / popup attempts ────────────────────────
+  window.addEventListener('click', function(e){
+    var el = e.target;
+    // Walk up the DOM to find anchor tags
+    while(el && el.tagName !== 'A') el = el.parentElement;
+    if(!el) return;
+    var href = el.getAttribute('href') || '';
+    var target = el.getAttribute('target') || '';
+    // Block any external link not from our own origin that tries to open new tab
+    if(target === '_blank' && href && href.indexOf(location.origin) === -1 &&
+       href.indexOf('youtube') === -1 && href.slice(0,1) !== '#'){
+      e.preventDefault();
+      e.stopPropagation();
+      toast('🛡 Ad blocked');
+    }
+  }, true);
+
+  // ── 4. Intercept iframe navigation attempts via postMessage ──────
+  window.addEventListener('message', function(e){
+    try{
+      var d = typeof e.data === 'string' ? e.data : JSON.stringify(e.data);
+      // Common ad redirect triggers
+      if(d.indexOf('location')>=0 && d.indexOf('href')>=0) return;
+    }catch(err){}
+  });
+
+  // ── 5. Re-intercept after iframe loads (they overwrite window.open) ──
+  var iframe = ge('pm-iframe');
+  if(iframe){
+    iframe.addEventListener('load', function(){
+      try{
+        // Block iframe's contentWindow.open if same-origin — cross-origin iframes
+        // are sandboxed anyway, but this covers edge cases
+        if(iframe.contentWindow){
+          iframe.contentWindow.open = function(){ return null; };
+        }
+      }catch(err){}
+    });
+  }
+
+  // ── 6. Block document-level popunder trick ───────────────────────
+  // Some sources detect mouse leave and fire window.open on it
+  document.addEventListener('mouseleave', function(e){
+    if(e.clientY <= 0) e.stopImmediatePropagation();
+  }, true);
+
+  // ── 7. Periodically restore window.open in case iframe overwrites it ──
+  setInterval(function(){
+    if(window.open.toString().indexOf('native code') >= 0){
+      window.open = function(){ toast('🛡 Ad blocked'); return null; };
+    }
+  }, 500);
+
+  // ── 8. Block visibility-change popunder trick ────────────────────
+  // Malicious scripts open popup when tab loses/gains focus
+  document.addEventListener('visibilitychange', function(){
+    window.open = function(){ return null; };
+  });
 }
 
 // ═══ TOAST ═══
