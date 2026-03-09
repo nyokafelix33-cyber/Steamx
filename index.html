@@ -1077,7 +1077,7 @@ function loadHome(){
     tmdb('/movie/now_playing'),           // latest movies in cinemas
     tmdb('/tv/on_the_air'),               // series currently airing
     tmdb('/movie/popular'),
-    tmdb('/tv/on_the_air',{'vote_count.gte':5}),
+    tmdb('/discover/tv',{sort_by:'first_air_date.desc','first_air_date.gte':'2020-01-01','vote_count.gte':10}),
     tmdb('/discover/tv',{with_genres:'16',sort_by:'first_air_date.desc','first_air_date.gte':'2022-01-01','vote_count.gte':10})
   ]).then(function(rs){
     // Merge now-playing movies + on-air series, sort by date descending
@@ -1090,13 +1090,7 @@ function loadHome(){
     });
     heroItems = combined.slice(0,10);
     setHero(0);startHeroTimer();
-    var tvRes = (rs[3].results||SEED_TV).filter(function(s){
-      var d=s.first_air_date||''; return d>='2023-01-01';
-    });
-    var anRes = (rs[4].results||SEED_ANIME).filter(function(s){
-      var d=s.first_air_date||''; return d>='2022-01-01';
-    });
-    renderHome({trending:rs[0].results||SEED_MOVIES,popular:rs[2].results||SEED_MOVIES,tv:tvRes.length?tvRes:rs[3].results||SEED_TV,anime:anRes.length?anRes:rs[4].results||SEED_ANIME});
+    renderHome({trending:rs[0].results||SEED_MOVIES,popular:rs[2].results||SEED_MOVIES,tv:rs[3].results||SEED_TV,anime:rs[4].results||SEED_ANIME});
   }).catch(function(){});
 }
 
@@ -1192,9 +1186,9 @@ var COUNTRIES = [
 ];
 
 var filterState = {
-  movies: {sort:'popularity.desc',       genres:[], country:'', year:''},
-  series: {sort:'first_air_date.desc',   genres:[], country:'', year:'2024'},
-  anime:  {sort:'first_air_date.desc',   genres:[], country:'', year:'2022'},
+  movies: {sort:'popularity.desc',     genres:[], country:'', year:''},
+  series: {sort:'first_air_date.desc', genres:[], country:'', year:''},
+  anime:  {sort:'first_air_date.desc', genres:[], country:'', year:''},
 };
 var filterPage = 'movies';
 
@@ -1202,10 +1196,18 @@ function loadBrowse(pg){
   var tabs = (pg==='movies') ? SORT_TABS : SORT_TABS_TV;
   var rid = pg==='movies'?'mv-sort-row':pg==='series'?'sr-sort-row':'an-sort-row';
   var s = filterState[pg];
-  ge(rid).innerHTML = tabs.map(function(t){
-    var act = t.id===s.sort?' active':'';
-    return '<button class="sort-btn'+act+'" onclick="setSort(\"'+pg+'\",\"'+t.id+'\")">'+t.n+'</button>';
-  }).join('');
+  var row = ge(rid);
+  row.innerHTML = '';
+  tabs.forEach(function(t){
+    var btn = document.createElement('button');
+    btn.className = 'sort-btn' + (t.id===s.sort?' active':'');
+    btn.textContent = t.n;
+    btn.addEventListener('click', function(){
+      filterState[pg].sort = t.id;
+      loadBrowse(pg);
+    });
+    row.appendChild(btn);
+  });
   updateFilterBtn(pg);
   fetchBrowse(pg);
 }
@@ -1240,12 +1242,17 @@ function buildBrowseParams(pg, pageNum){
     if(pg==='movies'){
       params['primary_release_year'] = s.year;
     } else {
+      // For a specific year, show that whole year
       params['first_air_date.gte'] = s.year+'-01-01';
       params['first_air_date.lte'] = s.year+'-12-31';
     }
   } else if(s.year === 'older'){
     if(pg==='movies') params['primary_release_date.lte'] = '2015-12-31';
     else params['first_air_date.lte'] = '2015-12-31';
+  } else {
+    // No year filter — for series/anime show from 2018+ to keep it fresh
+    if(pg === 'series') params['first_air_date.gte'] = '2018-01-01';
+    if(pg === 'anime')  params['first_air_date.gte'] = '2019-01-01';
   }
   return params;
 }
