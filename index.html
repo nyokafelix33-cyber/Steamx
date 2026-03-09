@@ -410,6 +410,18 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
   min-height:0;
   width:100%;
 }
+/* When iframe-wrap goes native fullscreen */
+#pm-iframe-wrap:fullscreen,
+#pm-iframe-wrap:-webkit-full-screen{
+  width:100vw;
+  height:100vh;
+  background:#000;
+}
+#pm-iframe-wrap:fullscreen #pm-iframe,
+#pm-iframe-wrap:-webkit-full-screen #pm-iframe{
+  position:absolute;
+  top:0;left:0;width:100%;height:100%;
+}
 #pm-iframe{
   position:absolute;
   top:0;left:0;
@@ -921,6 +933,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
       <button class="pm-btn" id="pm-unmute-btn" onclick="pmUnmute()" style="background:rgba(255,165,0,.7);border-color:orange" title="If sound is off, tap here">&#128266; Unmute</button>
       <button class="pm-btn" id="pm-ep-btn" onclick="pmOpenEps()" style="display:none">&#9776; Episodes</button>
       <button class="pm-btn" id="pm-trl-btn" onclick="pmTrailer()" style="display:none">&#127909; Trailer</button>
+      <button class="pm-btn" id="pm-fs-btn" onclick="pmFullscreen()" title="Fullscreen + Landscape">&#x26F6; Fullscreen</button>
       <div class="pm-shield">&#128737; Shield ON</div>
     </div>
   </div>
@@ -1566,6 +1579,55 @@ function playEp(s,e){
 }
 
 // ═══ PLAYER MODAL ═══
+function pmFullscreen(){
+  var wrap = ge('pm-iframe-wrap') || ge('player-modal');
+  // Request native fullscreen on the wrapper element
+  var req = wrap.requestFullscreen || wrap.webkitRequestFullscreen || wrap.mozRequestFullScreen || wrap.msRequestFullscreen;
+  if(req){
+    req.call(wrap).then(function(){
+      // After fullscreen granted, lock to landscape
+      try{
+        if(screen.orientation && screen.orientation.lock){
+          screen.orientation.lock('landscape').catch(function(){});
+        } else if(window.screen.lockOrientation){
+          window.screen.lockOrientation('landscape');
+        } else if(window.screen.mozLockOrientation){
+          window.screen.mozLockOrientation('landscape');
+        }
+      }catch(e){}
+    }).catch(function(){
+      // Fallback: just try orientation lock without fullscreen
+      try{
+        if(screen.orientation && screen.orientation.lock)
+          screen.orientation.lock('landscape').catch(function(){});
+      }catch(e){}
+    });
+  } else {
+    // Older iOS Safari — can't do programmatic fullscreen, just lock orientation
+    try{
+      if(screen.orientation && screen.orientation.lock)
+        screen.orientation.lock('landscape').catch(function(){});
+    }catch(e){}
+    toast('Tap the video expand button for fullscreen');
+  }
+}
+
+// Listen for native fullscreen change — unlock orientation on exit
+document.addEventListener('fullscreenchange', function(){
+  if(!document.fullscreenElement){
+    try{
+      if(screen.orientation && screen.orientation.unlock) screen.orientation.unlock();
+    }catch(e){}
+  }
+});
+document.addEventListener('webkitfullscreenchange', function(){
+  if(!document.webkitFullscreenElement){
+    try{
+      if(screen.orientation && screen.orientation.unlock) screen.orientation.unlock();
+    }catch(e){}
+  }
+});
+
 function openPlayer(src,srvIdx,epInfo){
   var modal=ge('player-modal');
   try{if(screen.orientation&&screen.orientation.lock)screen.orientation.lock('landscape').catch(function(){});}catch(e){}
