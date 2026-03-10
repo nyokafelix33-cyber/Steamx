@@ -745,6 +745,81 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
 }
 .fd-divider{height:1px;background:rgba(255,255,255,.06);margin:18px 0 0}
 
+
+/* ── AD SHIELD: block corner/edge ad clicks ── */
+#pm-iframe-wrap::before,
+#pm-iframe-wrap::after {
+  content:'';position:absolute;z-index:10;pointer-events:all;
+}
+#pm-iframe-wrap::before {
+  top:0;left:0;right:0;height:52px; /* top banner zone */
+  background:transparent;
+}
+#pm-iframe-wrap::after {
+  bottom:0;left:0;right:0;height:0px;
+  background:transparent;
+}
+.pm-corner-shield {
+  position:absolute;z-index:10;pointer-events:all;
+  background:transparent;
+}
+
+/* ── ACTOR PROFILE PAGE ── */
+#actor-profile{
+  display:none;position:fixed;inset:0;z-index:7000;
+  background:var(--bg);overflow-y:auto;
+}
+#actor-profile.open{display:block}
+.actor-hero{
+  position:relative;height:200px;background:var(--bg3);
+  display:flex;align-items:flex-end;
+}
+.actor-hero-img{
+  position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top;
+  opacity:0.35;
+}
+.actor-hero-grad{
+  position:absolute;inset:0;
+  background:linear-gradient(to top,var(--bg) 0%,transparent 60%);
+}
+.actor-hero-content{
+  position:relative;z-index:2;
+  display:flex;align-items:flex-end;gap:14px;padding:16px;width:100%;
+}
+.actor-photo{
+  width:80px;height:80px;border-radius:50%;object-fit:cover;object-position:top;
+  border:3px solid var(--red);flex-shrink:0;background:var(--bg3);
+}
+.actor-info{flex:1;min-width:0}
+.actor-name{font-size:20px;font-weight:800;margin-bottom:4px}
+.actor-meta{font-size:12px;color:var(--muted)}
+.actor-back{
+  position:fixed;top:16px;left:16px;z-index:7010;
+  width:38px;height:38px;border-radius:50%;
+  background:rgba(7,7,15,.85);border:1px solid rgba(255,255,255,.2);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;font-size:18px;backdrop-filter:blur(10px);
+}
+.actor-body{padding:16px}
+.actor-bio{
+  font-size:13px;color:rgba(240,240,248,.72);line-height:1.7;
+  margin-bottom:20px;font-family:var(--font2);
+  display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;
+  cursor:pointer;
+}
+.actor-bio.expanded{-webkit-line-clamp:unset;}
+.actor-filter-row{
+  display:flex;gap:8px;margin-bottom:14px;overflow-x:auto;scrollbar-width:none;
+}
+.actor-filter-row::-webkit-scrollbar{display:none}
+.actor-filter-chip{
+  flex-shrink:0;padding:6px 14px;border-radius:20px;
+  font-size:12px;font-weight:700;cursor:pointer;
+  background:rgba(255,255,255,.07);border:1px solid var(--bdr);
+  color:var(--muted);font-family:var(--font);transition:all .2s;
+}
+.actor-filter-chip.active{background:var(--red);border-color:var(--red);color:#fff}
+
 </style>
 </head>
 <body>
@@ -897,9 +972,11 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
     <div class="pm-ep-badge" id="pm-ep-badge" style="display:none"></div>
   </div>
   <div id="pm-iframe-wrap">
-    <iframe id="pm-iframe" src="" allowfullscreen allow="autoplay;encrypted-media;picture-in-picture" referrerpolicy="no-referrer"></iframe>
-    <!-- Only block the very top strip where banner ads appear -->
-    <div id="as-top-only"></div>
+    <iframe id="pm-iframe" src="" allowfullscreen allow="autoplay;encrypted-media;picture-in-picture;fullscreen" referrerpolicy="no-referrer" sandbox="allow-scripts allow-same-origin allow-forms allow-presentation allow-pointer-lock allow-popups-to-escape-sandbox"></iframe>
+    <!-- Corner ad shields — block clicks without blocking video -->
+    <div id="as-top-only" style="position:absolute;top:0;left:0;right:0;height:52px;z-index:10;pointer-events:all;background:transparent;cursor:default;"></div>
+    <div class="pm-corner-shield" style="top:0;left:0;width:80px;height:80px;"></div>
+    <div class="pm-corner-shield" style="top:0;right:0;width:80px;height:80px;"></div>
   </div>
   <div id="pm-bottombar">
     <div class="pm-srv-row" id="pm-srv-row"></div>
@@ -919,6 +996,28 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
   </div>
 </div>
 
+
+
+<!-- ACTOR PROFILE -->
+<div id="actor-profile">
+  <button class="actor-back" onclick="closeActorProfile()">&#8592;</button>
+  <div class="actor-hero">
+    <img class="actor-hero-img" id="actor-hero-img" src="" alt="">
+    <div class="actor-hero-grad"></div>
+    <div class="actor-hero-content">
+      <img class="actor-photo" id="actor-photo" src="" alt="">
+      <div class="actor-info">
+        <div class="actor-name" id="actor-name"></div>
+        <div class="actor-meta" id="actor-meta"></div>
+      </div>
+    </div>
+  </div>
+  <div class="actor-body">
+    <div class="actor-bio" id="actor-bio" onclick="this.classList.toggle('expanded')"></div>
+    <div class="actor-filter-row" id="actor-filters"></div>
+    <div class="grid" id="actor-grid"></div>
+  </div>
+</div>
 
 <div id="toast"></div>
 
@@ -980,19 +1079,17 @@ var SEED_TRENDING = [
 // ═══ SERVERS ═══
 // Server list — ordered cleanest first (fewest ads/popups)
 var SRVN = [
-  'Videasy',      // S1 — fast, clean, reliable
-  'VidSrc.me',    // S2 — popular fallback
-  'VidSrc.xyz',   // S3 — solid backup
-  'AutoEmbed',    // S4 — low ads
-  'SmashyStream', // S5 — good fallback
-  'Vidfast',      // S6
-  'Vidlink',      // S7
-  'VidSrc.to',    // S8
-  'VidSrc.rip',   // S9 — last resort
+  'VidSrc.me',    // S1 — popular, reliable
+  'VidSrc.xyz',   // S2 — solid backup
+  'AutoEmbed',    // S3 — low ads
+  'SmashyStream', // S4 — good fallback
+  'Vidfast',      // S5
+  'Vidlink',      // S6
+  'VidSrc.to',    // S7
+  'VidSrc.rip',   // S8 — last resort
 ];
 function getSrcs(type,id,s,e){
   if(type==='movie')return[
-    'https://player.videasy.net/movie/'+id+'?color=e5091a&autoplay=true',
     'https://vidsrc.me/embed/movie?tmdb='+id,
     'https://vidsrc.xyz/embed/movie?tmdb='+id,
     'https://autoembed.cc/movie/tmdb-'+id,
@@ -1003,15 +1100,14 @@ function getSrcs(type,id,s,e){
     'https://vidsrc.rip/embed/movie?tmdb='+id,
   ];
   return[
-    'https://player.videasy.net/tv/'+id+'/'+s+'/'+e+'?color=e5091a&autoplay=true',
     'https://vidsrc.me/embed/tv?tmdb='+id+'&season='+s+'&episode='+e,
-    'https://vidsrc.to/embed/tv/'+id+'/'+s+'/'+e,
-    'https://vidsrc.rip/embed/tv?tmdb='+id+'&season='+s+'&episode='+e,
+    'https://vidsrc.xyz/embed/tv?tmdb='+id+'&season='+s+'&episode='+e,
     'https://autoembed.cc/tv/tmdb-'+id+'-'+s+'-'+e,
     'https://player.smashy.stream/tv/'+id+'?s='+s+'&e='+e,
-    'https://vidsrc.xyz/embed/tv?tmdb='+id+'&season='+s+'&episode='+e,
     'https://vidfast.pro/tv/'+id+'/'+s+'/'+e+'?autoPlay=true',
     'https://vidlink.pro/tv/'+id+'/'+s+'/'+e+'?autoplay=true&title=false&primaryColor=e5091a',
+    'https://vidsrc.to/embed/tv/'+id+'/'+s+'/'+e,
+    'https://vidsrc.rip/embed/tv?tmdb='+id+'&season='+s+'&episode='+e,
   ];
 }
 
@@ -1070,42 +1166,55 @@ function startHeroTimer(){clearInterval(heroTimer);heroTimer=setInterval(functio
 
 // ═══ HOME ═══
 function loadHome(){
+  // Show seed data immediately
   heroItems=SEED_TRENDING;
   setHero(0);startHeroTimer();
-  renderHome({trending:SEED_TRENDING,popular:SEED_MOVIES,tv:SEED_TV,anime:SEED_ANIME});
+  renderHome({trending:SEED_TRENDING,popular:SEED_MOVIES,tv:SEED_TV,anime:SEED_ANIME,newMovies:[],topRated:[],kDrama:[],action:[]});
+  // Fetch live data — many sections
   Promise.all([
-    tmdb('/movie/now_playing'),           // latest movies in cinemas
-    tmdb('/tv/on_the_air'),               // series currently airing
+    tmdb('/trending/all/week'),
+    tmdb('/movie/now_playing'),
     tmdb('/movie/popular'),
-    tmdb('/tv/on_the_air',{'vote_count.gte':5}),
-    tmdb('/discover/tv',{with_genres:'16',sort_by:'first_air_date.desc','first_air_date.gte':'2022-01-01','vote_count.gte':10})
+    tmdb('/movie/top_rated'),
+    tmdb('/tv/popular'),
+    tmdb('/tv/top_rated'),
+    tmdb('/discover/tv',{with_genres:'16',sort_by:'popularity.desc','vote_count.gte':50}),
+    tmdb('/discover/movie',{with_genres:'28',sort_by:'popularity.desc'}),
+    tmdb('/discover/tv',{with_origin_country:'KR',sort_by:'popularity.desc','vote_count.gte':20}),
+    tmdb('/discover/movie',{with_genres:'27',sort_by:'popularity.desc'}),
   ]).then(function(rs){
-    // Merge now-playing movies + on-air series, sort by date descending
-    var nowMovies = (rs[0].results||[]).map(function(m){ m.media_type='movie'; return m; });
-    var onAirTV   = (rs[1].results||[]).map(function(t){ t.media_type='tv';    return t; });
-    var combined  = nowMovies.concat(onAirTV).sort(function(a,b){
-      var da = new Date(a.release_date||a.first_air_date||0);
-      var db = new Date(b.release_date||b.first_air_date||0);
-      return db - da;
+    var trending=(rs[0].results||[]).map(function(m){if(!m.media_type)m.media_type='movie';return m;});
+    var nowMovies=(rs[1].results||[]).map(function(m){m.media_type='movie';return m;});
+    var onAirCombined=nowMovies.concat((rs[4].results||[]).map(function(t){t.media_type='tv';return t;}))
+      .sort(function(a,b){return new Date(b.release_date||b.first_air_date||0)-new Date(a.release_date||a.first_air_date||0);});
+    if(trending.length){heroItems=trending.slice(0,10);setHero(0);startHeroTimer();}
+    renderHome({
+      trending:   trending.length?trending:SEED_TRENDING,
+      popular:    rs[2].results||SEED_MOVIES,
+      tv:         rs[4].results||SEED_TV,
+      anime:      rs[6].results||SEED_ANIME,
+      newMovies:  nowMovies.slice(0,12),
+      topRated:   rs[3].results||[],
+      topSeries:  rs[5].results||[],
+      kDrama:     rs[8].results||[],
+      action:     rs[7].results||[],
+      horror:     rs[9].results||[],
     });
-    heroItems = combined.slice(0,10);
-    setHero(0);startHeroTimer();
-    var tvRes = (rs[3].results||SEED_TV).filter(function(s){
-      var d=s.first_air_date||''; return d>='2023-01-01';
-    });
-    var anRes = (rs[4].results||SEED_ANIME).filter(function(s){
-      var d=s.first_air_date||''; return d>='2022-01-01';
-    });
-    renderHome({trending:rs[0].results||SEED_MOVIES,popular:rs[2].results||SEED_MOVIES,tv:tvRes.length?tvRes:rs[3].results||SEED_TV,anime:anRes.length?anRes:rs[4].results||SEED_ANIME});
   }).catch(function(){});
 }
 
 function renderHome(d){
   var h='';
-  h+=makeSection('TRENDING',d.trending||[],'movie',true);
+  h+=makeSection('TRENDING NOW',d.trending||[],'movie',true);
   h+=makeSection('POPULAR MOVIES',d.popular||[],'movie',false);
+  if(d.newMovies&&d.newMovies.length)h+=makeSection('NEW IN CINEMAS',d.newMovies,'movie',false);
+  if(d.topRated&&d.topRated.length)h+=makeSection('TOP RATED MOVIES',d.topRated,'movie',false);
   h+=makeSection('TOP SERIES',d.tv||[],'tv',false);
+  if(d.topSeries&&d.topSeries.length)h+=makeSection('HIGHEST RATED SERIES',d.topSeries,'tv',false);
   h+=makeSection('ANIME',d.anime||[],'tv',false);
+  if(d.kDrama&&d.kDrama.length)h+=makeSection('K-DRAMA',d.kDrama,'tv',false);
+  if(d.action&&d.action.length)h+=makeSection('ACTION MOVIES',d.action,'movie',false);
+  if(d.horror&&d.horror.length)h+=makeSection('HORROR',d.horror,'movie',false);
   ge('home-sections').innerHTML=h;
 }
 
@@ -1192,9 +1301,9 @@ var COUNTRIES = [
 ];
 
 var filterState = {
-  movies: {sort:'popularity.desc',       genres:[], country:'', year:''},
-  series: {sort:'first_air_date.desc',   genres:[], country:'', year:'2024'},
-  anime:  {sort:'first_air_date.desc',   genres:[], country:'', year:'2022'},
+  movies: {sort:'popularity.desc', genres:[], country:'', year:''},
+  series: {sort:'popularity.desc', genres:[], country:'', year:''},
+  anime:  {sort:'popularity.desc', genres:['16'], country:'', year:''},
 };
 var filterPage = 'movies';
 
@@ -1500,14 +1609,14 @@ function showDetailTab(name,d){
     if(seas.length)loadSeasonEps(1,null);
     return;
   } else if(name==='cast'){
-    var cast=(d.credits&&d.credits.cast?d.credits.cast:[]).slice(0,20);
+    var cast=(d.credits&&d.credits.cast?d.credits.cast:[]).slice(0,24);
     h='<div class="cast-row">'+cast.map(function(c){
       var img=c.profile_path?iurl(c.profile_path,'w185'):'';
-      return '<div class="cast-card">'
+      return '<div class="cast-card" style="cursor:pointer" data-actorid="'+c.id+'" data-actorname="'+xe(c.name)+'">'
         +(img?'<img class="cast-img" src="'+img+'" loading="lazy" alt="'+xe(c.name)+'">'
           :'<div class="cast-img" style="display:flex;align-items:center;justify-content:center;font-size:20px">&#128100;</div>')
         +'<div class="cast-name">'+xe(c.name)+'</div>'
-        +'<div class="cast-role">'+xe(c.character||'')+'</div>'
+        +'<div class="cast-role" style="color:var(--red);font-size:9px">Tap to view</div>'
         +'</div>';
     }).join('')+'</div>';
   } else if(name==='similar'){
@@ -1683,17 +1792,143 @@ function doSearch(q){
 function clearSearch(){ge('sinput').value='';ge('sclr').className='btn';if(curPage==='search')go('home',true);}
 
 
-// ═══ AD BLOCKER ═══
+// ═══ AD BLOCKER (FULL STRENGTH) ═══
 function installAB(){
   if(window._abOn)return;window._abOn=true;
-  var orig=window.open;
+
+  // 1. Block window.open() popups from ads
+  var origOpen=window.open;
   window.open=function(url){
     if(!url)return null;
-    var safe=['youtube','youtu.be','tmdb','vidsrc','vidlink','videasy','vidfast','embed.su','autoembed','smashy','vidsrc.cc','vidsrc.to','vidsrc.xyz'];
-    if(safe.some(function(d){return url.indexOf(d)>=0;}))return orig.apply(window,arguments);
-    toast('Ad blocked!');return{closed:false,close:function(){},focus:function(){}};
+    var safe=['youtube','youtu.be','tmdb','vidsrc','vidlink','videasy','vidfast','autoembed','smashy','vidsrc.to','vidsrc.xyz','vidsrc.me','vidsrc.rip','vidfast.pro','moviesapi'];
+    if(safe.some(function(d){return url.indexOf(d)>=0;}))return origOpen.apply(window,arguments);
+    toast('🛡 Ad blocked!');return{closed:false,close:function(){},focus:function(){}};
   };
+
+  // 2. Block location hijacking — prevent page from being redirected
+  try{
+    Object.defineProperty(window,'location',{
+      set:function(v){toast('🛡 Redirect blocked!');},
+      get:function(){return window.location;}
+    });
+  }catch(e){}
+
+  // 3. Intercept ALL clicks on the iframe area — if a new tab/window tries
+  //    to open within 300ms of a click, kill it
+  var iframeWrap = ge('pm-iframe-wrap');
+  if(iframeWrap){
+    var lastClick=0;
+    iframeWrap.addEventListener('mousedown',function(){lastClick=Date.now();},true);
+    iframeWrap.addEventListener('touchstart',function(){lastClick=Date.now();},{passive:true,capture:true});
+    // Watch for blur (tab switch / popup opened)
+    window.addEventListener('blur',function(){
+      if(Date.now()-lastClick<800){
+        setTimeout(function(){window.focus();},100);
+        toast('🛡 Ad blocked!');
+      }
+    });
+  }
+
+  // 4. Kill any beforeunload / unload attempts from iframe
+  window.addEventListener('beforeunload',function(e){
+    if(ge('player-modal').classList.contains('open')){
+      e.preventDefault();e.returnValue='';
+      return '';
+    }
+  });
 }
+
+
+// ═══ ACTOR PROFILE ═══
+var actorFilter = 'all';
+function openActorProfile(actorId, name){
+  var profile = ge('actor-profile');
+  profile.classList.add('open');
+  document.body.style.overflow='hidden';
+  ge('actor-name').textContent = name||'Loading...';
+  ge('actor-meta').textContent = '';
+  ge('actor-bio').textContent = 'Loading biography...';
+  ge('actor-photo').src = '';
+  ge('actor-hero-img').src = '';
+  ge('actor-grid').innerHTML = '<div class="spinwrap"><div class="spinner"></div></div>';
+  ge('actor-filters').innerHTML = '';
+  actorFilter = 'all';
+  Promise.all([
+    tmdb('/person/'+actorId),
+    tmdb('/person/'+actorId+'/combined_credits')
+  ]).then(function(rs){
+    var p = rs[0];
+    var credits = rs[1];
+    // Photo
+    if(p.profile_path){
+      ge('actor-photo').src = iurl(p.profile_path,'w185');
+      ge('actor-hero-img').src = iurl(p.profile_path,'w500');
+    }
+    // Name + meta
+    ge('actor-name').textContent = p.name||name||'';
+    var meta = [];
+    if(p.birthday) meta.push('Born: '+p.birthday);
+    if(p.place_of_birth) meta.push(p.place_of_birth);
+    if(p.known_for_department) meta.push(p.known_for_department);
+    ge('actor-meta').textContent = meta.join(' · ');
+    // Bio
+    ge('actor-bio').textContent = p.biography||'No biography available.';
+    // Filter chips
+    ge('actor-filters').innerHTML =
+      '<div class="actor-filter-chip active" onclick="filterActorCredits(\'all\',this)">All</div>'+
+      '<div class="actor-filter-chip" onclick="filterActorCredits(\'movie\',this)">Movies</div>'+
+      '<div class="actor-filter-chip" onclick="filterActorCredits(\'tv\',this)">TV Shows</div>';
+    // Credits
+    window._actorCredits = (credits.cast||[]).filter(function(c){
+      return c.poster_path && (c.title||c.name);
+    }).sort(function(a,b){
+      var da=new Date(b.release_date||b.first_air_date||0);
+      var db=new Date(a.release_date||a.first_air_date||0);
+      return da-db;
+    });
+    renderActorCredits();
+  }).catch(function(){
+    ge('actor-bio').textContent = 'Failed to load profile.';
+    ge('actor-grid').innerHTML = '<div class="empty">Could not load credits.</div>';
+  });
+}
+
+function filterActorCredits(type, btn){
+  actorFilter = type;
+  document.querySelectorAll('.actor-filter-chip').forEach(function(c){c.classList.remove('active');});
+  if(btn) btn.classList.add('active');
+  renderActorCredits();
+}
+
+function renderActorCredits(){
+  var all = window._actorCredits||[];
+  var filtered = actorFilter==='all' ? all : all.filter(function(c){return c.media_type===actorFilter;});
+  // Dedupe by id
+  var seen={};
+  filtered = filtered.filter(function(c){if(seen[c.id])return false;seen[c.id]=1;return true;});
+  if(!filtered.length){
+    ge('actor-grid').innerHTML='<div class="empty" style="grid-column:1/-1">No credits found.</div>';
+    return;
+  }
+  ge('actor-grid').innerHTML = filtered.slice(0,30).map(function(c){
+    return makeCard(c, c.media_type||'movie', false);
+  }).join('');
+}
+
+function closeActorProfile(){
+  ge('actor-profile').classList.remove('open');
+  document.body.style.overflow='';
+}
+
+// ═══ CAST CARD DELEGATION ═══
+document.addEventListener('click', function(e){
+  var el = e.target;
+  while(el && !el.getAttribute('data-actorid')) el = el.parentElement;
+  if(!el) return;
+  var aid = parseInt(el.getAttribute('data-actorid'));
+  var aname = el.getAttribute('data-actorname') || '';
+  if(aid) openActorProfile(aid, aname);
+});
 
 // ═══ TOAST ═══
 var toastT;
