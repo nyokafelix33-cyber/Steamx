@@ -1079,34 +1079,34 @@ var SEED_TRENDING = [
 // ═══ SERVERS ═══
 // Server list — ordered cleanest first (fewest ads/popups)
 var SRVN = [
-  'VidSrc.me',    // S1 — popular, reliable
+  'VidSrc.cc',    // S1 — your favourite
   'VidSrc.xyz',   // S2 — solid backup
-  'AutoEmbed',    // S3 — low ads
-  'SmashyStream', // S4 — good fallback
-  'Vidfast',      // S5
-  'Vidlink',      // S6
-  'VidSrc.to',    // S7
+  'VidSrc.me',    // S3 — popular
+  'VidSrc.to',    // S4 — stable
+  'Vidlink',      // S5 — good quality
+  'AutoEmbed',    // S6
+  'Vidfast',      // S7
   'VidSrc.rip',   // S8 — last resort
 ];
 function getSrcs(type,id,s,e){
   if(type==='movie')return[
-    'https://vidsrc.me/embed/movie?tmdb='+id,
+    'https://vidsrc.cc/v2/embed/movie/'+id+'?autoPlay=true',
     'https://vidsrc.xyz/embed/movie?tmdb='+id,
-    'https://autoembed.cc/movie/tmdb-'+id,
-    'https://player.smashy.stream/movie/'+id,
-    'https://vidfast.pro/movie/'+id+'?autoPlay=true',
-    'https://vidlink.pro/movie/'+id+'?autoplay=true&title=false&primaryColor=e5091a',
+    'https://vidsrc.me/embed/movie?tmdb='+id,
     'https://vidsrc.to/embed/movie/'+id,
+    'https://vidlink.pro/movie/'+id+'?autoplay=true&primaryColor=e5091a',
+    'https://autoembed.cc/movie/tmdb-'+id,
+    'https://vidfast.pro/movie/'+id+'?autoPlay=true',
     'https://vidsrc.rip/embed/movie?tmdb='+id,
   ];
   return[
-    'https://vidsrc.me/embed/tv?tmdb='+id+'&season='+s+'&episode='+e,
+    'https://vidsrc.cc/v2/embed/tv/'+id+'/'+s+'/'+e+'?autoPlay=true',
     'https://vidsrc.xyz/embed/tv?tmdb='+id+'&season='+s+'&episode='+e,
-    'https://autoembed.cc/tv/tmdb-'+id+'-'+s+'-'+e,
-    'https://player.smashy.stream/tv/'+id+'?s='+s+'&e='+e,
-    'https://vidfast.pro/tv/'+id+'/'+s+'/'+e+'?autoPlay=true',
-    'https://vidlink.pro/tv/'+id+'/'+s+'/'+e+'?autoplay=true&title=false&primaryColor=e5091a',
+    'https://vidsrc.me/embed/tv?tmdb='+id+'&season='+s+'&episode='+e,
     'https://vidsrc.to/embed/tv/'+id+'/'+s+'/'+e,
+    'https://vidlink.pro/tv/'+id+'/'+s+'/'+e+'?autoplay=true&primaryColor=e5091a',
+    'https://autoembed.cc/tv/tmdb-'+id+'-'+s+'-'+e,
+    'https://vidfast.pro/tv/'+id+'/'+s+'/'+e+'?autoPlay=true',
     'https://vidsrc.rip/embed/tv?tmdb='+id+'&season='+s+'&episode='+e,
   ];
 }
