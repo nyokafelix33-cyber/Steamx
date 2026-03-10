@@ -1729,24 +1729,48 @@ function pmUnmute(){
 }
 
 function pmFullscreen(){
-  var wrap = ge('pm-iframe-wrap');
-  var iframe = ge('pm-iframe');
-  // Lock to landscape
-  try{
-    if(screen.orientation && screen.orientation.lock){
-      screen.orientation.lock('landscape').catch(function(){});
-    }
-  }catch(e){}
-  // Try fullscreen on wrap first, then iframe
-  var el = wrap || iframe;
-  if(el.requestFullscreen){ el.requestFullscreen(); }
-  else if(el.webkitRequestFullscreen){ el.webkitRequestFullscreen(); }
-  else if(el.mozRequestFullScreen){ el.mozRequestFullScreen(); }
-  else if(iframe.requestFullscreen){ iframe.requestFullscreen(); }
-  else if(iframe.webkitRequestFullscreen){ iframe.webkitRequestFullscreen(); }
-  // Fallback: make modal cover everything
   var modal = ge('player-modal');
-  if(modal){ modal.style.position='fixed'; modal.style.inset='0'; modal.style.zIndex='99999'; }
+  var wrap = ge('pm-iframe-wrap');
+
+  // Step 1: go fullscreen on the modal element
+  var el = modal || wrap;
+  var fsPromise = null;
+  if(el.requestFullscreen){ fsPromise = el.requestFullscreen(); }
+  else if(el.webkitRequestFullscreen){ fsPromise = el.webkitRequestFullscreen(); }
+  else if(el.mozRequestFullScreen){ fsPromise = el.mozRequestFullScreen(); }
+
+  // Step 2: after fullscreen is granted, lock to landscape
+  function lockLandscape(){
+    try{
+      if(screen.orientation && screen.orientation.lock){
+        screen.orientation.lock('landscape').catch(function(){});
+      } else if(window.screen && window.screen.lockOrientation){
+        window.screen.lockOrientation('landscape');
+      } else if(window.screen && window.screen.mozLockOrientation){
+        window.screen.mozLockOrientation('landscape');
+      }
+    }catch(e){}
+  }
+
+  if(fsPromise && fsPromise.then){
+    fsPromise.then(lockLandscape).catch(function(){lockLandscape();});
+  } else {
+    setTimeout(lockLandscape, 100);
+  }
+
+  // Step 3: listen for fullscreen exit — unlock orientation
+  function onFsChange(){
+    var isFs = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement;
+    if(!isFs){
+      try{
+        if(screen.orientation && screen.orientation.unlock) screen.orientation.unlock();
+      }catch(e){}
+      document.removeEventListener('fullscreenchange', onFsChange);
+      document.removeEventListener('webkitfullscreenchange', onFsChange);
+    }
+  }
+  document.addEventListener('fullscreenchange', onFsChange);
+  document.addEventListener('webkitfullscreenchange', onFsChange);
 }
 
 function pmToggle(){if(pmVisible)pmHideControls();else pmShowControls();}
