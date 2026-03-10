@@ -754,6 +754,167 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
 }
 .fd-divider{height:1px;background:rgba(255,255,255,.06);margin:18px 0 0}
 
+
+/* ══ ACTOR PROFILE PAGE ══ */
+#actor-page{
+  position:fixed;inset:0;z-index:7000;
+  background:var(--bg);overflow-y:auto;
+  display:none;flex-direction:column;
+}
+#actor-page.open{ display:flex; }
+
+.actor-topbar{
+  position:sticky;top:0;z-index:10;
+  display:flex;align-items:center;gap:12px;
+  padding:12px 16px;
+  background:rgba(10,10,18,.92);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid rgba(255,255,255,.07);
+}
+.actor-topbar-name{
+  font-size:15px;font-weight:800;
+  overflow:hidden;white-space:nowrap;text-overflow:ellipsis;
+}
+.actor-hero{
+  position:relative;width:100%;
+  aspect-ratio:3/4;max-height:420px;overflow:hidden;
+  background:var(--bg3);
+}
+.actor-hero-img{
+  width:100%;height:100%;object-fit:cover;object-position:top;
+  display:block;
+}
+.actor-hero-overlay{
+  position:absolute;inset:0;
+  background:linear-gradient(to bottom,rgba(0,0,0,0) 40%,rgba(10,10,18,1) 100%);
+}
+.actor-hero-info{
+  position:absolute;bottom:0;left:0;right:0;
+  padding:0 16px 20px;
+}
+.actor-name{
+  font-size:26px;font-weight:900;letter-spacing:-.3px;
+  text-shadow:0 2px 12px rgba(0,0,0,.8);
+}
+.actor-meta{
+  font-size:12px;color:var(--muted);margin-top:4px;
+  display:flex;flex-wrap:wrap;gap:8px;
+}
+.actor-meta span{
+  background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:20px;padding:3px 10px;
+  font-size:11px;
+}
+.actor-body{padding:16px 16px 80px;}
+
+.actor-section-title{
+  font-size:14px;font-weight:800;letter-spacing:.4px;
+  color:var(--text);margin:20px 0 12px;
+  display:flex;align-items:center;gap:8px;
+}
+.actor-section-title::before{
+  content:'';display:block;
+  width:3px;height:16px;border-radius:2px;
+  background:var(--red);flex-shrink:0;
+}
+.actor-bio{
+  font-size:13px;line-height:1.7;color:var(--muted);
+  margin-bottom:4px;
+}
+.actor-bio.collapsed{
+  display:-webkit-box;-webkit-line-clamp:4;
+  -webkit-box-orient:vertical;overflow:hidden;
+}
+.actor-bio-toggle{
+  font-size:12px;color:var(--red);font-weight:700;
+  cursor:pointer;margin-top:6px;display:inline-block;
+}
+.actor-filmography-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:10px;
+}
+.actor-known-for{
+  display:flex;gap:10px;overflow-x:auto;
+  padding-bottom:8px;scrollbar-width:none;
+}
+.actor-known-for::-webkit-scrollbar{display:none}
+.actor-kf-chip{
+  flex-shrink:0;padding:6px 14px;border-radius:20px;
+  background:rgba(229,9,26,.12);border:1px solid rgba(229,9,26,.3);
+  color:var(--text);font-size:11px;font-weight:700;cursor:pointer;
+  font-family:var(--font);transition:all .2s;white-space:nowrap;
+}
+.actor-kf-chip:hover{background:rgba(229,9,26,.25);}
+.actor-kf-chip.active{background:var(--red);color:#fff;border-color:var(--red);}
+
+
+/* ── STREAM ERROR BANNER ── */
+#pm-err-banner{
+  position:absolute;
+  top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  z-index:20;
+  display:flex;align-items:center;justify-content:center;
+  pointer-events:none;
+}
+.pm-err-box{
+  background:rgba(10,10,18,.95);
+  border:1.5px solid rgba(229,9,26,.5);
+  border-radius:16px;
+  padding:16px 22px;
+  display:flex;flex-direction:column;align-items:center;gap:12px;
+  pointer-events:all;
+  backdrop-filter:blur(12px);
+  text-align:center;
+  box-shadow:0 8px 32px rgba(0,0,0,.8);
+  animation:fadeIn .3s ease;
+}
+.pm-err-box span{
+  font-size:14px;font-weight:700;color:var(--text);
+}
+.pm-err-box button{
+  padding:10px 24px;border-radius:24px;
+  background:var(--red);border:none;
+  color:#fff;font-size:13px;font-weight:800;
+  cursor:pointer;font-family:var(--font);
+  transition:all .2s;
+}
+.pm-err-box button:active{transform:scale(.95)}
+
+
+/* ── ENHANCED CAST CARDS ── */
+.cast-card-tap{
+  cursor:pointer;transition:transform .2s;position:relative;
+}
+.cast-card-tap:active{transform:scale(.93);}
+.cast-img-wrap{
+  position:relative;width:72px;height:72px;
+  border-radius:50%;overflow:hidden;margin:0 auto 6px;
+  border:2px solid rgba(229,9,26,.4);
+  transition:border-color .2s;
+}
+.cast-card-tap:hover .cast-img-wrap,
+.cast-card-tap:active .cast-img-wrap{
+  border-color:var(--red);
+}
+.cast-img-wrap .cast-img{
+  width:100%;height:100%;object-fit:cover;display:block;border:none;margin:0;border-radius:0;
+}
+.cast-img-blank{
+  width:100%;height:100%;display:flex;align-items:center;justify-content:center;
+  font-size:26px;background:var(--bg3);
+}
+.cast-img-overlay{
+  position:absolute;inset:0;
+  background:rgba(229,9,26,.55);
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;color:#fff;
+  opacity:0;transition:opacity .2s;
+}
+.cast-card-tap:hover .cast-img-overlay,
+.cast-card-tap:active .cast-img-overlay{opacity:1;}
+
 </style>
   <!-- Ad & redirect protection -->
   <meta http-equiv="Content-Security-Policy" content="
@@ -923,8 +1084,15 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
   </div>
   <div id="pm-iframe-wrap">
     <iframe id="pm-iframe" src="" allowfullscreen allow="autoplay;encrypted-media;picture-in-picture" referrerpolicy="no-referrer" sandbox="allow-scripts allow-same-origin allow-forms allow-presentation allow-pointer-lock"></iframe>
-    <!-- Ad shield overlay — transparent, only catches rogue navigation clicks -->
+    <!-- Ad shield overlay -->
     <div id="ad-shield-overlay"></div>
+    <!-- Stream error banner -->
+    <div id="pm-err-banner" style="display:none">
+      <div class="pm-err-box">
+        <span>⚠️ Stream not loading?</span>
+        <button onclick="pmNextSrv();var eb=ge('pm-err-banner');if(eb)eb.style.display='none'">Try Next Server</button>
+      </div>
+    </div>
   </div>
   <div id="pm-bottombar">
     <div class="pm-srv-row" id="pm-srv-row"></div>
@@ -1008,29 +1176,26 @@ var SEED_TRENDING = [
 // ── Streaming servers — ordered cleanest first ──────────────────────
 // All sources run through our iframe sandbox which blocks top-level navigation
 var SRVN = [
-  'VidSrc',       // S1 — most reliable, clean
-  'VidSrc.cc',    // S2 — iframe-only, no popups
-  'EmbedSU',      // S3 — clean player
-  'VidSrc.xyz',   // S4 — solid fallback
-  'Videasy',      // S5 — minimal ads
-  'NontonGo',     // S6 — alternative
+  'VidSrc.cc',   // S1 ★ your favourite — clean, no popups
+  'EmbedSU',     // S2 — clean player
+  'VidSrc.xyz',  // S3 — solid fallback
+  'Videasy',     // S4 — minimal ads
+  'VidSrc.rip',  // S5 — extra backup
 ];
 function getSrcs(type,id,s,e){
   if(type==='movie')return[
-    'https://vidsrc.to/embed/movie/'+id,
-    'https://vidsrc.cc/v2/embed/movie/'+id,
+    'https://vidsrc.cc/v2/embed/movie/'+id+'?autoPlay=true&autoNext=true',
     'https://embed.su/embed/movie/'+id,
     'https://vidsrc.xyz/embed/movie?tmdb='+id,
     'https://player.videasy.net/movie/'+id+'?color=e5091a&autoplay=true',
-    'https://www.NontonGo.net/embed/movie/'+id,
+    'https://vidsrc.rip/embed/movie?tmdb='+id,
   ];
   return[
-    'https://vidsrc.to/embed/tv/'+id+'/'+s+'/'+e,
-    'https://vidsrc.cc/v2/embed/tv/'+id+'/'+s+'/'+e,
+    'https://vidsrc.cc/v2/embed/tv/'+id+'/'+s+'/'+e+'?autoPlay=true&autoNext=true',
     'https://embed.su/embed/tv/'+id+'/'+s+'/'+e,
     'https://vidsrc.xyz/embed/tv?tmdb='+id+'&season='+s+'&episode='+e,
     'https://player.videasy.net/tv/'+id+'/'+s+'/'+e+'?color=e5091a&autoplay=true',
-    'https://www.NontonGo.net/embed/tv/'+id+'/'+s+'/'+e,
+    'https://vidsrc.rip/embed/tv?tmdb='+id+'&season='+s+'&episode='+e,
   ];
 }
 
@@ -1502,6 +1667,46 @@ function openDetail(id,type){
   });
 }
 
+// Cast card click delegation
+document.addEventListener('click', function(e){
+  var el = e.target;
+  while(el && !el.getAttribute('data-actorid')) el = el.parentElement;
+  if(!el) return;
+  var aid = parseInt(el.getAttribute('data-actorid'));
+  var aname = el.getAttribute('data-actorname') || '';
+  if(aid) openActorProfile(aid, aname);
+});
+
+// Actor filmography card delegation
+document.addEventListener('click', function(e){
+  var el = e.target;
+  while(el && !el.getAttribute('data-filmid')) el = el.parentElement;
+  if(!el) return;
+  var fid = parseInt(el.getAttribute('data-filmid'));
+  var ftype = el.getAttribute('data-filmtype') || 'movie';
+  if(fid){ closeActorProfile(); openDetail(fid, ftype); }
+});
+
+// Actor filter chip delegation
+document.addEventListener('click', function(e){
+  var el = e.target;
+  if(!el.getAttribute('data-filter')) return;
+  var filter = el.getAttribute('data-filter');
+  actorFilter = filter;
+  document.querySelectorAll('#actor-filter-row .actor-kf-chip').forEach(function(b){ b.classList.remove('active'); });
+  el.classList.add('active');
+  tmdb('/person/'+curActorId,{append_to_response:'combined_credits'}).then(function(p){
+    var credits = (p.combined_credits&&p.combined_credits.cast)||[];
+    var seen={};
+    credits = credits.filter(function(cr){
+      if(seen[cr.id])return false; seen[cr.id]=1;
+      return (cr.release_date||cr.first_air_date);
+    });
+    credits.sort(function(a,b){return (b.popularity||0)-(a.popularity||0);});
+    renderActorBody(p, credits);
+  });
+});
+
 function switchTab(name,btn){
   document.querySelectorAll('#d-tabs .tab').forEach(function(t){t.classList.remove('active');});
   btn.classList.add('active');
@@ -1526,16 +1731,21 @@ function showDetailTab(name,d){
     if(seas.length)loadSeasonEps(1,null);
     return;
   } else if(name==='cast'){
-    var cast=(d.credits&&d.credits.cast?d.credits.cast:[]).slice(0,20);
-    h='<div class="cast-row">'+cast.map(function(c){
-      var img=c.profile_path?iurl(c.profile_path,'w185'):'';
-      return '<div class="cast-card">'
-        +(img?'<img class="cast-img" src="'+img+'" loading="lazy" alt="'+xe(c.name)+'">'
-          :'<div class="cast-img" style="display:flex;align-items:center;justify-content:center;font-size:20px">&#128100;</div>')
-        +'<div class="cast-name">'+xe(c.name)+'</div>'
-        +'<div class="cast-role">'+xe(c.character||'')+'</div>'
+    var cast=(d.credits&&d.credits.cast?d.credits.cast:[]).slice(0,30);
+    h='<p style="font-size:11px;color:var(--muted);margin-bottom:12px;text-align:center">👆 Tap any cast member to see their full filmography</p>';
+    h+='<div class="cast-row">'+cast.map(function(cm){
+      var img=cm.profile_path?iurl(cm.profile_path,'w185'):'';
+      return '<div class="cast-card cast-card-tap" data-actorid="'+cm.id+'" data-actorname="'+xe(cm.name).replace(/"/g,'&quot;')+'">'
+        +'<div class="cast-img-wrap">'
+        +(img?'<img class="cast-img" src="'+img+'" loading="lazy" alt="'+xe(cm.name)+'">'
+          :'<div class="cast-img cast-img-blank">&#128100;</div>')
+        +'<div class="cast-img-overlay">&#9654;</div>'
+        +'</div>'
+        +'<div class="cast-name">'+xe(cm.name)+'</div>'
+        +'<div class="cast-role">'+xe(cm.character||'')+'</div>'
         +'</div>';
     }).join('')+'</div>';
+
   } else if(name==='similar'){
     var sim=(d.similar&&d.similar.results?d.similar.results:[]).slice(0,12);
     h='<div class="sim-grid">'+sim.map(function(s){return makeCard(s,curDetailType,false);}).join('')+'</div>';
@@ -1628,12 +1838,26 @@ document.addEventListener('webkitfullscreenchange', function(){
   }
 });
 
+var _errTimer = null;
 function openPlayer(src,srvIdx,epInfo){
   var modal=ge('player-modal');
   try{if(screen.orientation&&screen.orientation.lock)screen.orientation.lock('landscape').catch(function(){});}catch(e){}
-  // Re-nuke window.open every time player opens
   window.open=function(){ return null; };
   ge('pm-iframe').src=src;
+  // Hide any previous error banner
+  var eb = ge('pm-err-banner');
+  if(eb) eb.style.display='none';
+  // Auto-detect failed stream: if after 20s iframe didn't load content,
+  // show a "try next server" banner (we can't read inside iframe, so use timer)
+  clearTimeout(_errTimer);
+  if(srvIdx >= 0){ // not trailer
+    _errTimer = setTimeout(function(){
+      if(ge('player-modal').classList.contains('open')){
+        var eb2 = ge('pm-err-banner');
+        if(eb2) eb2.style.display='flex';
+      }
+    }, 20000);
+  }
   ge('pm-title').textContent=pTitle||'Now Playing';
   var epBadge=ge('pm-ep-badge');
   if(epInfo){epBadge.textContent=epInfo;epBadge.style.display='block';}
@@ -1650,6 +1874,8 @@ function openPlayer(src,srvIdx,epInfo){
 }
 
 function closePlayer(){
+  clearTimeout(_errTimer);
+  var eb=ge('pm-err-banner');if(eb)eb.style.display='none';
   ge('pm-iframe').src='';
   ge('player-modal').classList.remove('open');
   pmCloseEps();
@@ -1659,6 +1885,8 @@ function closePlayer(){
 
 function switchSrv(idx){
   pSrv=idx;
+  clearTimeout(_errTimer);
+  var eb=ge('pm-err-banner'); if(eb) eb.style.display='none';
   var src=getSrcs(pType,pId,pEpS,pEpE)[idx];
   ge('pm-iframe').src=src;
   document.querySelectorAll('.pm-srv').forEach(function(b,i){b.classList.toggle('active',i===idx);});
@@ -1838,6 +2066,144 @@ function installAB(){
   });
 }
 
+
+// ═══ ACTOR PROFILE ═══
+var curActorId = null;
+var actorFilter = 'all'; // 'all','movie','tv'
+
+function openActorProfile(actorId, actorName){
+  curActorId = actorId;
+  actorFilter = 'all';
+  var page = ge('actor-page');
+  ge('actor-topbar-name').textContent = actorName;
+  ge('actor-name').textContent = actorName;
+  ge('actor-meta').innerHTML = '';
+  ge('actor-hero-img').src = '';
+  ge('actor-body').innerHTML = '<div class="spinwrap"><div class="spinner"></div></div>';
+  page.classList.add('open');
+  document.body.style.overflow = 'hidden';
+
+  // Fetch person details + combined_credits in one call
+  Promise.all([
+    tmdb('/person/'+actorId, {append_to_response:'combined_credits,images'}),
+  ]).then(function(rs){
+    var p = rs[0];
+    // Hero image — try profile photo
+    var imgPath = p.profile_path ? iurl(p.profile_path,'h632') : '';
+    if(imgPath) ge('actor-hero-img').src = imgPath;
+
+    ge('actor-name').textContent = p.name || actorName;
+    ge('actor-topbar-name').textContent = p.name || actorName;
+
+    // Meta chips
+    var meta = '';
+    if(p.birthday) meta += '<span>Born: '+p.birthday.slice(0,10)+'</span>';
+    if(p.place_of_birth) meta += '<span>'+xe(p.place_of_birth)+'</span>';
+    if(p.known_for_department) meta += '<span>'+xe(p.known_for_department)+'</span>';
+    ge('actor-meta').innerHTML = meta;
+
+    // Build filmography
+    var credits = (p.combined_credits && p.combined_credits.cast) ? p.combined_credits.cast : [];
+    // Deduplicate by id, sort by popularity desc
+    var seen = {};
+    credits = credits.filter(function(cr){
+      if(seen[cr.id]) return false;
+      seen[cr.id] = 1;
+      // Skip items without a release date (unreleased)
+      return (cr.release_date||cr.first_air_date);
+    });
+    credits.sort(function(a,b){ return (b.popularity||0)-(a.popularity||0); });
+
+    renderActorBody(p, credits);
+  }).catch(function(err){
+    ge('actor-body').innerHTML = '<div class="empty">Could not load profile. Try again.</div>';
+  });
+}
+
+function renderActorBody(p, allCredits){
+  var bio = p.biography || '';
+  var credits = allCredits;
+
+  // Filter by type
+  if(actorFilter === 'movie'){
+    credits = allCredits.filter(function(c){ return c.media_type==='movie'; });
+  } else if(actorFilter === 'tv'){
+    credits = allCredits.filter(function(c){ return c.media_type==='tv'; });
+  }
+
+  var h = '';
+
+  // Biography
+  if(bio){
+    h += '<div class="actor-section-title">Biography</div>';
+    var bioId = 'actor-bio-text';
+    h += '<div class="actor-bio collapsed" id="'+bioId+'">'+xe(bio)+'</div>';
+    h += '<span class="actor-bio-toggle" onclick="toggleActorBio()">Read more</span>';
+  }
+
+  // Filter chips
+  var movieCount = allCredits.filter(function(c){return c.media_type==='movie';}).length;
+  var tvCount    = allCredits.filter(function(c){return c.media_type==='tv';}).length;
+  h += '<div class="actor-section-title">Filmography</div>';
+  h += '<div class="actor-known-for" id="actor-filter-row" style="margin-bottom:14px">';
+  h += '<button class="actor-kf-chip'+(actorFilter==='all'?' active':'')+'" data-filter="all">All ('+allCredits.length+')</button>';
+  h += '<button class="actor-kf-chip'+(actorFilter==='movie'?' active':'')+'" data-filter="movie">Movies ('+movieCount+')</button>';
+  h += '<button class="actor-kf-chip'+(actorFilter==='tv'?' active':'')+'" data-filter="tv">Series ('+tvCount+')</button>';
+  h += '</div>';
+
+  // Grid of credits
+  if(!credits.length){
+    h += '<div class="empty">No credits found.</div>';
+  } else {
+    h += '<div class="actor-filmography-grid">';
+    credits.forEach(function(cr){
+      var type = cr.media_type || 'movie';
+      var title = xe(cr.title || cr.name || '');
+      var poster = cr.poster_path ? iurl(cr.poster_path,'w342') : '';
+      var yr = (cr.release_date||cr.first_air_date||'').slice(0,4);
+      var rating = cr.vote_average ? cr.vote_average.toFixed(1) : '';
+      h += '<div class="card actor-film-card" data-filmid="'+cr.id+'" data-filmtype="'+type+'" style="cursor:pointer">';
+      h += '<div class="card-img-wrap">';
+      if(poster){
+        h += '<img class="card-img" src="'+poster+'" loading="lazy" alt="'+title+'">';
+      } else {
+        h += '<div class="card-img" style="background:var(--bg4);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--muted);padding:8px;text-align:center">'+title+'</div>';
+      }
+      if(rating) h += '<div class="card-rating">&#9733; '+rating+'</div>';
+      // Type badge
+      h += '<div style="position:absolute;top:5px;right:5px;background:rgba(0,0,0,.75);color:#fff;font-size:9px;font-weight:800;padding:2px 6px;border-radius:4px;text-transform:uppercase">'+(type==='movie'?'FILM':'TV')+'</div>';
+      h += '</div>';
+      h += '<div class="card-info"><div class="card-title">'+title+'</div>';
+      if(yr) h += '<div class="card-yr">'+yr+'</div>';
+      h += '</div></div>';
+    });
+    h += '</div>';
+  }
+
+  ge('actor-body').innerHTML = h;
+
+  // Restore bio toggle state
+  var bioEl = ge('actor-bio-text');
+  if(bioEl) bioEl._expanded = false;
+}
+
+
+
+function toggleActorBio(){
+  var el = ge('actor-bio-text');
+  var btn = el && el.nextElementSibling;
+  if(!el) return;
+  el._expanded = !el._expanded;
+  el.classList.toggle('collapsed', !el._expanded);
+  if(btn) btn.textContent = el._expanded ? 'Show less' : 'Read more';
+}
+
+function closeActorProfile(){
+  ge('actor-page').classList.remove('open');
+  document.body.style.overflow = '';
+  curActorId = null;
+}
+
 // ═══ TOAST ═══
 var toastT;
 function toast(msg){var t=ge('toast');t.textContent=msg;t.classList.add('on');clearTimeout(toastT);toastT=setTimeout(function(){t.classList.remove('on');},2500);}
@@ -1846,6 +2212,26 @@ function toast(msg){var t=ge('toast');t.textContent=msg;t.classList.add('on');cl
 updateWLCount();
 loadHome();
 </script>
+
+
+<!-- ACTOR PROFILE PAGE -->
+<div id="actor-page" class="page">
+  <div class="actor-topbar">
+    <button class="detail-back" onclick="closeActorProfile()">&#8592;</button>
+    <div class="actor-topbar-name" id="actor-topbar-name"></div>
+  </div>
+  <div class="actor-hero">
+    <img id="actor-hero-img" src="" alt="" class="actor-hero-img">
+    <div class="actor-hero-overlay"></div>
+    <div class="actor-hero-info">
+      <div class="actor-name" id="actor-name"></div>
+      <div class="actor-meta" id="actor-meta"></div>
+    </div>
+  </div>
+  <div class="actor-body" id="actor-body">
+    <div class="spinwrap"><div class="spinner"></div></div>
+  </div>
+</div>
 
 </body>
 </html>
