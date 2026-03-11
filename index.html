@@ -989,7 +989,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
     <div class="pm-ep-badge" id="pm-ep-badge" style="display:none"></div>
   </div>
   <div id="pm-iframe-wrap">
-    <iframe id="pm-iframe" src="" allowfullscreen allow="autoplay;encrypted-media;picture-in-picture;fullscreen" referrerpolicy="no-referrer" sandbox="allow-scripts allow-same-origin allow-forms allow-presentation allow-pointer-lock allow-popups-to-escape-sandbox"></iframe>
+    <iframe id="pm-iframe" src="" allowfullscreen allow="autoplay;encrypted-media;picture-in-picture;fullscreen" referrerpolicy="no-referrer"></iframe>
     <!-- Corner ad shields — block clicks without blocking video -->
     <div id="as-top-only" style="position:absolute;top:0;left:0;right:0;height:52px;z-index:10;pointer-events:all;background:transparent;cursor:default;"></div>
     <div class="pm-corner-shield" style="top:0;left:0;width:80px;height:80px;"></div>
@@ -1095,40 +1095,38 @@ var SEED_TRENDING = [
 ];
 
 // ═══ SERVERS ═══
-// Server list — ordered cleanest first (fewest ads/popups)
 var SRVN = [
-  'VidSrc.cc',    // S1 — your favourite
-  'VidSrc.xyz',   // S2 — solid backup
-  'VidSrc.me',    // S3 — popular
-  'VidSrc.to',    // S4 — stable
-  'Vidlink',      // S5 — good quality
-  'AutoEmbed',    // S6
-  'Vidfast',      // S7
-  'VidSrc.rip',   // S8 — last resort
+  'VidSrc.cc',    // S1
+  '2Embed',       // S2
+  'VidSrc.xyz',   // S3
+  'VidLink',      // S4
+  'SuperEmbed',   // S5
+  'VidSrc.me',    // S6
+  'VidSrc.to',    // S7
+  'AutoEmbed',    // S8
 ];
 function getSrcs(type,id,s,e){
   if(type==='movie')return[
-    'https://vidsrc.cc/v2/embed/movie/'+id+'?autoPlay=true',
+    'https://vidsrc.cc/v2/embed/movie/'+id,
+    'https://www.2embed.stream/embed/movie/'+id,
     'https://vidsrc.xyz/embed/movie?tmdb='+id,
+    'https://vidlink.pro/movie/'+id+'?autoplay=true&primaryColor=e5091a',
+    'https://multiembed.mov/?video_id='+id+'&tmdb=1',
     'https://vidsrc.me/embed/movie?tmdb='+id,
     'https://vidsrc.to/embed/movie/'+id,
-    'https://vidlink.pro/movie/'+id+'?autoplay=true&primaryColor=e5091a',
     'https://autoembed.cc/movie/tmdb-'+id,
-    'https://vidfast.pro/movie/'+id+'?autoPlay=true',
-    'https://vidsrc.rip/embed/movie?tmdb='+id,
   ];
   return[
-    'https://vidsrc.cc/v2/embed/tv/'+id+'/'+s+'/'+e+'?autoPlay=true',
+    'https://vidsrc.cc/v2/embed/tv/'+id+'/'+s+'/'+e,
+    'https://www.2embed.stream/embed/tv/'+id+'/'+s+'/'+e,
     'https://vidsrc.xyz/embed/tv?tmdb='+id+'&season='+s+'&episode='+e,
+    'https://vidlink.pro/tv/'+id+'/'+s+'/'+e+'?autoplay=true&primaryColor=e5091a',
+    'https://multiembed.mov/?video_id='+id+'&tmdb=1&s='+s+'&e='+e,
     'https://vidsrc.me/embed/tv?tmdb='+id+'&season='+s+'&episode='+e,
     'https://vidsrc.to/embed/tv/'+id+'/'+s+'/'+e,
-    'https://vidlink.pro/tv/'+id+'/'+s+'/'+e+'?autoplay=true&primaryColor=e5091a',
     'https://autoembed.cc/tv/tmdb-'+id+'-'+s+'-'+e,
-    'https://vidfast.pro/tv/'+id+'/'+s+'/'+e+'?autoPlay=true',
-    'https://vidsrc.rip/embed/tv?tmdb='+id+'&season='+s+'&episode='+e,
   ];
 }
-
 // ═══ STATE ═══
 var curPage='home', prevPage='home';
 var heroItems=[], heroIdx=0, heroTimer=null;
@@ -1683,8 +1681,7 @@ function playEp(s,e){
 function openPlayer(src,srvIdx,epInfo){
   var modal=ge('player-modal');
   try{if(screen.orientation&&screen.orientation.lock)screen.orientation.lock('landscape').catch(function(){});}catch(e){}
-  var iframe=ge('pm-iframe');
-  iframe.src=src;
+  ge('pm-iframe').src=src;
   ge('pm-title').textContent=pTitle||'Now Playing';
   var epBadge=ge('pm-ep-badge');
   if(epInfo){epBadge.textContent=epInfo;epBadge.style.display='block';}
@@ -1698,44 +1695,6 @@ function openPlayer(src,srvIdx,epInfo){
   document.body.style.overflow='hidden';
   pmShowControls();
   installAB();
-  installAutoRetry(srvIdx);
-}
-
-// Auto-switch server if current one errors out
-var _autoRetryTimer=null;
-function installAutoRetry(startIdx){
-  clearTimeout(_autoRetryTimer);
-  var iframe=ge('pm-iframe');
-  if(!iframe)return;
-  // Remove old listener
-  if(iframe._errHandler) iframe.removeEventListener('load', iframe._errHandler);
-  
-  iframe._errHandler=function(){
-    clearTimeout(_autoRetryTimer);
-    // Give the iframe 8 seconds to show content — if it shows error, we catch via message
-    _autoRetryTimer=setTimeout(function(){
-      // Check if iframe loaded something broken by trying next server silently
-    },100);
-  };
-  iframe.addEventListener('load', iframe._errHandler);
-
-  // Listen for error messages from the iframe (some players post messages)
-  if(!window._msgListenerOn){
-    window._msgListenerOn=true;
-    window.addEventListener('message',function(e){
-      var d=e.data;
-      if(!d)return;
-      var str=typeof d==='string'?d:JSON.stringify(d);
-      // Common error signals from embed players
-      if(str.indexOf('233011')>=0||str.indexOf('error')>=0||str.indexOf('unavailable')>=0||str.indexOf('cannot be played')>=0){
-        if(ge('player-modal').classList.contains('open')){
-          var next=(pSrv+1)%SRVN.length;
-          toast('⚡ Auto-switching to '+SRVN[next]+'...');
-          setTimeout(function(){switchSrv(next);},800);
-        }
-      }
-    });
-  }
 }
 
 function closePlayer(){
@@ -1748,33 +1707,11 @@ function closePlayer(){
 
 function switchSrv(idx){
   pSrv=idx;
-  var srcs=getSrcs(pType,pId,pEpS,pEpE);
-  ge('pm-iframe').src=srcs[idx];
+  ge('pm-iframe').src=getSrcs(pType,pId,pEpS,pEpE)[idx];
   document.querySelectorAll('.pm-srv').forEach(function(b,i){b.classList.toggle('active',i===idx);});
   pmShowControls();
   toast('Loading '+SRVN[idx]+'...');
-  var oldOv=ge('pm-err-overlay');if(oldOv)oldOv.remove();
-  clearTimeout(window._srvTimeout);
-  window._srvTimeout=setTimeout(function(){
-    if(!ge('player-modal').classList.contains('open'))return;
-    showErrOverlay(idx,(idx+1)%SRVN.length);
-  },12000);
 }
-
-function showErrOverlay(curIdx,nextIdx){
-  var oldOv=ge('pm-err-overlay');if(oldOv)oldOv.remove();
-  var overlay=document.createElement('div');
-  overlay.id='pm-err-overlay';
-  overlay.style.cssText='position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.92);border:1px solid rgba(229,9,26,.5);border-radius:14px;padding:20px 24px;text-align:center;z-index:20;min-width:240px;';
-  var btn=document.createElement('button');
-  btn.textContent='Try S'+(nextIdx+1)+' '+SRVN[nextIdx];
-  btn.style.cssText='background:var(--red);color:#fff;border:none;border-radius:10px;padding:10px 20px;font-size:13px;font-weight:700;cursor:pointer;width:100%;margin-top:14px;font-family:var(--font);';
-  btn.onclick=function(){switchSrv(nextIdx);};
-  overlay.innerHTML='<div style="font-size:22px;margin-bottom:8px">⚠️</div><div style="font-weight:700;margin-bottom:6px">Stream not loading?</div><div style="font-size:12px;color:rgba(255,255,255,.6);margin-bottom:4px">'+SRVN[curIdx]+' may not have this content</div>';
-  overlay.appendChild(btn);
-  var wrap=ge('pm-iframe-wrap');if(wrap)wrap.appendChild(overlay);
-}
-
 
 function pmNextSrv(){var n=(pSrv+1)%SRVN.length;switchSrv(n);}
 function pmTrailer(){if(pYTKey)openPlayer('https://www.youtube.com/embed/'+pYTKey+'?autoplay=1&rel=0',-1,'Trailer');}
