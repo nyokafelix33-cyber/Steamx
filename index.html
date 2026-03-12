@@ -822,6 +822,37 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
   cursor:default;
 }
 
+/* ── FULL TAP SHIELD ── */
+#tap-shield {
+  position:absolute;
+  inset:0;
+  z-index:100;
+  background:transparent;
+  cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+}
+#tap-shield.unlocked {
+  pointer-events:none; /* unlocked = let taps through to video */
+}
+#tap-hint {
+  position:absolute;
+  bottom:90px;
+  left:50%;
+  transform:translateX(-50%);
+  background:rgba(0,0,0,.75);
+  color:#fff;
+  font-size:12px;
+  font-weight:700;
+  padding:6px 14px;
+  border-radius:20px;
+  pointer-events:none;
+  opacity:0;
+  transition:opacity .3s;
+  white-space:nowrap;
+  z-index:101;
+}
+#tap-hint.show { opacity:1; }
+
 </style>
 </head>
 <body>
@@ -985,6 +1016,9 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
     <div class="ad-shield" style="top:45px;left:0;width:40px;bottom:85px;"></div>
     <!-- Right side strip -->
     <div class="ad-shield" style="top:45px;right:0;width:40px;bottom:85px;"></div>
+    <!-- FULL TAP SHIELD: blocks all ad redirects. Tap to unlock video controls -->
+    <div id="tap-shield" onclick="unlockControls()"></div>
+    <div id="tap-hint">Tap again to use controls</div>
   </div>
   <div id="pm-bottombar">
     <div class="pm-srv-row" id="pm-srv-row"></div>
@@ -1687,6 +1721,7 @@ function openPlayer(src,srvIdx,epInfo){
   document.body.style.overflow='hidden';
   pmShowControls();
   installAB();
+  relockShield();
 }
 
 function closePlayer(){
@@ -1699,6 +1734,7 @@ function closePlayer(){
 
 function switchSrv(idx){
   pSrv=idx;
+  relockShield();
   ge('pm-iframe').src=getSrcs(pType,pId,pEpS,pEpE)[idx];
   document.querySelectorAll('.pm-srv').forEach(function(b,i){b.classList.toggle('active',i===idx);});
   pmShowControls();
@@ -1904,6 +1940,31 @@ function installAB(){
       toast('🛡 Ad blocked!');
     }
   });
+}
+
+
+// ═══ TAP SHIELD ═══
+var _lockTimer = null;
+function unlockControls(){
+  var shield = ge('tap-shield');
+  var hint = ge('tap-hint');
+  if(!shield) return;
+  // Unlock — let taps reach the video
+  shield.classList.add('unlocked');
+  if(hint){ hint.classList.add('show'); }
+  clearTimeout(_lockTimer);
+  // Re-lock after 4 seconds to block ads again
+  _lockTimer = setTimeout(function(){
+    shield.classList.remove('unlocked');
+    if(hint){ hint.classList.remove('show'); }
+  }, 4000);
+}
+function relockShield(){
+  var shield = ge('tap-shield');
+  var hint = ge('tap-hint');
+  clearTimeout(_lockTimer);
+  if(shield) shield.classList.remove('unlocked');
+  if(hint) hint.classList.remove('show');
 }
 
 // ═══ TOAST ═══
