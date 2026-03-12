@@ -1096,34 +1096,35 @@ var SEED_TRENDING = [
 
 // ═══ SERVERS ═══
 var SRVN = [
-  'VidSrc.cc',    // S1
-  '2Embed',       // S2
-  'VidSrc.xyz',   // S3
-  'VidLink',      // S4
-  'SuperEmbed',   // S5
+  'VidSrc.cc',    // S1 — movies
+  'VidSrc.to',    // S2 — best for TV/streaming exclusives
+  '2Embed',       // S3 — huge library
+  'VidLink',      // S4 — clean player
+  'VidSrc.xyz',   // S5
   'VidSrc.me',    // S6
-  'VidSrc.to',    // S7
+  'SuperEmbed',   // S7
   'AutoEmbed',    // S8
 ];
 function getSrcs(type,id,s,e){
   if(type==='movie')return[
     'https://vidsrc.cc/v2/embed/movie/'+id,
-    'https://www.2embed.stream/embed/movie/'+id,
-    'https://vidsrc.xyz/embed/movie?tmdb='+id,
-    'https://vidlink.pro/movie/'+id+'?autoplay=true&primaryColor=e5091a',
-    'https://multiembed.mov/?video_id='+id+'&tmdb=1',
-    'https://vidsrc.me/embed/movie?tmdb='+id,
     'https://vidsrc.to/embed/movie/'+id,
+    'https://www.2embed.stream/embed/movie/'+id,
+    'https://vidlink.pro/movie/'+id+'?autoplay=true&primaryColor=e5091a',
+    'https://vidsrc.xyz/embed/movie?tmdb='+id,
+    'https://vidsrc.me/embed/movie?tmdb='+id,
+    'https://multiembed.mov/?video_id='+id+'&tmdb=1',
     'https://autoembed.cc/movie/tmdb-'+id,
   ];
+  // TV — VidSrc.to first because it has streaming exclusives (Amazon, Netflix, etc.)
   return[
+    'https://vidsrc.to/embed/tv/'+id+'/'+s+'/'+e,
     'https://vidsrc.cc/v2/embed/tv/'+id+'/'+s+'/'+e,
     'https://www.2embed.stream/embed/tv/'+id+'/'+s+'/'+e,
-    'https://vidsrc.xyz/embed/tv?tmdb='+id+'&season='+s+'&episode='+e,
     'https://vidlink.pro/tv/'+id+'/'+s+'/'+e+'?autoplay=true&primaryColor=e5091a',
-    'https://multiembed.mov/?video_id='+id+'&tmdb=1&s='+s+'&e='+e,
+    'https://vidsrc.xyz/embed/tv?tmdb='+id+'&season='+s+'&episode='+e,
     'https://vidsrc.me/embed/tv?tmdb='+id+'&season='+s+'&episode='+e,
-    'https://vidsrc.to/embed/tv/'+id+'/'+s+'/'+e,
+    'https://multiembed.mov/?video_id='+id+'&tmdb=1&s='+s+'&e='+e,
     'https://autoembed.cc/tv/tmdb-'+id+'-'+s+'-'+e,
   ];
 }
@@ -1863,143 +1864,18 @@ function doSearch(q){
 function clearSearch(){ge('sinput').value='';ge('sclr').className='btn';if(curPage==='search')go('home',true);}
 
 
-// ═══ AD BLOCKER (FULL STRENGTH) ═══
+// ═══ AD BLOCKER ═══
 function installAB(){
   if(window._abOn)return;window._abOn=true;
-
-  // 1. Block window.open() popups from ads
   var origOpen=window.open;
   window.open=function(url){
     if(!url)return null;
-    var safe=['youtube','youtu.be','tmdb','vidsrc','vidlink','videasy','vidfast','autoembed','smashy','vidsrc.to','vidsrc.xyz','vidsrc.me','vidsrc.rip','vidfast.pro','moviesapi'];
+    var safe=['youtube','youtu.be','tmdb','vidsrc','vidlink','2embed','multiembed','autoembed'];
     if(safe.some(function(d){return url.indexOf(d)>=0;}))return origOpen.apply(window,arguments);
-    toast('🛡 Ad blocked!');return{closed:false,close:function(){},focus:function(){}};
+    toast('🛡 Ad blocked!');
+    return{closed:false,close:function(){},focus:function(){}};
   };
-
-  // 2. Block location hijacking — prevent page from being redirected
-  try{
-    Object.defineProperty(window,'location',{
-      set:function(v){toast('🛡 Redirect blocked!');},
-      get:function(){return window.location;}
-    });
-  }catch(e){}
-
-  // 3. Intercept ALL clicks on the iframe area — if a new tab/window tries
-  //    to open within 300ms of a click, kill it
-  var iframeWrap = ge('pm-iframe-wrap');
-  if(iframeWrap){
-    var lastClick=0;
-    iframeWrap.addEventListener('mousedown',function(){lastClick=Date.now();},true);
-    iframeWrap.addEventListener('touchstart',function(){lastClick=Date.now();},{passive:true,capture:true});
-    // Watch for blur (tab switch / popup opened)
-    window.addEventListener('blur',function(){
-      if(Date.now()-lastClick<800){
-        setTimeout(function(){window.focus();},100);
-        toast('🛡 Ad blocked!');
-      }
-    });
-  }
-
-  // 4. Kill any beforeunload / unload attempts from iframe
-  window.addEventListener('beforeunload',function(e){
-    if(ge('player-modal').classList.contains('open')){
-      e.preventDefault();e.returnValue='';
-      return '';
-    }
-  });
 }
-
-
-// ═══ ACTOR PROFILE ═══
-var actorFilter = 'all';
-function openActorProfile(actorId, name){
-  var profile = ge('actor-profile');
-  profile.classList.add('open');
-  document.body.style.overflow='hidden';
-  ge('actor-name').textContent = name||'Loading...';
-  ge('actor-meta').textContent = '';
-  ge('actor-bio').textContent = 'Loading biography...';
-  ge('actor-photo').src = '';
-  ge('actor-hero-img').src = '';
-  ge('actor-grid').innerHTML = '<div class="spinwrap"><div class="spinner"></div></div>';
-  ge('actor-filters').innerHTML = '';
-  actorFilter = 'all';
-  Promise.all([
-    tmdb('/person/'+actorId),
-    tmdb('/person/'+actorId+'/combined_credits')
-  ]).then(function(rs){
-    var p = rs[0];
-    var credits = rs[1];
-    // Photo
-    if(p.profile_path){
-      ge('actor-photo').src = iurl(p.profile_path,'w185');
-      ge('actor-hero-img').src = iurl(p.profile_path,'w500');
-    }
-    // Name + meta
-    ge('actor-name').textContent = p.name||name||'';
-    var meta = [];
-    if(p.birthday) meta.push('Born: '+p.birthday);
-    if(p.place_of_birth) meta.push(p.place_of_birth);
-    if(p.known_for_department) meta.push(p.known_for_department);
-    ge('actor-meta').textContent = meta.join(' · ');
-    // Bio
-    ge('actor-bio').textContent = p.biography||'No biography available.';
-    // Filter chips
-    ge('actor-filters').innerHTML =
-      '<div class="actor-filter-chip active" onclick="filterActorCredits(\'all\',this)">All</div>'+
-      '<div class="actor-filter-chip" onclick="filterActorCredits(\'movie\',this)">Movies</div>'+
-      '<div class="actor-filter-chip" onclick="filterActorCredits(\'tv\',this)">TV Shows</div>';
-    // Credits
-    window._actorCredits = (credits.cast||[]).filter(function(c){
-      return c.poster_path && (c.title||c.name);
-    }).sort(function(a,b){
-      var da=new Date(b.release_date||b.first_air_date||0);
-      var db=new Date(a.release_date||a.first_air_date||0);
-      return da-db;
-    });
-    renderActorCredits();
-  }).catch(function(){
-    ge('actor-bio').textContent = 'Failed to load profile.';
-    ge('actor-grid').innerHTML = '<div class="empty">Could not load credits.</div>';
-  });
-}
-
-function filterActorCredits(type, btn){
-  actorFilter = type;
-  document.querySelectorAll('.actor-filter-chip').forEach(function(c){c.classList.remove('active');});
-  if(btn) btn.classList.add('active');
-  renderActorCredits();
-}
-
-function renderActorCredits(){
-  var all = window._actorCredits||[];
-  var filtered = actorFilter==='all' ? all : all.filter(function(c){return c.media_type===actorFilter;});
-  // Dedupe by id
-  var seen={};
-  filtered = filtered.filter(function(c){if(seen[c.id])return false;seen[c.id]=1;return true;});
-  if(!filtered.length){
-    ge('actor-grid').innerHTML='<div class="empty" style="grid-column:1/-1">No credits found.</div>';
-    return;
-  }
-  ge('actor-grid').innerHTML = filtered.slice(0,30).map(function(c){
-    return makeCard(c, c.media_type||'movie', false);
-  }).join('');
-}
-
-function closeActorProfile(){
-  ge('actor-profile').classList.remove('open');
-  document.body.style.overflow='';
-}
-
-// ═══ CAST CARD DELEGATION ═══
-document.addEventListener('click', function(e){
-  var el = e.target;
-  while(el && !el.getAttribute('data-actorid')) el = el.parentElement;
-  if(!el) return;
-  var aid = parseInt(el.getAttribute('data-actorid'));
-  var aname = el.getAttribute('data-actorname') || '';
-  if(aid) openActorProfile(aid, aname);
-});
 
 // ═══ TOAST ═══
 var toastT;
