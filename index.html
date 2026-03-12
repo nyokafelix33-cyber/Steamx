@@ -1005,10 +1005,8 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
     <div class="pm-ep-badge" id="pm-ep-badge" style="display:none"></div>
   </div>
   <div id="pm-iframe-wrap">
-    <iframe id="pm-iframe" src="" allowfullscreen allow="autoplay;encrypted-media;picture-in-picture;fullscreen" referrerpolicy="no-referrer"></iframe>
-    <!-- Top banner ad shield -->
-
-
+    <!-- IFRAME with sandbox to block top navigation -->
+    <iframe id="pm-iframe" src="" allowfullscreen allow="autoplay;encrypted-media;picture-in-picture;fullscreen" referrerpolicy="no-referrer" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-presentation"></iframe>
     <!-- AD SHIELDS: top + sides only. Bottom left free for video controls -->
     <!-- Top strip: blocks banner ads at top of player -->
     <div class="ad-shield" style="top:0;left:0;right:0;height:45px;"></div>
@@ -1028,6 +1026,8 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
       <button class="pm-btn" id="pm-ep-btn" onclick="pmOpenEps()" style="display:none">&#9776; Episodes</button>
       <button class="pm-btn" id="pm-trl-btn" onclick="pmTrailer()" style="display:none">&#127909; Trailer</button>
       <button class="pm-btn" onclick="pmFullscreen()" style="background:rgba(255,255,255,.15)">&#x26F6; Fullscreen</button>
+      <!-- NEW: Unlock button for manual control -->
+      <button class="pm-btn" id="pm-unlock-btn" onclick="unlockControls()" style="background:rgba(255,165,0,.7);">🔓 Unlock</button>
       <div class="pm-shield">&#128737; Shield ON</div>
     </div>
   </div>
@@ -1038,8 +1038,6 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
     <div id="pm-ep-list"><div class="spinwrap"><div class="spinner"></div></div></div>
   </div>
 </div>
-
-
 
 <!-- ACTOR PROFILE -->
 <div id="actor-profile">
@@ -1707,7 +1705,9 @@ function playEp(s,e){
 function openPlayer(src,srvIdx,epInfo){
   var modal=ge('player-modal');
   try{if(screen.orientation&&screen.orientation.lock)screen.orientation.lock('landscape').catch(function(){});}catch(e){}
-  ge('pm-iframe').src=src;
+  var iframe=ge('pm-iframe');
+  iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-presentation');
+  iframe.src=src;
   ge('pm-title').textContent=pTitle||'Now Playing';
   var epBadge=ge('pm-ep-badge');
   if(epInfo){epBadge.textContent=epInfo;epBadge.style.display='block';}
@@ -1735,7 +1735,9 @@ function closePlayer(){
 function switchSrv(idx){
   pSrv=idx;
   relockShield();
-  ge('pm-iframe').src=getSrcs(pType,pId,pEpS,pEpE)[idx];
+  var iframe=ge('pm-iframe');
+  iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-presentation');
+  iframe.src=getSrcs(pType,pId,pEpS,pEpE)[idx];
   document.querySelectorAll('.pm-srv').forEach(function(b,i){b.classList.toggle('active',i===idx);});
   pmShowControls();
   toast('Loading '+SRVN[idx]+'...');
@@ -1891,55 +1893,84 @@ function doSearch(q){
 function clearSearch(){ge('sinput').value='';ge('sclr').className='btn';if(curPage==='search')go('home',true);}
 
 
-// ═══ AD BLOCKER ═══
+// ═══ ENHANCED AD BLOCKER ═══
 function installAB(){
-  if(window._abOn)return;window._abOn=true;
+  if(window._abOn) return;
+  window._abOn = true;
 
-  // 1. Block window.open() popup ads
-  var origOpen=window.open;
-  window.open=function(url){
-    if(!url)return null;
-    var safe=['youtube','youtu.be','vidsrc','vidlink','2embed','multiembed','autoembed','tmdb'];
-    if(safe.some(function(d){return url.indexOf(d)>=0;}))return origOpen.apply(window,arguments);
-    toast('🛡 Ad blocked!');
-    return{closed:false,close:function(){},focus:function(){}};
+  // 1. Override window.open to block popups
+  var origOpen = window.open;
+  window.open = function(url, name, features){
+    // Whitelist safe domains
+    var safe = ['youtube.com', 'youtu.be', 'vidsrc.cc', 'vidsrc.to', 'vidsrc.me', 'vidsrc.xyz', '2embed.stream', 'vidlink.pro', 'multiembed.mov', 'autoembed.cc', 'tmdb.org'];
+    if(url && safe.some(function(d){ return url.indexOf(d) >= 0; })){
+      return origOpen.apply(window, arguments);
+    }
+    toast('🛡️ Popup blocked!');
+    return null; // Block the popup
   };
 
-  // 2. visibilitychange — fires on mobile when ad redirects you away
-  document.addEventListener('visibilitychange',function(){
+  // 2. Blur trap — catch focus loss from tap-to-redirect ads
+  var lastTap = 0;
+  var wrap = ge('pm-iframe-wrap');
+  if(wrap){
+    wrap.addEventListener('touchstart', function(){ lastTap = Date.now(); }, {passive: true, capture: true});
+    wrap.addEventListener('mousedown', function(){ lastTap = Date.now(); }, true);
+  }
+  window.addEventListener('blur', function(){
+    if(!ge('player-modal').classList.contains('open')) return;
+    if(Date.now() - lastTap < 2000){ // within 2 seconds of a tap
+      setTimeout(function(){
+        try{ window.focus(); } catch(e){}
+        history.pushState(null, null, location.href); // prevent back navigation
+      }, 50);
+      toast('🛡️ Ad redirect blocked!');
+    }
+  });
+
+  // 3. Pagehide / visibilitychange — keep your existing
+  document.addEventListener('visibilitychange', function(){
     if(document.hidden && ge('player-modal').classList.contains('open')){
       setTimeout(function(){
         if(document.hidden){
           history.back();
           window.focus();
         }
-      },100);
+      }, 100);
     }
   });
 
-  // 3. pagehide — fires on iOS Safari when leaving page
-  window.addEventListener('pagehide',function(){
+  window.addEventListener('pagehide', function(){
     if(ge('player-modal').classList.contains('open')){
-      setTimeout(function(){history.back();},50);
+      setTimeout(function(){ history.back(); }, 50);
     }
   });
 
-  // 4. blur trap — catch focus loss from tap-to-redirect ads
-  var lastTap=0;
-  var wrap=ge('pm-iframe-wrap');
-  if(wrap){
-    wrap.addEventListener('touchstart',function(){lastTap=Date.now();},{passive:true,capture:true});
-    wrap.addEventListener('mousedown',function(){lastTap=Date.now();},true);
-  }
-  window.addEventListener('blur',function(){
-    if(!ge('player-modal').classList.contains('open'))return;
-    if(Date.now()-lastTap<1500){
-      setTimeout(function(){
-        try{window.focus();}catch(e){}
-      },50);
-      toast('🛡 Ad blocked!');
-    }
+  // 4. MutationObserver to catch dynamically inserted ad scripts
+  var observer = new MutationObserver(function(mutations){
+    mutations.forEach(function(m){
+      m.addedNodes.forEach(function(node){
+        if(node.tagName === 'SCRIPT' && node.src){
+          var src = node.src || '';
+          if(src.match(/doubleclick|googlead|googlesyndication|adservice|popads|exoclick|adserver|adtech|advertising/i)){
+            node.remove(); // Remove ad script
+            toast('🛡️ Ad script blocked');
+          }
+        }
+      });
+    });
   });
+  observer.observe(document, { childList: true, subtree: true });
+
+  // 5. Block clicks on any element with ad-related classes (if any appear)
+  document.addEventListener('click', function(e){
+    var adSelectors = '[class*="ad"], [class*="banner"], [id*="ad"], [id*="banner"], [class*="sponsor"]';
+    if(e.target.closest(adSelectors)){
+      e.preventDefault();
+      e.stopPropagation();
+      return false;
+    }
+  }, true);
 }
 
 
@@ -1953,11 +1984,11 @@ function unlockControls(){
   shield.classList.add('unlocked');
   if(hint){ hint.classList.add('show'); }
   clearTimeout(_lockTimer);
-  // Re-lock after 4 seconds to block ads again
+  // Re-lock after 10 seconds (longer to give user time)
   _lockTimer = setTimeout(function(){
     shield.classList.remove('unlocked');
     if(hint){ hint.classList.remove('show'); }
-  }, 4000);
+  }, 10000);
 }
 function relockShield(){
   var shield = ge('tap-shield');
