@@ -4,6 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
 <title>Feng World</title>
+<meta http-equiv="Content-Security-Policy" content="frame-ancestors 'self'; navigate-to 'self' vidsrc.cc vidsrc.to vidsrc.me vidsrc.xyz 2embed.stream vidlink.pro multiembed.mov autoembed.cc youtube.com youtu.be;">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
 <style>
 :root{
@@ -397,7 +398,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
   padding:8px 14px;
   background:rgba(0,0,0,.92);
   border-bottom:1px solid rgba(255,255,255,.08);
-  z-index:30;
+  z-index:9500;
   position:relative;
 }
 
@@ -419,16 +420,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
   display:block;
   background:#000;
 }
-/* Only block top banner strip ~50px — ads appear there, controls don't */
-#as-top-only{
-  position:absolute;
-  top:0;left:0;right:0;
-  height:48px;
-  z-index:6;
-  background:transparent;
-  pointer-events:all;
-  cursor:default;
-}
+
 
 /* BOTTOM BAR — fixed height, never hidden, always clickable */
 #pm-bottombar{
@@ -437,7 +429,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
   padding:10px 14px 18px;
   background:rgba(0,0,0,.92);
   border-top:1px solid rgba(255,255,255,.08);
-  z-index:30;
+  z-index:9500;
   position:relative;
 }
 .pm-back{
@@ -746,23 +738,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
 .fd-divider{height:1px;background:rgba(255,255,255,.06);margin:18px 0 0}
 
 
-/* ── AD SHIELD: block corner/edge ad clicks ── */
-#pm-iframe-wrap::before,
-#pm-iframe-wrap::after {
-  content:'';position:absolute;z-index:10;pointer-events:all;
-}
-#pm-iframe-wrap::before {
-  top:0;left:0;right:0;height:52px; /* top banner zone */
-  background:transparent;
-}
-#pm-iframe-wrap::after {
-  bottom:0;left:0;right:0;height:0px;
-  background:transparent;
-}
-.pm-corner-shield {
-  position:absolute;z-index:10;pointer-events:all;
-  background:transparent;
-}
+
 
 /* ── ACTOR PROFILE PAGE ── */
 #actor-profile{
@@ -835,6 +811,15 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
   top:0;left:0;
   width:100% !important;
   height:100% !important;
+}
+
+/* ── AD SHIELDS — top & sides only, bottom free for video controls ── */
+.ad-shield {
+  position:absolute;
+  z-index:50;
+  pointer-events:all;
+  background:transparent;
+  cursor:default;
 }
 
 </style>
@@ -990,10 +975,16 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
   </div>
   <div id="pm-iframe-wrap">
     <iframe id="pm-iframe" src="" allowfullscreen allow="autoplay;encrypted-media;picture-in-picture;fullscreen" referrerpolicy="no-referrer"></iframe>
-    <!-- Corner ad shields — block clicks without blocking video -->
-    <div id="as-top-only" style="position:absolute;top:0;left:0;right:0;height:52px;z-index:10;pointer-events:all;background:transparent;cursor:default;"></div>
-    <div class="pm-corner-shield" style="top:0;left:0;width:80px;height:80px;"></div>
-    <div class="pm-corner-shield" style="top:0;right:0;width:80px;height:80px;"></div>
+    <!-- Top banner ad shield -->
+
+
+    <!-- AD SHIELDS: top + sides only. Bottom left free for video controls -->
+    <!-- Top strip: blocks banner ads at top of player -->
+    <div class="ad-shield" style="top:0;left:0;right:0;height:45px;"></div>
+    <!-- Left side strip -->
+    <div class="ad-shield" style="top:45px;left:0;width:40px;bottom:85px;"></div>
+    <!-- Right side strip -->
+    <div class="ad-shield" style="top:45px;right:0;width:40px;bottom:85px;"></div>
   </div>
   <div id="pm-bottombar">
     <div class="pm-srv-row" id="pm-srv-row"></div>
@@ -1867,14 +1858,52 @@ function clearSearch(){ge('sinput').value='';ge('sclr').className='btn';if(curPa
 // ═══ AD BLOCKER ═══
 function installAB(){
   if(window._abOn)return;window._abOn=true;
+
+  // 1. Block window.open() popup ads
   var origOpen=window.open;
   window.open=function(url){
     if(!url)return null;
-    var safe=['youtube','youtu.be','tmdb','vidsrc','vidlink','2embed','multiembed','autoembed'];
+    var safe=['youtube','youtu.be','vidsrc','vidlink','2embed','multiembed','autoembed','tmdb'];
     if(safe.some(function(d){return url.indexOf(d)>=0;}))return origOpen.apply(window,arguments);
     toast('🛡 Ad blocked!');
     return{closed:false,close:function(){},focus:function(){}};
   };
+
+  // 2. visibilitychange — fires on mobile when ad redirects you away
+  document.addEventListener('visibilitychange',function(){
+    if(document.hidden && ge('player-modal').classList.contains('open')){
+      setTimeout(function(){
+        if(document.hidden){
+          history.back();
+          window.focus();
+        }
+      },100);
+    }
+  });
+
+  // 3. pagehide — fires on iOS Safari when leaving page
+  window.addEventListener('pagehide',function(){
+    if(ge('player-modal').classList.contains('open')){
+      setTimeout(function(){history.back();},50);
+    }
+  });
+
+  // 4. blur trap — catch focus loss from tap-to-redirect ads
+  var lastTap=0;
+  var wrap=ge('pm-iframe-wrap');
+  if(wrap){
+    wrap.addEventListener('touchstart',function(){lastTap=Date.now();},{passive:true,capture:true});
+    wrap.addEventListener('mousedown',function(){lastTap=Date.now();},true);
+  }
+  window.addEventListener('blur',function(){
+    if(!ge('player-modal').classList.contains('open'))return;
+    if(Date.now()-lastTap<1500){
+      setTimeout(function(){
+        try{window.focus();}catch(e){}
+      },50);
+      toast('🛡 Ad blocked!');
+    }
+  });
 }
 
 // ═══ TOAST ═══
