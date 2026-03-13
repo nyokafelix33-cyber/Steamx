@@ -964,7 +964,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
     <div class="pm-ep-badge" id="pm-ep-badge" style="display:none"></div>
   </div>
   <div id="pm-iframe-wrap">
-    <iframe id="pm-iframe" src="" allowfullscreen allow="autoplay;encrypted-media;picture-in-picture;fullscreen" referrerpolicy="no-referrer" sandbox="allow-scripts allow-same-origin allow-forms allow-presentation allow-popups allow-popups-to-escape-sandbox"></iframe>
+    <iframe id="pm-iframe" src="" allowfullscreen allow="autoplay;encrypted-media;picture-in-picture;fullscreen" referrerpolicy="no-referrer"></iframe>
   </div>
   <div id="pm-bottombar">
     <div class="pm-srv-row" id="pm-srv-row"></div>
@@ -1838,48 +1838,57 @@ function clearSearch(){ge('sinput').value='';ge('sclr').className='btn';if(curPa
 function installAB(){
   if(window._abOn)return;window._abOn=true;
 
-  // Block ALL window.open — no exceptions for ad domains
-  window.open=function(url,name,specs){
+  // 1. Kill window.open — blocks popup ads and new tab ads
+  window.open=function(url){
     if(!url)return null;
     var safe=['vidsrc','vidlink','2embed','multiembed','autoembed','youtube','tmdb'];
-    if(safe.some(function(d){return String(url).indexOf(d)>=0;})){
-      return window.open.apply(window,arguments);
-    }
+    if(safe.some(function(d){return String(url).indexOf(d)>=0;}))return null;
     toast('🛡 Ad blocked!');
     return null;
   };
 
-  // Block all link clicks that try to leave the site
+  // 2. Override location.href setter to catch direct navigation attempts
+  try{
+    var _loc=window.location;
+    Object.defineProperty(window,'location',{
+      get:function(){return _loc;},
+      set:function(v){
+        var s=String(v);
+        var safe=['vidsrc','vidlink','2embed','multiembed','autoembed','youtube','tmdb','github.io'];
+        if(safe.some(function(d){return s.indexOf(d)>=0;})){_loc.href=s;}
+        else{ toast('🛡 Ad blocked!'); }
+      },
+      configurable:true
+    });
+  }catch(e){}
+
+  // 3. visibilitychange — fires the instant browser navigates away on Android
+  // Use NO setTimeout — snap back in same tick
+  document.addEventListener('visibilitychange',function(){
+    if(document.hidden && ge('player-modal').classList.contains('open')){
+      history.back();
+    }
+  });
+
+  // 4. pagehide — iOS Safari
+  window.addEventListener('pagehide',function(){
+    if(ge('player-modal').classList.contains('open')){
+      history.back();
+    }
+  },true);
+
+  // 5. Block all external link clicks from inside the page
   document.addEventListener('click',function(e){
-    var a=e.target.closest('a');
+    var a=e.target.closest('a[href]');
     if(!a)return;
     var href=a.href||'';
-    if(href && href.indexOf(location.hostname)<0 && href.indexOf('javascript')<0){
+    if(href.indexOf('javascript')>=0)return;
+    if(href.indexOf(location.hostname)<0 && href.indexOf('http')===0){
       e.preventDefault();
       e.stopImmediatePropagation();
       toast('🛡 Ad blocked!');
     }
   },true);
-
-  // Catch redirect attempts via location change
-  var _safeHref=location.href;
-  document.addEventListener('visibilitychange',function(){
-    if(document.hidden && ge('player-modal').classList.contains('open')){
-      // Page went hidden while player open = ad redirect
-      setTimeout(function(){
-        if(document.hidden){
-          history.back();
-        }
-      },80);
-    }
-  });
-
-  // iOS Safari
-  window.addEventListener('pagehide',function(){
-    if(ge('player-modal').classList.contains('open')){
-      history.back();
-    }
-  });
 }
 
 // ═══ TOAST ═══
