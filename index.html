@@ -4,7 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
 <title>Feng World</title>
-<meta http-equiv="Content-Security-Policy" content="frame-ancestors 'self'; navigate-to 'self' vidsrc.cc vidsrc.to vidsrc.me vidsrc.xyz 2embed.stream vidlink.pro multiembed.mov autoembed.cc youtube.com youtu.be;">
+<meta http-equiv="Content-Security-Policy" content="default-src * data: blob:; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; frame-src vidsrc.to vidsrc.cc vidlink.pro 2embed.stream vidsrc.xyz vidsrc.me autoembed.cc multiembed.mov youtube.com www.youtube.com; navigate-to 'self';">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
 <style>
 :root{
@@ -383,12 +383,13 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
 /* ── PLAYER MODAL ── */
 #player-modal{
   display:none;
+  visibility:hidden;
   position:fixed;inset:0;z-index:9000;
   background:#000;
   flex-direction:column;
   overflow:hidden;
 }
-#player-modal.open{display:flex}
+#player-modal.open{display:flex;visibility:visible;}
 
 /* TOP BAR — fixed height, never hidden, always clickable */
 #pm-topbar{
@@ -398,8 +399,6 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
   padding:8px 14px;
   background:rgba(1,18,10,.95);
   border-bottom:1px solid rgba(255,255,255,.08);
-  z-index:9500;
-  position:relative;
 }
 
 /* IFRAME fills ALL remaining space between topbar and bottombar */
@@ -429,8 +428,6 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
   padding:10px 14px 18px;
   background:rgba(1,18,10,.95);
   border-top:1px solid rgba(255,255,255,.08);
-  z-index:9500;
-  position:relative;
 }
 .pm-back{
   width:42px;height:42px;border-radius:50%;
@@ -967,16 +964,13 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
     <div class="pm-ep-badge" id="pm-ep-badge" style="display:none"></div>
   </div>
   <div id="pm-iframe-wrap">
-    <iframe id="pm-iframe" src="" allowfullscreen allow="autoplay;encrypted-media;picture-in-picture;fullscreen" referrerpolicy="no-referrer"></iframe>
-    <!-- Top banner ad shield -->
-    <!-- Left side strip -->
-    <!-- Right side strip -->Tap again to use controls</div>
+    <iframe id="pm-iframe" src="" allowfullscreen allow="autoplay;encrypted-media;picture-in-picture;fullscreen" referrerpolicy="no-referrer" sandbox="allow-scripts allow-same-origin allow-forms allow-presentation allow-popups allow-popups-to-escape-sandbox"></iframe>
   </div>
   <div id="pm-bottombar">
     <div class="pm-srv-row" id="pm-srv-row"></div>
     <div class="pm-actions">
       <button class="pm-btn red" onclick="pmNextSrv()">&#9889; Next Server</button>
-      <button class="pm-btn" id="pm-unmute-btn" onclick="pmUnmute()" style="background:rgba(255,165,0,.7);border-color:orange" title="If sound is off, tap here">&#128266; Unmute</button>
+      <button class="pm-btn" id="pm-unmute-btn" onclick="pmUnmute()" style="background:rgba(255,165,0,.7);border-color:orange">&#128266; Unmute</button>
       <button class="pm-btn" id="pm-ep-btn" onclick="pmOpenEps()" style="display:none">&#9776; Episodes</button>
       <button class="pm-btn" id="pm-trl-btn" onclick="pmTrailer()" style="display:none">&#127909; Trailer</button>
       <button class="pm-btn" onclick="pmFullscreen()" style="background:rgba(255,255,255,.15)">&#x26F6; Fullscreen</button>
@@ -1072,13 +1066,36 @@ var SEED_TRENDING = [
 ];
 
 // ═══ SERVERS ═══
-var SRVN = ['VidSrc.to'];
+var SRVN = [
+  'VidSrc.to',
+  'VidSrc.cc',
+  'VidLink',
+  '2Embed',
+  'VidSrc.xyz',
+  'VidSrc.me',
+  'AutoEmbed',
+  'SuperEmbed',
+];
 function getSrcs(type,id,s,e){
   if(type==='movie')return[
     'https://vidsrc.to/embed/movie/'+id,
+    'https://vidsrc.cc/v2/embed/movie/'+id,
+    'https://vidlink.pro/movie/'+id+'?autoplay=true&primaryColor=00a651',
+    'https://www.2embed.stream/embed/movie/'+id,
+    'https://vidsrc.xyz/embed/movie?tmdb='+id,
+    'https://vidsrc.me/embed/movie?tmdb='+id,
+    'https://autoembed.cc/movie/tmdb-'+id,
+    'https://multiembed.mov/?video_id='+id+'&tmdb=1',
   ];
   return[
     'https://vidsrc.to/embed/tv/'+id+'/'+s+'/'+e,
+    'https://vidsrc.cc/v2/embed/tv/'+id+'/'+s+'/'+e,
+    'https://vidlink.pro/tv/'+id+'/'+s+'/'+e+'?autoplay=true&primaryColor=00a651',
+    'https://www.2embed.stream/embed/tv/'+id+'/'+s+'/'+e,
+    'https://vidsrc.xyz/embed/tv?tmdb='+id+'&season='+s+'&episode='+e,
+    'https://vidsrc.me/embed/tv?tmdb='+id+'&season='+s+'&episode='+e,
+    'https://autoembed.cc/tv/tmdb-'+id+'-'+s+'-'+e,
+    'https://multiembed.mov/?video_id='+id+'&tmdb=1&s='+s+'&e='+e,
   ];
 }
 // ═══ STATE ═══
@@ -1821,42 +1838,48 @@ function clearSearch(){ge('sinput').value='';ge('sclr').className='btn';if(curPa
 function installAB(){
   if(window._abOn)return;window._abOn=true;
 
-  // Block all window.open calls
-  var origOpen=window.open;
-  window.open=function(){
-    toast('🛡 Blocked!');
-    return{closed:true,close:function(){},focus:function(){}};
+  // Block ALL window.open — no exceptions for ad domains
+  window.open=function(url,name,specs){
+    if(!url)return null;
+    var safe=['vidsrc','vidlink','2embed','multiembed','autoembed','youtube','tmdb'];
+    if(safe.some(function(d){return String(url).indexOf(d)>=0;})){
+      return window.open.apply(window,arguments);
+    }
+    toast('🛡 Ad blocked!');
+    return null;
   };
 
-  // Block all anchor navigation from inside iframes
-  // Override location setter on every possible object
-  var noop=function(){};
-  try{ Object.defineProperty(window,'location',{set:noop}); }catch(e){}
-
-  // Catch visibilitychange (Android - tab redirect)
-  document.addEventListener('visibilitychange',function(){
-    if(document.hidden && ge('player-modal').classList.contains('open')){
-      history.go(0); // reload current page state without leaving
-      setTimeout(function(){ window.focus(); },0);
-    }
-  });
-
-  // Catch pagehide (iOS Safari - page navigation)
-  window.addEventListener('pagehide',function(e){
-    if(ge('player-modal').classList.contains('open')){
+  // Block all link clicks that try to leave the site
+  document.addEventListener('click',function(e){
+    var a=e.target.closest('a');
+    if(!a)return;
+    var href=a.href||'';
+    if(href && href.indexOf(location.hostname)<0 && href.indexOf('javascript')<0){
+      e.preventDefault();
       e.stopImmediatePropagation();
-      history.go(0);
+      toast('🛡 Ad blocked!');
     }
   },true);
 
-  // Catch ANY attempt to change top-level URL
-  var _href = window.location.href;
-  setInterval(function(){
-    if(!ge('player-modal').classList.contains('open'))return;
-    if(window.location.href !== _href){
-      window.location.replace(_href);
+  // Catch redirect attempts via location change
+  var _safeHref=location.href;
+  document.addEventListener('visibilitychange',function(){
+    if(document.hidden && ge('player-modal').classList.contains('open')){
+      // Page went hidden while player open = ad redirect
+      setTimeout(function(){
+        if(document.hidden){
+          history.back();
+        }
+      },80);
     }
-  }, 300);
+  });
+
+  // iOS Safari
+  window.addEventListener('pagehide',function(){
+    if(ge('player-modal').classList.contains('open')){
+      history.back();
+    }
+  });
 }
 
 // ═══ TOAST ═══
