@@ -8,8 +8,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
 <style>
 :root{
-  --red:#e5091a;--red2:#ff2d3f;
-  --bg:#07070f;--bg2:#0d0d1a;--bg3:#12121f;--bg4:#1a1a2a;
+  --red:#00a651;--red2:#00c962;
+  --bg:#010f08;--bg2:#051a10;--bg3:#0a2016;--bg4:#0f2d1c;
   --text:#f0f0f8;--muted:rgba(240,240,248,.45);--bdr:rgba(255,255,255,.08);
   --card-r:14px;--nav-h:64px;
   --font:'Space Grotesk',sans-serif;--font2:'DM Sans',sans-serif;
@@ -20,13 +20,13 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
 /* ── SCROLLBAR ── */
 ::-webkit-scrollbar{width:4px;height:4px}
 ::-webkit-scrollbar-track{background:transparent}
-::-webkit-scrollbar-thumb{background:rgba(229,9,26,.4);border-radius:2px}
+::-webkit-scrollbar-thumb{background:rgba(0,166,81,.4);border-radius:2px}
 
 /* ── NAV ── */
 #nav{
   position:fixed;top:0;left:0;right:0;height:var(--nav-h);z-index:500;
   display:flex;align-items:center;padding:0 20px;gap:16px;
-  background:linear-gradient(to bottom,rgba(7,7,15,.98),rgba(7,7,15,.85));
+  background:linear-gradient(to bottom,rgba(1,15,8,.98),rgba(1,15,8,.85));
   backdrop-filter:blur(20px);
   border-bottom:1px solid rgba(255,255,255,.05);
 }
@@ -34,7 +34,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
 .logo-icon{
   width:36px;height:36px;background:var(--red);border-radius:10px;
   display:flex;align-items:center;justify-content:center;
-  box-shadow:0 0 20px rgba(229,9,26,.5);
+  box-shadow:0 0 20px rgba(0,166,81,.5);
   font-size:16px;font-weight:900;color:#fff;
 }
 .logo-txt{
@@ -49,7 +49,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
   background:none;font-family:var(--font);white-space:nowrap;
 }
 .nav-link:hover{color:var(--text);background:rgba(255,255,255,.06)}
-.nav-link.active{color:#fff;background:rgba(229,9,26,.18);border:1px solid rgba(229,9,26,.3)}
+.nav-link.active{color:#fff;background:rgba(0,166,81,.18);border:1px solid rgba(0,166,81,.3)}
 .nav-r{display:flex;align-items:center;gap:8px;margin-left:auto}
 .wl-btn{
   display:flex;align-items:center;gap:6px;
@@ -64,7 +64,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
 #searchbar{
   position:fixed;top:var(--nav-h);left:0;right:0;z-index:490;
   padding:8px 16px 10px;
-  background:rgba(7,7,15,.96);
+  background:rgba(1,15,8,.96);
   backdrop-filter:blur(20px);
   border-bottom:1px solid rgba(255,255,255,.05);
 }
@@ -76,9 +76,9 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
   transition:all .25s;
 }
 .search-inner:focus-within{
-  border-color:rgba(229,9,26,.5);
-  background:rgba(229,9,26,.05);
-  box-shadow:0 0 0 3px rgba(229,9,26,.08);
+  border-color:rgba(0,166,81,.5);
+  background:rgba(0,166,81,.05);
+  box-shadow:0 0 0 3px rgba(0,166,81,.08);
 }
 .search-inner svg{flex-shrink:0;opacity:.4}
 #sinput{
@@ -109,8 +109,8 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
 }
 .hero-grad{
   position:absolute;inset:0;
-  background:linear-gradient(to top,var(--bg) 0%,rgba(7,7,15,.7) 40%,rgba(7,7,15,.2) 100%),
-             linear-gradient(to right,rgba(7,7,15,.8) 0%,transparent 60%);
+  background:linear-gradient(to top,var(--bg) 0%,rgba(1,15,8,.7) 40%,rgba(1,15,8,.2) 100%),
+             linear-gradient(to right,rgba(1,15,8,.8) 0%,transparent 60%);
 }
 .hero-content{
   position:absolute;bottom:0;left:0;right:0;padding:20px 20px 28px;
@@ -118,7 +118,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
 }
 .hero-badges{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
 .hero-badge{
-  background:rgba(229,9,26,.85);border-radius:5px;
+  background:rgba(0,166,81,.85);border-radius:5px;
   padding:3px 8px;font-size:10px;font-weight:800;letter-spacing:.5px;
 }
 .hero-badge.outline{
@@ -155,9 +155,9 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
 }
 .btn-red{
   background:var(--red);color:#fff;
-  box-shadow:0 4px 16px rgba(229,9,26,.4);
+  box-shadow:0 4px 16px rgba(0,166,81,.4);
 }
-.btn-red:hover{background:var(--red2);transform:translateY(-1px);box-shadow:0 6px 20px rgba(229,9,26,.5)}
+.btn-red:hover{background:var(--red2);transform:translateY(-1px);box-shadow:0 6px 20px rgba(0,166,81,.5)}
 .btn-ghost{
   background:rgba(255,255,255,.1);color:var(--text);
   border:1px solid rgba(255,255,255,.15);backdrop-filter:blur(10px);
@@ -396,7 +396,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
   width:100%;
   display:flex;align-items:center;gap:10px;
   padding:8px 14px;
-  background:rgba(0,0,0,.92);
+  background:rgba(1,18,10,.95);
   border-bottom:1px solid rgba(255,255,255,.08);
   z-index:9500;
   position:relative;
@@ -427,7 +427,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
   flex:0 0 auto;
   width:100%;
   padding:10px 14px 18px;
-  background:rgba(0,0,0,.92);
+  background:rgba(1,18,10,.95);
   border-top:1px solid rgba(255,255,255,.08);
   z-index:9500;
   position:relative;
@@ -463,7 +463,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
   min-height:36px;display:flex;align-items:center;
 }
 .pm-srv:active{transform:scale(.95)}
-.pm-srv.active{background:var(--red);border-color:var(--red);color:#fff;box-shadow:0 2px 12px rgba(229,9,26,.5)}
+.pm-srv.active{background:var(--red);border-color:var(--red);color:#fff;box-shadow:0 2px 12px rgba(0,166,81,.5)}
 .pm-actions{display:flex;gap:8px;margin-top:8px;align-items:center;flex-wrap:wrap}
 .pm-btn{
   display:inline-flex;align-items:center;gap:6px;
@@ -473,7 +473,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
   font-family:var(--font);transition:all .2s;min-height:40px;
 }
 .pm-btn:active{transform:scale(.95)}
-.pm-btn.red{background:rgba(229,9,26,.8);border-color:var(--red);box-shadow:0 2px 12px rgba(229,9,26,.4)}
+.pm-btn.red{background:rgba(0,166,81,.8);border-color:var(--red);box-shadow:0 2px 12px rgba(0,166,81,.4)}
 .pm-shield{
   margin-left:auto;display:flex;align-items:center;gap:4px;
   background:rgba(0,200,80,.2);border:1px solid rgba(0,200,80,.4);
@@ -520,7 +520,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
 /* ── TOAST ── */
 #toast{
   position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(10px);
-  background:rgba(20,20,35,.95);border:1px solid rgba(255,255,255,.12);
+  background:rgba(5,25,14,.95);border:1px solid rgba(255,255,255,.12);
   backdrop-filter:blur(20px);padding:10px 18px;border-radius:10px;
   font-size:13px;font-weight:600;z-index:99999;
   opacity:0;transition:opacity .3s,transform .3s;pointer-events:none;white-space:nowrap;
@@ -603,8 +603,8 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
   letter-spacing: .5px;
 }
 .section-trending .sec-title::before {
-  background: linear-gradient(to bottom, #ff6b00, #ff2200);
-  box-shadow: 0 0 8px rgba(255,80,0,.7);
+  background: linear-gradient(to bottom, #00c962, #007a3d);
+  box-shadow: 0 0 8px rgba(0,166,81,.7);
 }
 
 /* ── POLISH: Section title bar ── */
@@ -616,12 +616,12 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
 
 /* ── POLISH: Card hover glow ── */
 .card:hover .card-img-wrap {
-  box-shadow: 0 8px 28px rgba(229,9,26,.35);
+  box-shadow: 0 8px 28px rgba(0,166,81,.35);
 }
 
 /* ── POLISH: Hero badge glow ── */
 .hero-badge:first-child {
-  box-shadow: 0 0 12px rgba(229,9,26,.5);
+  box-shadow: 0 0 12px rgba(0,166,81,.5);
 }
 
 /* ── POLISH: Section spacing ── */
@@ -667,7 +667,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
 }
 #filter-drawer.open{display:flex}
 .fd-box{
-  background:#0e0e1a;border:1px solid rgba(255,255,255,.08);
+  background:#071a0f;border:1px solid rgba(255,255,255,.08);
   border-radius:24px 24px 0 0;width:100%;max-width:600px;
   max-height:90vh;display:flex;flex-direction:column;
   box-shadow:0 -12px 48px rgba(0,0,0,.9);
@@ -688,18 +688,18 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
 .fd-title{font-size:18px;font-weight:800;flex:1}
 .fd-body{overflow-y:auto;padding:16px 18px;flex:1}
 .fd-body::-webkit-scrollbar{width:3px}
-.fd-body::-webkit-scrollbar-thumb{background:rgba(229,9,26,.4);border-radius:2px}
+.fd-body::-webkit-scrollbar-thumb{background:rgba(0,166,81,.4);border-radius:2px}
 .fd-footer{
   display:flex;gap:10px;padding:14px 18px 28px;
   border-top:1px solid rgba(255,255,255,.07);flex-shrink:0;
 }
 .fd-submit{
   flex:1;padding:14px;border-radius:14px;border:none;
-  background:#d4f200;color:#000;
+  background:#00a651;color:#fff;
   font-size:15px;font-weight:800;cursor:pointer;
   font-family:var(--font);transition:all .2s;
 }
-.fd-submit:hover{background:#e5ff00;transform:scale(1.01)}
+.fd-submit:hover{background:#00c962;transform:scale(1.01)}
 .fd-reset{
   padding:14px 22px;border-radius:14px;
   background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);
@@ -729,11 +729,11 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
 }
 .fd-chip.selected::before{content:'✓ ';font-size:10px;font-weight:900}
 .fd-chip-all{
-  background:rgba(212,242,0,.1);border-color:rgba(212,242,0,.4);
-  color:#d4f200;
+  background:rgba(0,166,81,.1);border-color:rgba(0,166,81,.4);
+  color:#00c962;
 }
 .fd-chip-all.selected{
-  background:rgba(212,242,0,.2);border-color:#d4f200;color:#d4f200;
+  background:rgba(0,166,81,.2);border-color:#00c962;color:#00c962;
 }
 .fd-divider{height:1px;background:rgba(255,255,255,.06);margin:18px 0 0}
 
@@ -813,45 +813,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
   height:100% !important;
 }
 
-/* ── AD SHIELDS — top & sides only, bottom free for video controls ── */
-.ad-shield {
-  position:absolute;
-  z-index:50;
-  pointer-events:all;
-  background:transparent;
-  cursor:default;
-}
 
-/* ── FULL TAP SHIELD ── */
-#tap-shield {
-  position:absolute;
-  inset:0;
-  z-index:100;
-  background:transparent;
-  cursor:pointer;
-  -webkit-tap-highlight-color:transparent;
-}
-#tap-shield.unlocked {
-  pointer-events:none; /* unlocked = let taps through to video */
-}
-#tap-hint {
-  position:absolute;
-  bottom:90px;
-  left:50%;
-  transform:translateX(-50%);
-  background:rgba(0,0,0,.75);
-  color:#fff;
-  font-size:12px;
-  font-weight:700;
-  padding:6px 14px;
-  border-radius:20px;
-  pointer-events:none;
-  opacity:0;
-  transition:opacity .3s;
-  white-space:nowrap;
-  z-index:101;
-}
-#tap-hint.show { opacity:1; }
 
 </style>
 </head>
@@ -1005,18 +967,10 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
     <div class="pm-ep-badge" id="pm-ep-badge" style="display:none"></div>
   </div>
   <div id="pm-iframe-wrap">
-    <!-- IFRAME with sandbox to block top navigation -->
-    <iframe id="pm-iframe" src="" allowfullscreen allow="autoplay;encrypted-media;picture-in-picture;fullscreen" referrerpolicy="no-referrer" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-presentation"></iframe>
-    <!-- AD SHIELDS: top + sides only. Bottom left free for video controls -->
-    <!-- Top strip: blocks banner ads at top of player -->
-    <div class="ad-shield" style="top:0;left:0;right:0;height:45px;"></div>
+    <iframe id="pm-iframe" src="" allowfullscreen allow="autoplay;encrypted-media;picture-in-picture;fullscreen" referrerpolicy="no-referrer"></iframe>
+    <!-- Top banner ad shield -->
     <!-- Left side strip -->
-    <div class="ad-shield" style="top:45px;left:0;width:40px;bottom:85px;"></div>
-    <!-- Right side strip -->
-    <div class="ad-shield" style="top:45px;right:0;width:40px;bottom:85px;"></div>
-    <!-- FULL TAP SHIELD: blocks all ad redirects. Tap to unlock video controls -->
-    <div id="tap-shield" onclick="unlockControls()"></div>
-    <div id="tap-hint">Tap again to use controls</div>
+    <!-- Right side strip -->Tap again to use controls</div>
   </div>
   <div id="pm-bottombar">
     <div class="pm-srv-row" id="pm-srv-row"></div>
@@ -1026,8 +980,6 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
       <button class="pm-btn" id="pm-ep-btn" onclick="pmOpenEps()" style="display:none">&#9776; Episodes</button>
       <button class="pm-btn" id="pm-trl-btn" onclick="pmTrailer()" style="display:none">&#127909; Trailer</button>
       <button class="pm-btn" onclick="pmFullscreen()" style="background:rgba(255,255,255,.15)">&#x26F6; Fullscreen</button>
-      <!-- NEW: Unlock button for manual control -->
-      <button class="pm-btn" id="pm-unlock-btn" onclick="unlockControls()" style="background:rgba(255,165,0,.7);">🔓 Unlock</button>
       <div class="pm-shield">&#128737; Shield ON</div>
     </div>
   </div>
@@ -1038,6 +990,8 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
     <div id="pm-ep-list"><div class="spinwrap"><div class="spinner"></div></div></div>
   </div>
 </div>
+
+
 
 <!-- ACTOR PROFILE -->
 <div id="actor-profile">
@@ -1118,37 +1072,13 @@ var SEED_TRENDING = [
 ];
 
 // ═══ SERVERS ═══
-var SRVN = [
-  'VidSrc.cc',    // S1 — movies
-  'VidSrc.to',    // S2 — best for TV/streaming exclusives
-  '2Embed',       // S3 — huge library
-  'VidLink',      // S4 — clean player
-  'VidSrc.xyz',   // S5
-  'VidSrc.me',    // S6
-  'SuperEmbed',   // S7
-  'AutoEmbed',    // S8
-];
+var SRVN = ['VidSrc.to'];
 function getSrcs(type,id,s,e){
   if(type==='movie')return[
-    'https://vidsrc.cc/v2/embed/movie/'+id,
     'https://vidsrc.to/embed/movie/'+id,
-    'https://www.2embed.stream/embed/movie/'+id,
-    'https://vidlink.pro/movie/'+id+'?autoplay=true&primaryColor=e5091a',
-    'https://vidsrc.xyz/embed/movie?tmdb='+id,
-    'https://vidsrc.me/embed/movie?tmdb='+id,
-    'https://multiembed.mov/?video_id='+id+'&tmdb=1',
-    'https://autoembed.cc/movie/tmdb-'+id,
   ];
-  // TV — VidSrc.to first because it has streaming exclusives (Amazon, Netflix, etc.)
   return[
     'https://vidsrc.to/embed/tv/'+id+'/'+s+'/'+e,
-    'https://vidsrc.cc/v2/embed/tv/'+id+'/'+s+'/'+e,
-    'https://www.2embed.stream/embed/tv/'+id+'/'+s+'/'+e,
-    'https://vidlink.pro/tv/'+id+'/'+s+'/'+e+'?autoplay=true&primaryColor=e5091a',
-    'https://vidsrc.xyz/embed/tv?tmdb='+id+'&season='+s+'&episode='+e,
-    'https://vidsrc.me/embed/tv?tmdb='+id+'&season='+s+'&episode='+e,
-    'https://multiembed.mov/?video_id='+id+'&tmdb=1&s='+s+'&e='+e,
-    'https://autoembed.cc/tv/tmdb-'+id+'-'+s+'-'+e,
   ];
 }
 // ═══ STATE ═══
@@ -1705,9 +1635,7 @@ function playEp(s,e){
 function openPlayer(src,srvIdx,epInfo){
   var modal=ge('player-modal');
   try{if(screen.orientation&&screen.orientation.lock)screen.orientation.lock('landscape').catch(function(){});}catch(e){}
-  var iframe=ge('pm-iframe');
-  iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-presentation');
-  iframe.src=src;
+  ge('pm-iframe').src=src;
   ge('pm-title').textContent=pTitle||'Now Playing';
   var epBadge=ge('pm-ep-badge');
   if(epInfo){epBadge.textContent=epInfo;epBadge.style.display='block';}
@@ -1721,7 +1649,6 @@ function openPlayer(src,srvIdx,epInfo){
   document.body.style.overflow='hidden';
   pmShowControls();
   installAB();
-  relockShield();
 }
 
 function closePlayer(){
@@ -1734,10 +1661,7 @@ function closePlayer(){
 
 function switchSrv(idx){
   pSrv=idx;
-  relockShield();
-  var iframe=ge('pm-iframe');
-  iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-presentation');
-  iframe.src=getSrcs(pType,pId,pEpS,pEpE)[idx];
+  ge('pm-iframe').src=getSrcs(pType,pId,pEpS,pEpE)[idx];
   document.querySelectorAll('.pm-srv').forEach(function(b,i){b.classList.toggle('active',i===idx);});
   pmShowControls();
   toast('Loading '+SRVN[idx]+'...');
@@ -1893,109 +1817,46 @@ function doSearch(q){
 function clearSearch(){ge('sinput').value='';ge('sclr').className='btn';if(curPage==='search')go('home',true);}
 
 
-// ═══ ENHANCED AD BLOCKER ═══
+// ═══ AD BLOCKER ═══
 function installAB(){
-  if(window._abOn) return;
-  window._abOn = true;
+  if(window._abOn)return;window._abOn=true;
 
-  // 1. Override window.open to block popups
-  var origOpen = window.open;
-  window.open = function(url, name, features){
-    // Whitelist safe domains
-    var safe = ['youtube.com', 'youtu.be', 'vidsrc.cc', 'vidsrc.to', 'vidsrc.me', 'vidsrc.xyz', '2embed.stream', 'vidlink.pro', 'multiembed.mov', 'autoembed.cc', 'tmdb.org'];
-    if(url && safe.some(function(d){ return url.indexOf(d) >= 0; })){
-      return origOpen.apply(window, arguments);
-    }
-    toast('🛡️ Popup blocked!');
-    return null; // Block the popup
+  // Block all window.open calls
+  var origOpen=window.open;
+  window.open=function(){
+    toast('🛡 Blocked!');
+    return{closed:true,close:function(){},focus:function(){}};
   };
 
-  // 2. Blur trap — catch focus loss from tap-to-redirect ads
-  var lastTap = 0;
-  var wrap = ge('pm-iframe-wrap');
-  if(wrap){
-    wrap.addEventListener('touchstart', function(){ lastTap = Date.now(); }, {passive: true, capture: true});
-    wrap.addEventListener('mousedown', function(){ lastTap = Date.now(); }, true);
-  }
-  window.addEventListener('blur', function(){
-    if(!ge('player-modal').classList.contains('open')) return;
-    if(Date.now() - lastTap < 2000){ // within 2 seconds of a tap
-      setTimeout(function(){
-        try{ window.focus(); } catch(e){}
-        history.pushState(null, null, location.href); // prevent back navigation
-      }, 50);
-      toast('🛡️ Ad redirect blocked!');
-    }
-  });
+  // Block all anchor navigation from inside iframes
+  // Override location setter on every possible object
+  var noop=function(){};
+  try{ Object.defineProperty(window,'location',{set:noop}); }catch(e){}
 
-  // 3. Pagehide / visibilitychange — keep your existing
-  document.addEventListener('visibilitychange', function(){
+  // Catch visibilitychange (Android - tab redirect)
+  document.addEventListener('visibilitychange',function(){
     if(document.hidden && ge('player-modal').classList.contains('open')){
-      setTimeout(function(){
-        if(document.hidden){
-          history.back();
-          window.focus();
-        }
-      }, 100);
+      history.go(0); // reload current page state without leaving
+      setTimeout(function(){ window.focus(); },0);
     }
   });
 
-  window.addEventListener('pagehide', function(){
+  // Catch pagehide (iOS Safari - page navigation)
+  window.addEventListener('pagehide',function(e){
     if(ge('player-modal').classList.contains('open')){
-      setTimeout(function(){ history.back(); }, 50);
+      e.stopImmediatePropagation();
+      history.go(0);
     }
-  });
+  },true);
 
-  // 4. MutationObserver to catch dynamically inserted ad scripts
-  var observer = new MutationObserver(function(mutations){
-    mutations.forEach(function(m){
-      m.addedNodes.forEach(function(node){
-        if(node.tagName === 'SCRIPT' && node.src){
-          var src = node.src || '';
-          if(src.match(/doubleclick|googlead|googlesyndication|adservice|popads|exoclick|adserver|adtech|advertising/i)){
-            node.remove(); // Remove ad script
-            toast('🛡️ Ad script blocked');
-          }
-        }
-      });
-    });
-  });
-  observer.observe(document, { childList: true, subtree: true });
-
-  // 5. Block clicks on any element with ad-related classes (if any appear)
-  document.addEventListener('click', function(e){
-    var adSelectors = '[class*="ad"], [class*="banner"], [id*="ad"], [id*="banner"], [class*="sponsor"]';
-    if(e.target.closest(adSelectors)){
-      e.preventDefault();
-      e.stopPropagation();
-      return false;
+  // Catch ANY attempt to change top-level URL
+  var _href = window.location.href;
+  setInterval(function(){
+    if(!ge('player-modal').classList.contains('open'))return;
+    if(window.location.href !== _href){
+      window.location.replace(_href);
     }
-  }, true);
-}
-
-
-// ═══ TAP SHIELD ═══
-var _lockTimer = null;
-function unlockControls(){
-  var shield = ge('tap-shield');
-  var hint = ge('tap-hint');
-  if(!shield) return;
-  // Unlock — let taps reach the video
-  shield.classList.add('unlocked');
-  if(hint){ hint.classList.add('show'); }
-  clearTimeout(_lockTimer);
-  // Re-lock after 10 seconds (longer to give user time)
-  _lockTimer = setTimeout(function(){
-    shield.classList.remove('unlocked');
-    if(hint){ hint.classList.remove('show'); }
-  }, 10000);
-}
-function relockShield(){
-  var shield = ge('tap-shield');
-  var hint = ge('tap-hint');
-  clearTimeout(_lockTimer);
-  if(shield) shield.classList.remove('unlocked');
-  if(hint) hint.classList.remove('show');
+  }, 300);
 }
 
 // ═══ TOAST ═══
