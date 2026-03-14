@@ -1067,8 +1067,8 @@ var SEED_TRENDING = [
 
 // ═══ SERVERS ═══
 var SRVN = [
-  'VidSrc.to',
   'VidSrc.cc',
+  'VidSrc.to',
   'VidLink',
   '2Embed',
   'VidSrc.xyz',
@@ -1078,8 +1078,8 @@ var SRVN = [
 ];
 function getSrcs(type,id,s,e){
   if(type==='movie')return[
-    'https://vidsrc.to/embed/movie/'+id,
     'https://vidsrc.cc/v2/embed/movie/'+id,
+    'https://vidsrc.to/embed/movie/'+id,
     'https://vidlink.pro/movie/'+id+'?autoplay=true&primaryColor=00a651',
     'https://www.2embed.stream/embed/movie/'+id,
     'https://vidsrc.xyz/embed/movie?tmdb='+id,
@@ -1088,8 +1088,8 @@ function getSrcs(type,id,s,e){
     'https://multiembed.mov/?video_id='+id+'&tmdb=1',
   ];
   return[
-    'https://vidsrc.to/embed/tv/'+id+'/'+s+'/'+e,
     'https://vidsrc.cc/v2/embed/tv/'+id+'/'+s+'/'+e,
+    'https://vidsrc.to/embed/tv/'+id+'/'+s+'/'+e,
     'https://vidlink.pro/tv/'+id+'/'+s+'/'+e+'?autoplay=true&primaryColor=00a651',
     'https://www.2embed.stream/embed/tv/'+id+'/'+s+'/'+e,
     'https://vidsrc.xyz/embed/tv?tmdb='+id+'&season='+s+'&episode='+e,
@@ -1838,57 +1838,63 @@ function clearSearch(){ge('sinput').value='';ge('sclr').className='btn';if(curPa
 function installAB(){
   if(window._abOn)return;window._abOn=true;
 
-  // 1. Kill window.open — blocks popup ads and new tab ads
-  window.open=function(url){
-    if(!url)return null;
-    var safe=['vidsrc','vidlink','2embed','multiembed','autoembed','youtube','tmdb'];
-    if(safe.some(function(d){return String(url).indexOf(d)>=0;}))return null;
-    toast('🛡 Ad blocked!');
-    return null;
-  };
+  // Kill window.open completely
+  window.open=function(){ toast('🛡 Ad blocked!'); return null; };
 
-  // 2. Override location.href setter to catch direct navigation attempts
-  try{
-    var _loc=window.location;
-    Object.defineProperty(window,'location',{
-      get:function(){return _loc;},
-      set:function(v){
-        var s=String(v);
-        var safe=['vidsrc','vidlink','2embed','multiembed','autoembed','youtube','tmdb','github.io'];
-        if(safe.some(function(d){return s.indexOf(d)>=0;})){_loc.href=s;}
-        else{ toast('🛡 Ad blocked!'); }
-      },
-      configurable:true
-    });
-  }catch(e){}
+  // Kill window.alert/confirm used by some ad scripts
+  window.alert=function(){};
+  window.confirm=function(){return false;};
+  window.prompt=function(){return null;};
 
-  // 3. visibilitychange — fires the instant browser navigates away on Android
-  // Use NO setTimeout — snap back in same tick
+  // Catch redirect the instant it happens — visibilitychange fires
+  // before the browser actually loads the new page
+  // history.back() in same tick cancels navigation on Android Chrome
   document.addEventListener('visibilitychange',function(){
     if(document.hidden && ge('player-modal').classList.contains('open')){
       history.back();
     }
   });
 
-  // 4. pagehide — iOS Safari
+  // iOS Safari — pagehide fires before unload
   window.addEventListener('pagehide',function(){
     if(ge('player-modal').classList.contains('open')){
       history.back();
     }
   },true);
 
-  // 5. Block all external link clicks from inside the page
+  // Catch any <a> clicks trying to navigate away
   document.addEventListener('click',function(e){
     var a=e.target.closest('a[href]');
     if(!a)return;
-    var href=a.href||'';
-    if(href.indexOf('javascript')>=0)return;
-    if(href.indexOf(location.hostname)<0 && href.indexOf('http')===0){
+    var href=String(a.href||'');
+    if(href.indexOf('javascript')>=0||href.indexOf('#')===0)return;
+    if(href.indexOf(location.hostname)<0){
       e.preventDefault();
       e.stopImmediatePropagation();
       toast('🛡 Ad blocked!');
     }
   },true);
+
+  // Watch for any new iframes injected by ads
+  var obs=new MutationObserver(function(muts){
+    muts.forEach(function(m){
+      m.addedNodes.forEach(function(n){
+        if(n.tagName==='IFRAME' && n.id!=='pm-iframe'){
+          n.remove();
+          toast('🛡 Ad blocked!');
+        }
+        // Also remove injected script tags from unknown domains
+        if(n.tagName==='SCRIPT'){
+          var src=n.src||'';
+          var safe=['vidsrc','vidlink','2embed','multiembed','autoembed','youtube','tmdb','github','googleapis','gstatic'];
+          if(src && !safe.some(function(d){return src.indexOf(d)>=0;})){
+            n.remove();
+          }
+        }
+      });
+    });
+  });
+  obs.observe(document.documentElement,{childList:true,subtree:true});
 }
 
 // ═══ TOAST ═══
