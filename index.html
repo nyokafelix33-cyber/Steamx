@@ -420,6 +420,45 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
   background:#000;
 }
 
+/* AD SHIELDS — top & sides only, bottom free for video controls */
+.ad-shield {
+  position:absolute;
+  z-index:50;
+  pointer-events:all;
+  background:transparent;
+  cursor:default;
+}
+
+/* FULL TAP SHIELD */
+#tap-shield {
+  position:absolute;
+  inset:0;
+  z-index:100;
+  background:transparent;
+  cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+}
+#tap-shield.unlocked {
+  pointer-events:none; /* unlocked = let taps through to video */
+}
+#tap-hint {
+  position:absolute;
+  bottom:90px;
+  left:50%;
+  transform:translateX(-50%);
+  background:rgba(0,0,0,.75);
+  color:#fff;
+  font-size:12px;
+  font-weight:700;
+  padding:6px 14px;
+  border-radius:20px;
+  pointer-events:none;
+  opacity:0;
+  transition:opacity .3s;
+  white-space:nowrap;
+  z-index:101;
+}
+#tap-hint.show { opacity:1; }
 
 /* BOTTOM BAR — fixed height, never hidden, always clickable */
 #pm-bottombar{
@@ -809,9 +848,6 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
   width:100% !important;
   height:100% !important;
 }
-
-
-
 </style>
 </head>
 <body>
@@ -964,7 +1000,18 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
     <div class="pm-ep-badge" id="pm-ep-badge" style="display:none"></div>
   </div>
   <div id="pm-iframe-wrap">
-    <iframe id="pm-iframe" src="" allowfullscreen allow="autoplay;encrypted-media;picture-in-picture;fullscreen" referrerpolicy="no-referrer"></iframe>
+    <!-- IFRAME with sandbox to block top navigation -->
+    <iframe id="pm-iframe" src="" allowfullscreen allow="autoplay;encrypted-media;picture-in-picture;fullscreen" referrerpolicy="no-referrer" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-presentation"></iframe>
+    <!-- AD SHIELDS: top + sides only. Bottom left free for video controls -->
+    <!-- Top strip: blocks banner ads at top of player -->
+    <div class="ad-shield" style="top:0;left:0;right:0;height:45px;"></div>
+    <!-- Left side strip -->
+    <div class="ad-shield" style="top:45px;left:0;width:40px;bottom:85px;"></div>
+    <!-- Right side strip -->
+    <div class="ad-shield" style="top:45px;right:0;width:40px;bottom:85px;"></div>
+    <!-- FULL TAP SHIELD: blocks all ad redirects. Tap to unlock video controls -->
+    <div id="tap-shield" onclick="unlockControls()"></div>
+    <div id="tap-hint">Tap again to use controls</div>
   </div>
   <div id="pm-bottombar">
     <div class="pm-srv-row" id="pm-srv-row"></div>
@@ -974,6 +1021,8 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
       <button class="pm-btn" id="pm-ep-btn" onclick="pmOpenEps()" style="display:none">&#9776; Episodes</button>
       <button class="pm-btn" id="pm-trl-btn" onclick="pmTrailer()" style="display:none">&#127909; Trailer</button>
       <button class="pm-btn" onclick="pmFullscreen()" style="background:rgba(255,255,255,.15)">&#x26F6; Fullscreen</button>
+      <!-- NEW: Unlock button for manual control -->
+      <button class="pm-btn" id="pm-unlock-btn" onclick="unlockControls()" style="background:rgba(255,165,0,.7);">🔓 Unlock</button>
       <div class="pm-shield">&#128737; Shield ON</div>
     </div>
   </div>
@@ -984,8 +1033,6 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
     <div id="pm-ep-list"><div class="spinwrap"><div class="spinner"></div></div></div>
   </div>
 </div>
-
-
 
 <!-- ACTOR PROFILE -->
 <div id="actor-profile">
@@ -1012,7 +1059,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
 
 <script>
 // ═══════════════════════════════════════════════════════════════
-// FENG WORLD — Complete App  (Live TV removed, polished)
+// FENG WORLD — Complete App (Cineby.gd style + Enhanced Ad Blocker)
 // ═══════════════════════════════════════════════════════════════
 var API = 'https://api.themoviedb.org/3';
 var KEY = 'ea593c3fa4d4942ece315977cd7e32c9';
@@ -1067,19 +1114,19 @@ var SEED_TRENDING = [
 
 // ═══ SERVERS ═══
 var SRVN = [
-  'VidSrc.cc',
-  'VidSrc.to',
-  'VidLink',
-  '2Embed',
-  'VidSrc.xyz',
-  'VidSrc.me',
-  'AutoEmbed',
-  'SuperEmbed',
+  'VidSrc.to',    // S1 — best for TV/streaming exclusives
+  'VidSrc.cc',    // S2
+  'VidLink',      // S3
+  '2Embed',       // S4
+  'VidSrc.xyz',   // S5
+  'VidSrc.me',    // S6
+  'AutoEmbed',    // S7
+  'SuperEmbed',   // S8
 ];
 function getSrcs(type,id,s,e){
   if(type==='movie')return[
-    'https://vidsrc.cc/v2/embed/movie/'+id,
     'https://vidsrc.to/embed/movie/'+id,
+    'https://vidsrc.cc/v2/embed/movie/'+id,
     'https://vidlink.pro/movie/'+id+'?autoplay=true&primaryColor=00a651',
     'https://www.2embed.stream/embed/movie/'+id,
     'https://vidsrc.xyz/embed/movie?tmdb='+id,
@@ -1088,8 +1135,8 @@ function getSrcs(type,id,s,e){
     'https://multiembed.mov/?video_id='+id+'&tmdb=1',
   ];
   return[
-    'https://vidsrc.cc/v2/embed/tv/'+id+'/'+s+'/'+e,
     'https://vidsrc.to/embed/tv/'+id+'/'+s+'/'+e,
+    'https://vidsrc.cc/v2/embed/tv/'+id+'/'+s+'/'+e,
     'https://vidlink.pro/tv/'+id+'/'+s+'/'+e+'?autoplay=true&primaryColor=00a651',
     'https://www.2embed.stream/embed/tv/'+id+'/'+s+'/'+e,
     'https://vidsrc.xyz/embed/tv?tmdb='+id+'&season='+s+'&episode='+e,
@@ -1652,7 +1699,9 @@ function playEp(s,e){
 function openPlayer(src,srvIdx,epInfo){
   var modal=ge('player-modal');
   try{if(screen.orientation&&screen.orientation.lock)screen.orientation.lock('landscape').catch(function(){});}catch(e){}
-  ge('pm-iframe').src=src;
+  var iframe=ge('pm-iframe');
+  iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-presentation');
+  iframe.src=src;
   ge('pm-title').textContent=pTitle||'Now Playing';
   var epBadge=ge('pm-ep-badge');
   if(epInfo){epBadge.textContent=epInfo;epBadge.style.display='block';}
@@ -1666,6 +1715,7 @@ function openPlayer(src,srvIdx,epInfo){
   document.body.style.overflow='hidden';
   pmShowControls();
   installAB();
+  relockShield();
 }
 
 function closePlayer(){
@@ -1678,7 +1728,10 @@ function closePlayer(){
 
 function switchSrv(idx){
   pSrv=idx;
-  ge('pm-iframe').src=getSrcs(pType,pId,pEpS,pEpE)[idx];
+  relockShield();
+  var iframe=ge('pm-iframe');
+  iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-presentation');
+  iframe.src=getSrcs(pType,pId,pEpS,pEpE)[idx];
   document.querySelectorAll('.pm-srv').forEach(function(b,i){b.classList.toggle('active',i===idx);});
   pmShowControls();
   toast('Loading '+SRVN[idx]+'...');
@@ -1834,67 +1887,111 @@ function doSearch(q){
 function clearSearch(){ge('sinput').value='';ge('sclr').className='btn';if(curPage==='search')go('home',true);}
 
 
-// ═══ AD BLOCKER ═══
+// ═══ ENHANCED AD BLOCKER (from previous version) ═══
 function installAB(){
-  if(window._abOn)return;window._abOn=true;
+  if(window._abOn) return;
+  window._abOn = true;
 
-  // Kill window.open completely
-  window.open=function(){ toast('🛡 Ad blocked!'); return null; };
+  // 1. Override window.open with whitelist
+  var origOpen = window.open;
+  window.open = function(url, name, features){
+    var safe = ['youtube.com', 'youtu.be', 'vidsrc.cc', 'vidsrc.to', 'vidsrc.me', 'vidsrc.xyz', '2embed.stream', 'vidlink.pro', 'multiembed.mov', 'autoembed.cc', 'tmdb.org'];
+    if(url && safe.some(function(d){ return url.indexOf(d) >= 0; })){
+      return origOpen.apply(window, arguments);
+    }
+    toast('🛡️ Popup blocked!');
+    return null;
+  };
 
-  // Kill window.alert/confirm used by some ad scripts
-  window.alert=function(){};
-  window.confirm=function(){return false;};
-  window.prompt=function(){return null;};
-
-  // Catch redirect the instant it happens — visibilitychange fires
-  // before the browser actually loads the new page
-  // history.back() in same tick cancels navigation on Android Chrome
-  document.addEventListener('visibilitychange',function(){
-    if(document.hidden && ge('player-modal').classList.contains('open')){
-      history.back();
+  // 2. Blur trap for redirect attempts
+  var lastTap = 0;
+  var wrap = ge('pm-iframe-wrap');
+  if(wrap){
+    wrap.addEventListener('touchstart', function(){ lastTap = Date.now(); }, {passive: true, capture: true});
+    wrap.addEventListener('mousedown', function(){ lastTap = Date.now(); }, true);
+  }
+  window.addEventListener('blur', function(){
+    if(!ge('player-modal').classList.contains('open')) return;
+    if(Date.now() - lastTap < 2000){
+      setTimeout(function(){
+        try{ window.focus(); } catch(e){}
+        history.pushState(null, null, location.href);
+      }, 50);
+      toast('🛡️ Ad redirect blocked!');
     }
   });
 
-  // iOS Safari — pagehide fires before unload
-  window.addEventListener('pagehide',function(){
-    if(ge('player-modal').classList.contains('open')){
-      history.back();
-    }
-  },true);
-
-  // Catch any <a> clicks trying to navigate away
-  document.addEventListener('click',function(e){
-    var a=e.target.closest('a[href]');
-    if(!a)return;
-    var href=String(a.href||'');
-    if(href.indexOf('javascript')>=0||href.indexOf('#')===0)return;
-    if(href.indexOf(location.hostname)<0){
-      e.preventDefault();
-      e.stopImmediatePropagation();
-      toast('🛡 Ad blocked!');
-    }
-  },true);
-
-  // Watch for any new iframes injected by ads
-  var obs=new MutationObserver(function(muts){
-    muts.forEach(function(m){
-      m.addedNodes.forEach(function(n){
-        if(n.tagName==='IFRAME' && n.id!=='pm-iframe'){
-          n.remove();
-          toast('🛡 Ad blocked!');
+  // 3. Pagehide / visibilitychange (keep existing)
+  document.addEventListener('visibilitychange', function(){
+    if(document.hidden && ge('player-modal').classList.contains('open')){
+      setTimeout(function(){
+        if(document.hidden){
+          history.back();
+          window.focus();
         }
-        // Also remove injected script tags from unknown domains
-        if(n.tagName==='SCRIPT'){
-          var src=n.src||'';
-          var safe=['vidsrc','vidlink','2embed','multiembed','autoembed','youtube','tmdb','github','googleapis','gstatic'];
-          if(src && !safe.some(function(d){return src.indexOf(d)>=0;})){
-            n.remove();
+      }, 100);
+    }
+  });
+
+  window.addEventListener('pagehide', function(){
+    if(ge('player-modal').classList.contains('open')){
+      setTimeout(function(){ history.back(); }, 50);
+    }
+  });
+
+  // 4. MutationObserver to block ad scripts/iframes
+  var observer = new MutationObserver(function(mutations){
+    mutations.forEach(function(m){
+      m.addedNodes.forEach(function(node){
+        if(node.tagName === 'IFRAME' && node.id !== 'pm-iframe'){
+          node.remove();
+          toast('🛡️ Ad iframe blocked');
+        }
+        if(node.tagName === 'SCRIPT' && node.src){
+          var src = node.src || '';
+          var safe = ['vidsrc','vidlink','2embed','multiembed','autoembed','youtube','tmdb','github','googleapis','gstatic'];
+          if(src && !safe.some(function(d){ return src.indexOf(d) >= 0; })){
+            node.remove();
+            toast('🛡️ Ad script blocked');
           }
         }
       });
     });
   });
-  obs.observe(document.documentElement,{childList:true,subtree:true});
+  observer.observe(document, { childList: true, subtree: true });
+
+  // 5. Block clicks on any ad-like elements (if any appear)
+  document.addEventListener('click', function(e){
+    var adSelectors = '[class*="ad"], [class*="banner"], [id*="ad"], [id*="banner"], [class*="sponsor"]';
+    if(e.target.closest(adSelectors)){
+      e.preventDefault();
+      e.stopPropagation();
+      return false;
+    }
+  }, true);
+}
+
+// ═══ TAP SHIELD ═══
+var _lockTimer = null;
+function unlockControls(){
+  var shield = ge('tap-shield');
+  var hint = ge('tap-hint');
+  if(!shield) return;
+  shield.classList.add('unlocked');
+  if(hint){ hint.classList.add('show'); }
+  clearTimeout(_lockTimer);
+  // Re-lock after 10 seconds (user can also use the Unlock button again)
+  _lockTimer = setTimeout(function(){
+    shield.classList.remove('unlocked');
+    if(hint){ hint.classList.remove('show'); }
+  }, 10000);
+}
+function relockShield(){
+  var shield = ge('tap-shield');
+  var hint = ge('tap-hint');
+  clearTimeout(_lockTimer);
+  if(shield) shield.classList.remove('unlocked');
+  if(hint) hint.classList.remove('show');
 }
 
 // ═══ TOAST ═══
