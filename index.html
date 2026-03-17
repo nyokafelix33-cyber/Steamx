@@ -4,7 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
 <title>Feng World</title>
-<meta http-equiv="Content-Security-Policy" content="default-src * data: blob:; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; frame-src *; navigate-to 'self';">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' data: blob: https://api.themoviedb.org https://image.tmdb.org https://fonts.googleapis.com https://fonts.gstatic.com; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; frame-src https://vidsrc.cc https://vidsrc.to https://embed.su https://*.2embed.stream https://www.2embed.stream https://vidlink.pro https://www.youtube.com https://youtube.com; img-src 'self' data: blob: https://image.tmdb.org https://*.tmdb.org; connect-src 'self' https://api.themoviedb.org; navigate-to 'self';">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
 <style>
 :root{
@@ -940,10 +940,16 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
   <div id="pm-iframe-wrap">
     <!-- NO SANDBOX – all players work -->
     <iframe id="pm-iframe" src="" allowfullscreen allow="autoplay;encrypted-media;picture-in-picture;fullscreen" referrerpolicy="no-referrer"></iframe>
-    <!-- AD SHIELDS: top + sides only -->
-    <div class="ad-shield" style="top:0;left:0;right:0;height:45px;"></div>
-    <div class="ad-shield" style="top:45px;left:0;width:40px;bottom:85px;"></div>
-    <div class="ad-shield" style="top:45px;right:0;width:40px;bottom:85px;"></div>
+    <!-- AD SHIELDS: top, sides, and bottom corners -->
+    <div class="ad-shield" style="top:0;left:0;right:0;height:50px;"></div>
+    <div class="ad-shield" style="top:50px;left:0;width:45px;bottom:50px;"></div>
+    <div class="ad-shield" style="top:50px;right:0;width:45px;bottom:50px;"></div>
+    <div class="ad-shield" style="bottom:0;left:0;right:0;height:50px;"></div>
+    <!-- Corner shields for close/ad buttons -->
+    <div class="ad-shield" style="top:0;right:0;width:80px;height:80px;"></div>
+    <div class="ad-shield" style="top:0;left:0;width:80px;height:80px;"></div>
+    <div class="ad-shield" style="bottom:0;right:0;width:80px;height:80px;"></div>
+    <div class="ad-shield" style="bottom:0;left:0;width:80px;height:80px;"></div>
     <!-- FULL TAP SHIELD (manual toggle) -->
     <div id="tap-shield" class=""></div>
   </div>
@@ -1411,9 +1417,11 @@ function doSearch(q){
 function clearSearch(){ge('sinput').value='';ge('sclr').className='btn';if(curPage==='search')go('home',true);}
 
 // ========== SHIELD TOGGLE ==========
+var shieldAutoLockTimer = null;
 function toggleShield(){
   var shield = ge('tap-shield');
   var btn = ge('pm-shield-toggle');
+  clearTimeout(shieldAutoLockTimer);
   if(shield.classList.contains('unlocked')){
     shield.classList.remove('unlocked');
     btn.textContent = '🔒 Locked';
@@ -1421,64 +1429,283 @@ function toggleShield(){
   } else {
     shield.classList.add('unlocked');
     btn.textContent = '🔓 Unlocked';
-    toast('Shield unlocked – you can use video controls');
+    toast('Shield unlocked for 30s – use video controls');
+    // Auto-lock after 30 seconds to prevent accidental ad clicks
+    shieldAutoLockTimer = setTimeout(function(){
+      if(shield.classList.contains('unlocked')){
+        shield.classList.remove('unlocked');
+        btn.textContent = '🔒 Locked';
+        toast('Shield auto-locked for protection');
+      }
+    }, 30000);
   }
 }
 
-// ========== SIMPLE AD BLOCKER ==========
+// ========== COMPREHENSIVE AD BLOCKER ==========
+var AD_DOMAINS = [
+  'doubleclick','googlesyndication','adservice','adskeeper','adnxs','adsrvr',
+  'popads','popcash','popunder','propellerads','trafficjunky','exoclick',
+  'juicyads','revcontent','mgid','taboola','outbrain','adsterra','hilltopads',
+  'clickadu','pushground','richpush','evadav','galaksion','monetag','a-ads',
+  'admaven','adcash','bidvertiser','clickaine','roller-ads','onclicka',
+  'trackvoluum','cpalead','cpagrip','bongacams','chaturbate','stripchat',
+  'livejasmin','cam4','istripper','dating','meet','hookup',
+  'bet365','1xbet','betway','casino','poker','slots','gambling',
+  'tracker','analytics','pixel','beacon','telemetry','collect',
+  'cdn.snigelweb','cdn.spotx','cdn.stickyadstv','cdn.syndication',
+  'moatads','serving-sys','smartadserver','turn.com','undertone',
+  'zedo.com','media.net','inmobi','unity3d.com/ads','applovin',
+  'ad-maven','ad-score','ad-stir','ad4game','adbooth','adcolony',
+  'adsymptotic','adtidy','airpush','amazon-adsystem','chartboost',
+  'criteo','flurry','greedygame','heyzap','inmobi','leadbolt',
+  'loopme','millenialmedia','mobfox','mopub','nexage','smaato',
+  'startapp','supersonicads','tapjoy','vserv','youappi',
+  'go.onclasrv','onclkds','syndication','tsyndicate','tstrck'
+];
+
+function isAdURL(url){
+  if(!url) return false;
+  var u = url.toLowerCase();
+  return AD_DOMAINS.some(function(d){ return u.indexOf(d) >= 0; });
+}
+
+var SAFE_DOMAINS = [
+  'youtube.com','youtu.be','vidsrc','vidlink','2embed','embed.su',
+  'multiembed','autoembed','tmdb','themoviedb','github','googleapis',
+  'gstatic','fonts.google','cdnjs','cloudflare'
+];
+
+function isSafeURL(url){
+  if(!url) return false;
+  var u = url.toLowerCase();
+  return SAFE_DOMAINS.some(function(d){ return u.indexOf(d) >= 0; });
+}
+
 function installAB(){
   if(window._abOn) return;
   window._abOn = true;
+  var blocked = 0;
 
-  // Block window.open popups
+  // 1) Block window.open popups aggressively
   var origOpen = window.open;
   window.open = function(url, name, features){
-    var safe = ['youtube.com', 'youtu.be', 'vidsrc', 'vidlink', '2embed', 'multiembed', 'autoembed', 'tmdb'];
-    if(url && safe.some(function(d){ return url.indexOf(d) >= 0; })){
+    if(url && isSafeURL(url)){
       return origOpen.apply(window, arguments);
     }
-    toast('🛡️ Popup blocked!');
+    blocked++;
+    console.log('[FengShield] Popup blocked: ' + (url||'').slice(0,80));
     return null;
   };
 
-  // Detect visibility loss (redirect attempt) and try to stay
+  // 2) Intercept fetch to block ad requests
+  var origFetch = window.fetch;
+  window.fetch = function(input, init){
+    var url = (typeof input === 'string') ? input : (input && input.url ? input.url : '');
+    if(isAdURL(url)){
+      blocked++;
+      console.log('[FengShield] Fetch blocked: ' + url.slice(0,80));
+      return Promise.resolve(new Response('', {status:200}));
+    }
+    return origFetch.apply(window, arguments);
+  };
+
+  // 3) Intercept XMLHttpRequest to block ad requests
+  var origXHROpen = XMLHttpRequest.prototype.open;
+  XMLHttpRequest.prototype.open = function(method, url){
+    if(isAdURL(url)){
+      blocked++;
+      console.log('[FengShield] XHR blocked: ' + (url||'').slice(0,80));
+      this._blocked = true;
+    }
+    return origXHROpen.apply(this, arguments);
+  };
+  var origXHRSend = XMLHttpRequest.prototype.send;
+  XMLHttpRequest.prototype.send = function(){
+    if(this._blocked){
+      Object.defineProperty(this, 'status', {value:200});
+      Object.defineProperty(this, 'readyState', {value:4});
+      Object.defineProperty(this, 'responseText', {value:''});
+      if(this.onload) this.onload();
+      if(this.onreadystatechange) this.onreadystatechange();
+      return;
+    }
+    return origXHRSend.apply(this, arguments);
+  };
+
+  // 4) Block createElement for ad-related elements
+  var origCreate = document.createElement.bind(document);
+  document.createElement = function(tag){
+    var el = origCreate(tag);
+    if(tag.toLowerCase() === 'a'){
+      var origSetAttr = el.setAttribute.bind(el);
+      el.setAttribute = function(name, val){
+        if(name === 'href' && isAdURL(val)){
+          blocked++;
+          console.log('[FengShield] Ad link blocked');
+          return;
+        }
+        return origSetAttr(name, val);
+      };
+    }
+    return el;
+  };
+
+  // 5) Detect visibility loss (redirect attempts) and stay on page
   document.addEventListener('visibilitychange', function(){
     if(document.hidden && ge('player-modal').classList.contains('open')){
       setTimeout(function(){
         if(document.hidden){
-          history.back();
           window.focus();
         }
       }, 100);
     }
   });
 
-  window.addEventListener('pagehide', function(){
+  // 6) Prevent beforeunload hijacking
+  window.addEventListener('beforeunload', function(e){
     if(ge('player-modal').classList.contains('open')){
-      setTimeout(function(){ history.back(); }, 50);
+      e.preventDefault();
+      e.returnValue = '';
     }
   });
 
-  // Kill suspicious iframes and scripts
+  // 7) Block suspicious click event listeners on document/body
+  var origAddEL = EventTarget.prototype.addEventListener;
+  EventTarget.prototype.addEventListener = function(type, fn, opts){
+    if((type === 'click' || type === 'mousedown' || type === 'pointerdown') &&
+       (this === document || this === document.body || this === window)){
+      var fnStr = fn.toString().toLowerCase();
+      if(fnStr.indexOf('window.open') >= 0 || fnStr.indexOf('location') >= 0 ||
+         fnStr.indexOf('redirect') >= 0 || fnStr.indexOf('.href') >= 0){
+        blocked++;
+        console.log('[FengShield] Suspicious click handler blocked');
+        return;
+      }
+    }
+    return origAddEL.call(this, type, fn, opts);
+  };
+
+  // 8) Aggressive MutationObserver - remove ad iframes, scripts, overlays
   var observer = new MutationObserver(function(mutations){
     mutations.forEach(function(m){
       m.addedNodes.forEach(function(node){
-        if(node.tagName === 'IFRAME' && node.id !== 'pm-iframe'){
-          node.remove();
-          toast('🛡️ Ad iframe blocked');
-        }
-        if(node.tagName === 'SCRIPT' && node.src){
-          var src = node.src || '';
-          var safe = ['vidsrc','vidlink','2embed','multiembed','autoembed','youtube','tmdb','github','googleapis','gstatic'];
-          if(src && !safe.some(function(d){ return src.indexOf(d) >= 0; })){
+        if(!node.tagName) return;
+        var tag = node.tagName.toUpperCase();
+
+        // Block injected iframes (not our player)
+        if(tag === 'IFRAME' && node.id !== 'pm-iframe'){
+          var src = node.src || node.getAttribute('src') || '';
+          if(!isSafeURL(src)){
             node.remove();
-            toast('🛡️ Ad script blocked');
+            blocked++;
+            return;
+          }
+        }
+
+        // Block ad scripts
+        if(tag === 'SCRIPT'){
+          var ssrc = node.src || '';
+          if(ssrc && !isSafeURL(ssrc)){
+            node.remove();
+            blocked++;
+            return;
+          }
+        }
+
+        // Block ad-related divs (fixed/absolute positioned overlays)
+        if(tag === 'DIV' || tag === 'SECTION' || tag === 'ASIDE'){
+          var st = node.style;
+          if(st && (st.position === 'fixed' || st.position === 'absolute')){
+            var zIdx = parseInt(st.zIndex || '0');
+            // Overlays with very high z-index injected by ads
+            if(zIdx > 9000 && !node.closest('#player-modal') && !node.closest('#toast')){
+              node.remove();
+              blocked++;
+              return;
+            }
+          }
+          // Check for common ad class names/ids
+          var cls = (node.className || '').toString().toLowerCase();
+          var nid = (node.id || '').toLowerCase();
+          var adPatterns = ['popup','overlay','banner','adsbox','ad-container','ad_container',
+                            'adsbygoogle','sponsored','promo','interstitial','preroll'];
+          if(adPatterns.some(function(p){ return cls.indexOf(p)>=0 || nid.indexOf(p)>=0; })){
+            node.remove();
+            blocked++;
+            return;
+          }
+        }
+
+        // Block ad links
+        if(tag === 'A'){
+          var href = node.href || '';
+          if(isAdURL(href)){
+            node.remove();
+            blocked++;
+            return;
+          }
+        }
+
+        // Block ad images/tracking pixels
+        if(tag === 'IMG'){
+          var isrc = node.src || '';
+          if(isAdURL(isrc) || (node.width <= 2 && node.height <= 2)){
+            node.remove();
+            blocked++;
+            return;
           }
         }
       });
     });
   });
   observer.observe(document, { childList: true, subtree: true });
+
+  // 9) Periodic cleanup sweep - remove any ad elements that snuck in
+  setInterval(function(){
+    // Remove any non-player iframes
+    document.querySelectorAll('iframe:not(#pm-iframe)').forEach(function(f){
+      var src = f.src || '';
+      if(!isSafeURL(src)){
+        f.remove();
+        blocked++;
+      }
+    });
+    // Remove suspicious overlays
+    document.querySelectorAll('[style*="z-index"]').forEach(function(el){
+      if(el.closest('#player-modal') || el.closest('#nav') || el.closest('#toast') ||
+         el.closest('#filter-drawer') || el.closest('#actor-profile') || el.id === 'toast') return;
+      var z = parseInt(window.getComputedStyle(el).zIndex || '0');
+      if(z > 9500 && el.id !== 'player-modal' && !el.closest('#player-modal')){
+        el.remove();
+        blocked++;
+      }
+    });
+  }, 2000);
+
+  // 10) Prevent location changes via setters
+  try {
+    var origLocation = window.location;
+    var locDesc = Object.getOwnPropertyDescriptor(window, 'location');
+    if(locDesc && locDesc.configurable){
+      // Only intercept if configurable
+    }
+  } catch(e){}
+
+  // 11) Block document.write abuse (often used by ad scripts)
+  var origDocWrite = document.write.bind(document);
+  document.write = function(html){
+    if(typeof html === 'string' && (html.indexOf('<script') >= 0 || html.indexOf('<iframe') >= 0)){
+      var lower = html.toLowerCase();
+      if(!isSafeURL(lower)){
+        blocked++;
+        console.log('[FengShield] document.write blocked');
+        return;
+      }
+    }
+    return origDocWrite(html);
+  };
+
+  console.log('[FengShield] Ad blocker active');
 }
 
 // ========== TOAST ==========
@@ -1486,6 +1713,7 @@ var toastT;
 function toast(msg){var t=ge('toast');t.textContent=msg;t.classList.add('on');clearTimeout(toastT);toastT=setTimeout(function(){t.classList.remove('on');},2500);}
 
 // ========== INIT ==========
+installAB(); // Start ad blocking immediately on page load
 updateWLCount();
 loadHome();
 </script>
