@@ -381,6 +381,13 @@ body{
 .card-spotlight-meta{font-size:10px;color:rgba(255,255,255,.6);display:flex;gap:6px}
 
 /* ── BROWSE PAGE ── */
+.page-back-btn{
+  flex-shrink:0;width:36px;height:36px;border-radius:50%;
+  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);
+  color:var(--text);font-size:18px;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:all .2s;font-family:var(--font);
+}
+.page-back-btn:hover{background:rgba(229,9,26,.25);border-color:rgba(229,9,26,.4);color:#fff}
 .browse-topbar{
   display:flex;align-items:center;gap:10px;
   padding:0 20px 10px;flex-wrap:wrap;
@@ -979,6 +986,7 @@ body{
 <!-- MOVIES PAGE -->
 <div id="movies-page" class="page">
   <div class="browse-topbar">
+    <button class="page-back-btn" onclick="goBack()" title="Back">&#8592;</button>
     <div class="sort-tab-row" id="mv-sort-row"></div>
     <button class="filter-trigger-btn" id="mv-filter-btn" onclick="openFilter('movies')">&#9707; Filter</button>
   </div>
@@ -988,6 +996,7 @@ body{
 <!-- SERIES PAGE -->
 <div id="series-page" class="page">
   <div class="browse-topbar">
+    <button class="page-back-btn" onclick="goBack()" title="Back">&#8592;</button>
     <div class="sort-tab-row" id="sr-sort-row"></div>
     <button class="filter-trigger-btn" id="sr-filter-btn" onclick="openFilter('series')">&#9707; Filter</button>
   </div>
@@ -997,6 +1006,7 @@ body{
 <!-- ANIME PAGE -->
 <div id="anime-page" class="page">
   <div class="browse-topbar">
+    <button class="page-back-btn" onclick="goBack()" title="Back">&#8592;</button>
     <div class="sort-tab-row" id="an-sort-row"></div>
     <button class="filter-trigger-btn" id="an-filter-btn" onclick="openFilter('anime')">&#9707; Filter</button>
   </div>
@@ -1006,6 +1016,7 @@ body{
 <!-- CARTOONS PAGE -->
 <div id="cartoons-page" class="page">
   <div class="browse-topbar">
+    <button class="page-back-btn" onclick="goBack()" title="Back">&#8592;</button>
     <div class="sort-tab-row" id="ct-sort-row"></div>
     <button class="filter-trigger-btn" id="ct-filter-btn" onclick="openFilter('cartoons')">&#9707; Filter</button>
   </div>
@@ -1064,8 +1075,9 @@ body{
 
 <!-- WATCHLIST PAGE -->
 <div id="wl-page" class="page">
-  <div style="padding:16px 20px 10px;display:flex;align-items:center;justify-content:space-between">
-    <div style="font-size:20px;font-weight:800;font-family:'Syne',sans-serif">My Watchlist</div>
+  <div style="padding:16px 20px 10px;display:flex;align-items:center;gap:12px">
+    <button class="page-back-btn" onclick="goBack()" title="Back">&#8592;</button>
+    <div style="font-size:20px;font-weight:800;font-family:'Syne',sans-serif;flex:1">My Watchlist</div>
     <button class="btn btn-ghost btn-sm" onclick="clearWatchlist()">Clear All</button>
   </div>
   <div class="grid" id="wl-grid"></div>
@@ -1073,8 +1085,9 @@ body{
 
 <!-- SEARCH RESULTS PAGE -->
 <div id="search-page" class="page">
-  <div style="padding:16px 20px 10px;display:flex;align-items:center;justify-content:space-between">
-    <div style="font-size:16px;font-weight:700" id="sr-title">Results</div>
+  <div style="padding:16px 20px 10px;display:flex;align-items:center;gap:12px">
+    <button class="page-back-btn" onclick="goBack()" title="Back">&#8592;</button>
+    <div style="font-size:16px;font-weight:700;flex:1" id="sr-title">Results</div>
     <button class="btn btn-ghost btn-sm" onclick="clearSearch()">&#215; Clear</button>
   </div>
   <div class="grid" id="sr-grid2"></div>
