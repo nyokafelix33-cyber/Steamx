@@ -1045,6 +1045,32 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
   <div class="grid" id="sr-grid2"></div>
 </div>
 
+
+<!-- CHANNELS PAGE -->
+<div id="channels-page">
+  <div class="channels-page-header">
+    <button onclick="closeChannels()" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);color:#fff;width:36px;height:36px;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0">&#8592;</button>
+    <h2>Movie Channels</h2>
+  </div>
+  <div class="channels-grid" id="channels-grid">
+    <div class="spinwrap"><div class="spinner"></div></div>
+  </div>
+</div>
+
+<!-- PROVIDER MOVIES PAGE -->
+<div id="provider-page">
+  <div class="provider-header">
+    <button onclick="closeProvider()" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);color:#fff;width:36px;height:36px;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0">&#8592;</button>
+    <div class="provider-header-logo"><img id="provider-logo-img" src="" alt=""></div>
+    <h2 id="provider-name-title">Loading...</h2>
+  </div>
+  <div style="display:flex;gap:8px;padding:12px 16px 4px;overflow-x:auto;scrollbar-width:none;">
+    <button class="pm-srv active" id="prov-tab-movie" onclick="switchProviderTab('movie',this)">Movies</button>
+    <button class="pm-srv" id="prov-tab-tv" onclick="switchProviderTab('tv',this)">TV Shows</button>
+  </div>
+  <div class="grid" id="provider-grid" style="padding-bottom:40px;"></div>
+</div>
+
 <!-- FULLSCREEN PLAYER MODAL -->
 <div id="player-modal">
   <div id="pm-topbar">
@@ -1243,11 +1269,13 @@ function loadHome(){
 
 function renderHome(d){
   var h='';
+  h+='<div class="section"><div class="sec-head"><div class="sec-title">&#127916; Movie Channels</div><span class="sec-see-all" onclick="openChannels()">See All ›</span></div><div class="channels-strip" id="home-channels-strip"><div class="spinwrap" style="padding:20px"><div class="spinner"></div></div></div></div>';
   h+=makeSection('&#128293; Trending',d.trending||[],'',true);
   h+=makeSection('&#127916; Popular Movies',d.popular||[],'movie',false);
   h+=makeSection('&#128250; Top Series',d.tv||[],'tv',false);
   h+=makeSection('&#127981; Anime',d.anime||[],'tv',false);
   ge('home-sections').innerHTML=h;
+  loadHomeChannels();
 }
 
 function makeSection(title,items,type,isTrending){
@@ -1838,6 +1866,105 @@ function installAB(){
     if(ge('player-modal')&&ge('player-modal').classList.contains('open')){
       e.preventDefault();e.returnValue='';return'';
     }
+  });
+}
+
+
+// ═══ MOVIE CHANNELS ═══
+var _allProviders=[];
+var _curProviderId=null;
+var _curProviderType='movie';
+
+function loadHomeChannels(){
+  tmdb('/watch/providers/movie',{watch_region:'US',language:'en-US'}).then(function(d){
+    _allProviders=(d.results||[]).slice(0,20);
+    var strip=ge('home-channels-strip');
+    if(!strip)return;
+    strip.innerHTML=_allProviders.map(function(p){
+      return '<div class="ch-logo" onclick="openProvider('+p.provider_id+',\'' +xe(p.provider_name)+ '\',\'' +iurl(p.logo_path,'w92')+ '\')">'
+        +'<img src="'+iurl(p.logo_path,'w92')+'" alt="'+xe(p.provider_name)+'" onerror="this.parentNode.style.background=\'#222\'">'
+        +'</div>';
+    }).join('');
+  }).catch(function(){
+    var strip=ge('home-channels-strip');
+    if(strip)strip.innerHTML='<div style="color:var(--muted);font-size:13px;padding:20px">Could not load channels</div>';
+  });
+}
+
+function openChannels(){
+  var pg=ge('channels-page');
+  pg.classList.add('open');
+  document.body.style.overflow='hidden';
+  if(_allProviders.length){
+    renderChannelsGrid(_allProviders);
+  } else {
+    tmdb('/watch/providers/movie',{watch_region:'US',language:'en-US'}).then(function(d){
+      _allProviders=d.results||[];
+      renderChannelsGrid(_allProviders);
+    });
+  }
+}
+
+function renderChannelsGrid(providers){
+  var grid=ge('channels-grid');
+  if(!grid)return;
+  grid.innerHTML=providers.map(function(p){
+    return '<div class="ch-card" onclick="openProvider('+p.provider_id+',\'' +xe(p.provider_name)+ '\',\'' +iurl(p.logo_path,'w185')+ '\')">'
+      +'<img src="'+iurl(p.logo_path,'w185')+'" alt="'+xe(p.provider_name)+'" onerror="this.style.display=\'none\'">'
+      +'</div>';
+  }).join('');
+}
+
+function closeChannels(){
+  ge('channels-page').classList.remove('open');
+  document.body.style.overflow='';
+}
+
+function openProvider(id,name,logo){
+  _curProviderId=id;
+  _curProviderType='movie';
+  ge('provider-name-title').textContent=name;
+  ge('provider-logo-img').src=logo;
+  ge('provider-page').classList.add('open');
+  document.body.style.overflow='hidden';
+  // reset tabs
+  document.querySelectorAll('#prov-tab-movie,#prov-tab-tv').forEach(function(b){b.classList.remove('active');});
+  ge('prov-tab-movie').classList.add('active');
+  loadProviderContent(id,'movie');
+}
+
+function closeProvider(){
+  ge('provider-page').classList.remove('open');
+  document.body.style.overflow='';
+}
+
+function switchProviderTab(type,btn){
+  _curProviderType=type;
+  document.querySelectorAll('#prov-tab-movie,#prov-tab-tv').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');
+  loadProviderContent(_curProviderId,type);
+}
+
+function loadProviderContent(id,type){
+  var grid=ge('provider-grid');
+  grid.innerHTML='<div class="spinwrap"><div class="spinner"></div></div>';
+  var endpoint=type==='tv'?'/discover/tv':'/discover/movie';
+  tmdb(endpoint,{
+    with_watch_providers:id,
+    watch_region:'US',
+    sort_by:'popularity.desc',
+    language:'en-US'
+  }).then(function(d){
+    var items=d.results||[];
+    if(!items.length){
+      grid.innerHTML='<div style="padding:40px;text-align:center;color:var(--muted)">No content found</div>';
+      return;
+    }
+    grid.innerHTML=items.map(function(item){
+      return makeCard(item,type,false);
+    }).join('');
+  }).catch(function(){
+    grid.innerHTML='<div style="padding:40px;text-align:center;color:var(--muted)">Failed to load</div>';
   });
 }
 
