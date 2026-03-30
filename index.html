@@ -881,6 +881,107 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
 .cast-card-tap:hover .cast-img-overlay,
 .cast-card-tap:active .cast-img-overlay{opacity:1;}
 
+/* ── MOVIE CHANNELS STRIP ── */
+.channels-strip{
+  display:flex;
+  flex-direction:row;
+  gap:10px;
+  overflow-x:auto;
+  overflow-y:hidden;
+  padding:4px 16px 12px;
+  scrollbar-width:none;
+  -webkit-overflow-scrolling:touch;
+  white-space:nowrap;
+}
+.channels-strip::-webkit-scrollbar{display:none}
+.ch-logo{
+  display:inline-flex;
+  flex-direction:column;
+  flex-shrink:0;
+  width:72px;height:72px;
+  border-radius:14px;
+  overflow:hidden;
+  background:#1a1a2a;
+  border:2px solid rgba(255,255,255,.08);
+  cursor:pointer;
+  transition:transform .2s;
+  align-items:center;justify-content:center;
+}
+.ch-logo:active{transform:scale(.92)}
+.ch-logo img{width:100%;height:100%;object-fit:cover;}
+
+/* ── CHANNELS FULL PAGE ── */
+#channels-page{
+  display:none;
+  visibility:hidden;
+  position:fixed;
+  inset:0;
+  z-index:8000;
+  background:var(--bg);
+  overflow-y:auto;
+  overflow-x:hidden;
+}
+#channels-page.open{display:block;visibility:visible;}
+.channels-page-header{
+  position:sticky;top:0;z-index:10;
+  background:var(--bg);
+  display:flex;align-items:center;gap:14px;
+  padding:14px 16px;
+  border-bottom:1px solid rgba(255,255,255,.07);
+}
+.channels-page-header h2{font-size:18px;font-weight:800;flex:1}
+.channels-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+  padding:16px;
+}
+.ch-card{
+  border-radius:16px;overflow:hidden;
+  background:#1a1a2a;
+  border:2px solid rgba(255,255,255,.06);
+  cursor:pointer;
+  transition:transform .2s;
+  aspect-ratio:1;
+  display:flex;align-items:center;justify-content:center;
+}
+.ch-card:active{transform:scale(.93);}
+.ch-card img{width:100%;height:100%;object-fit:cover;}
+
+/* ── PROVIDER PAGE ── */
+#provider-page{
+  display:none;
+  visibility:hidden;
+  position:fixed;
+  inset:0;
+  z-index:8100;
+  background:var(--bg);
+  overflow-y:auto;
+  overflow-x:hidden;
+}
+#provider-page.open{display:block;visibility:visible;}
+.provider-header{
+  position:sticky;top:0;z-index:10;
+  background:var(--bg);
+  display:flex;align-items:center;gap:14px;
+  padding:14px 16px;
+  border-bottom:1px solid rgba(255,255,255,.07);
+}
+.provider-header-logo{
+  width:40px;height:40px;border-radius:10px;overflow:hidden;flex-shrink:0;
+}
+.provider-header-logo img{width:100%;height:100%;object-fit:cover;}
+.provider-header h2{font-size:16px;font-weight:800;flex:1;}
+
+/* ── SEC-SEE-ALL ── */
+.sec-see-all{
+  font-size:12px;font-weight:600;color:var(--red);cursor:pointer;
+  padding:4px 10px;border-radius:8px;
+  border:1px solid var(--red);
+  background:rgba(229,9,26,.08);white-space:nowrap;
+}
+.sec-head{display:flex;align-items:center;justify-content:space-between;padding:0 16px 10px;}
+
 </style>
   <!-- Ad & redirect protection -->
   <meta http-equiv="Content-Security-Policy" content="
@@ -1269,7 +1370,7 @@ function loadHome(){
 
 function renderHome(d){
   var h='';
-  h+='<div class="section"><div class="sec-head"><div class="sec-title">&#127916; Movie Channels</div><span class="sec-see-all" onclick="openChannels()">See All ›</span></div><div class="channels-strip" id="home-channels-strip"><div class="spinwrap" style="padding:20px"><div class="spinner"></div></div></div></div>';
+  h+='<div class="section"><div class="sec-head"><div class="sec-title">&#127916; Movie Channels</div><span class="sec-see-all" onclick="openChannels()">See All ›</span></div></div><div class="channels-strip" id="home-channels-strip"><div class="spinwrap" style="padding:20px"><div class="spinner"></div></div></div>';
   h+=makeSection('&#128293; Trending',d.trending||[],'',true);
   h+=makeSection('&#127916; Popular Movies',d.popular||[],'movie',false);
   h+=makeSection('&#128250; Top Series',d.tv||[],'tv',false);
