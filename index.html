@@ -233,7 +233,10 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
   padding:2px 5px;font-size:9px;font-weight:800;letter-spacing:.3px;
 }
 
-
+@keyframes newBadgeGlow {
+  0%,100% { box-shadow:0 0 6px rgba(255,100,0,.5); }
+  50%    { box-shadow:0 2px 16px rgba(255,100,0,.85); }
+}
 .card-title{font-size:12px;font-weight:600;line-height:1.3;color:var(--text)}
 .card-meta{font-size:10px;color:var(--muted);margin-top:2px}
 
@@ -394,7 +397,6 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
 #player-modal.open{display:flex}
 
 /* TOP BAR — fixed height, never hidden, always clickable */
-#pm-topbar.hidden,#pm-bottombar.hidden{opacity:0;pointer-events:none;}
 #pm-topbar{
   flex:0 0 54px;
   width:100%;
@@ -1215,7 +1217,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
     <div class="pm-ep-badge" id="pm-ep-badge" style="display:none"></div>
   </div>
   <div id="pm-iframe-wrap">
-    <iframe id="pm-iframe" src="" allowfullscreen allow="autoplay;encrypted-media;picture-in-picture" referrerpolicy="no-referrer" ></iframe>
+    <iframe id="pm-iframe" src="" allowfullscreen allow="autoplay;encrypted-media;picture-in-picture" referrerpolicy="no-referrer" sandbox="allow-scripts allow-same-origin allow-forms allow-presentation allow-pointer-lock"></iframe>
     <!-- Ad shield overlay -->
     <div id="ad-shield-overlay"></div>
   </div>
@@ -1246,7 +1248,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
   <div class="nav-item active" onclick="go('home')"><i>🏠</i>Home</div>
   <div class="nav-item" onclick="go('movies')"><i>🎬</i>Movies</div>
   <div class="nav-item" onclick="go('series')"><i>📺</i>Series</div>
-  <div class="nav-item" onclick="openChannels()"><i>📡</i>Channels</div>
+  <div class="nav-item" onclick="go('channels')"><i>📡</i>Channels</div>
   <div class="nav-item" onclick="go('wl')"><i>⭐</i>Watchlist</div>
 </div>
 
@@ -1665,8 +1667,8 @@ function openDetail(id,type){
   });
 }
 
-function toggleDub(){
-  pDubMode=!pDubMode;
+function toggleDub(checked){
+  pDubMode=checked!==undefined?checked:!pDubMode;
   ge('dub-state-lbl').textContent=pDubMode?'Dub':'Sub';
   toast(pDubMode?'English Dub mode':'Japanese Sub mode');
 }
@@ -1988,7 +1990,7 @@ function renderWL(){
 var searchDebounce=null;
 function doSearch(q){
   var clr=ge('sclr');
-  if(clr)clr.className='btn'+(q?' show':'');
+  if(clr)clr.className=''+(q?' show':'');
   clearTimeout(searchDebounce);
   if(!q){if(curPage==='search')go('home',true);return;}
   searchDebounce=setTimeout(function(){
@@ -2002,59 +2004,23 @@ function doSearch(q){
     });
   },400);
 }
-function clearSearch(){ge('sinput').value='';ge('sclr').className='btn';if(curPage==='search')go('home',true);}
+function clearSearch(){ge('sinput').value='';ge('sclr').className='';if(curPage==='search')go('home',true);}
 
 // ═══ AD SHIELD ═══
 function installAB(){
   if(window._abOn)return;window._abOn=true;
-
-  // Kill window.open popups
+  var orig=window.open;
   window.open=function(url){
     if(!url)return null;
-    var safe=['youtube','youtu.be','tmdb','vidsrc','vidlink','videasy','embed.su','vidsrc.rip'];
-    if(safe.some(function(d){return String(url).indexOf(d)>=0;}))return null;
-    toast('🛡 Ad blocked!');return null;
+    var safe=['youtube','youtu.be','tmdb','vidsrc','vidlink','videasy','vidfast','embed.su','multiembed','goojara','soaper','archive.org','dl.vidsrc'];
+    if(safe.some(function(d){return url.indexOf(d)>=0;}))return orig.apply(window,arguments);
+    toast('Ad blocked!');return{closed:false,close:function(){},focus:function(){}};
   };
-
-  // Kill alert/confirm used by ad scripts
-  window.alert=function(){};
-  window.confirm=function(){return false;};
-
-  // visibilitychange — catches redirect on Android the instant it fires
-  document.addEventListener('visibilitychange',function(){
-    if(document.hidden&&ge('player-modal').classList.contains('open')){
-      history.back();
+  window.addEventListener('beforeunload',function(e){
+    if(ge('player-modal')&&ge('player-modal').classList.contains('open')){
+      e.preventDefault();e.returnValue='';return'';
     }
   });
-
-  // pagehide — iOS Safari
-  window.addEventListener('pagehide',function(){
-    if(ge('player-modal').classList.contains('open')){
-      history.back();
-    }
-  },true);
-
-  // Block external link clicks
-  document.addEventListener('click',function(e){
-    var a=e.target.closest('a[href]');
-    if(!a)return;
-    var href=String(a.href||'');
-    if(href.indexOf('javascript')>=0||href.indexOf('#')===0)return;
-    if(href.indexOf(location.hostname)<0&&href.indexOf('http')===0){
-      e.preventDefault();e.stopImmediatePropagation();
-      toast('🛡 Ad blocked!');
-    }
-  },true);
-
-  // MutationObserver — kills injected ad iframes instantly
-  var obs=new MutationObserver(function(muts){
-    muts.forEach(function(m){
-      m.addedNodes.forEach(function(n){
-        if(n.tagName==='IFRAME'&&n.id!=='pm-iframe'){n.remove();toast('🛡 Ad blocked!');}
-      });
-    });
-  });
-  obs.observe(document.documentElement,{childList:true,subtree:true});
 }
 
 // ═══ MOVIE CHANNELS ═══
@@ -2179,8 +2145,8 @@ function toast(msg){var t=ge('toast');t.textContent=msg;t.classList.add('on');cl
 // ═══ THEME TOGGLE (NEW) ═══
 function toggleTheme(){
   var isDark = document.body.getAttribute('data-theme') === 'dark';
-  document.body.setAttribute('data-theme', isDark ? 'light' : 'dark');
-  localStorage.setItem('fw-theme', isDark ? 'light' : 'dark');
+  if(isDark){document.body.removeAttribute('data-theme');localStorage.setItem('fw-theme','light');}
+  else{document.body.setAttribute('data-theme','dark');localStorage.setItem('fw-theme','dark');}
 }
 
 // ═══ PWA (NEW) ═══
@@ -2194,6 +2160,7 @@ if ('serviceWorker' in navigator) {
 // ═══ INIT ═══
 updateWLCount();
 loadHome();
+loadHomeChannels();  // 60+ channels now loaded
 </script>
 </body>
 </html>
