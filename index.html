@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
+<meta name="theme-color" content="#2563eb"/>
 <title>Feng World</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
 <style>
@@ -12,6 +13,10 @@
   --text:#1f2937;--muted:#6b7280;--bdr:#e5e7eb;
   --card-r:14px;--nav-h:64px;
   --font:'Space Grotesk',sans-serif;--font2:'DM Sans',sans-serif;
+}
+[data-theme="dark"]{
+  --bg:#0a0a14;--bg2:#12121f;--bg3:#1a1a2a;--bg4:#25253a;
+  --text:#f8f9fa;--muted:#a1a1aa;--bdr:#2a2a3a;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:100vh;overflow-x:hidden}
@@ -431,7 +436,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
   display:block;
   background:#000;
 }
-/* Only block top banner strip ~50px — ads appear there, controls don't */
+/* Only block top banner strip \~50px — ads appear there, controls don't */
 #ad-shield-overlay{
   position:absolute;top:0;left:0;right:0;
   height:60px; /* covers top banner ad zone */
@@ -837,7 +842,6 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
   display:flex;gap:10px;overflow-x:auto;
   padding-bottom:8px;scrollbar-width:none;
 }
-.actor-known-for::-webkit-scrollbar{display:none}
 .actor-kf-chip{
   flex-shrink:0;padding:6px 14px;border-radius:20px;
   background:rgba(229,9,26,.12);border:1px solid rgba(229,9,26,.3);
@@ -982,6 +986,37 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
 }
 .sec-head{display:flex;align-items:center;justify-content:space-between;padding:0 16px 10px;}
 
+/* NEW: Bottom Navigation for Mobile App */
+#bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 70px;
+  background: rgba(10,10,20,0.95);
+  backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(255,255,255,0.1);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  z-index: 10000;
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.3);
+}
+.nav-item {
+  text-align: center;
+  font-size: 10px;
+  color: var(--muted);
+  transition: all .2s;
+}
+.nav-item.active {
+  color: #2563eb;
+  transform: scale(1.1);
+}
+.nav-item i {
+  font-size: 26px;
+  display: block;
+  margin-bottom: 3px;
+}
 </style>
   <!-- Ad & redirect protection -->
   <meta http-equiv="Content-Security-Policy" content="
@@ -1000,7 +1035,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
   ">
   <meta name="referrer" content="no-referrer">
 </head>
-<body>
+<body data-theme="dark">
 
 <!-- NAV -->
 <nav id="nav">
@@ -1206,6 +1241,15 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
 
 <div id="toast"></div>
 
+<!-- NEW BOTTOM NAV -->
+<div id="bottom-nav">
+  <div class="nav-item active" onclick="go('home')"><i>🏠</i>Home</div>
+  <div class="nav-item" onclick="go('movies')"><i>🎬</i>Movies</div>
+  <div class="nav-item" onclick="go('series')"><i>📺</i>Series</div>
+  <div class="nav-item" onclick="go('channels')"><i>📡</i>Channels</div>
+  <div class="nav-item" onclick="go('wl')"><i>⭐</i>Watchlist</div>
+</div>
+
 <script>
 var API='https://api.themoviedb.org/3';
 var KEY='ea593c3fa4d4942ece315977cd7e32c9';
@@ -1313,6 +1357,10 @@ function go(page,noHistory){
   else if(page==='anime')loadBrowse('anime');
   else if(page==='wl')renderWL();
   updateWLCount();
+  // Update bottom nav
+  document.querySelectorAll('#bottom-nav .nav-item').forEach(function(item){
+    item.classList.toggle('active', item.getAttribute('onclick').includes("'"+page+"'"));
+  });
 }
 function goBack(){go(prevPage,true);}
 
@@ -1350,7 +1398,6 @@ function loadHome(){
     tmdb('/discover/tv',{sort_by:'popularity.desc','first_air_date.gte':'2025-01-01','vote_count.gte':'20'}),
     tmdb('/discover/tv',{with_genres:'16',with_keywords:'210024|287501',sort_by:'popularity.desc'})
   ]).then(function(rs){
-    // Hero: merge now_playing movies + on_the_air shows, sorted by popularity
     var nowPlaying=(rs[0].results||[]).map(function(d){d.media_type='movie';return d;});
     var onAir=(rs[1].results||[]).map(function(d){d.media_type='tv';return d;});
     var merged=[];
@@ -1470,7 +1517,6 @@ function fetchBrowse(pg,pageNum){
 function loadMoreBrowse(pg){
   browsePage[pg]++;
   var gid=pg==='movies'?'mv-grid':pg==='series'?'sr-grid':'an-grid';
-  // Remove load more button
   var btn=ge(gid).querySelector('button');
   if(btn)btn.parentElement.remove();
   fetchBrowse(pg,browsePage[pg]);
@@ -1702,7 +1748,6 @@ function openActorProfile(actorId,actorName){
   curActorId=actorId;actorFilter='all';
   var ap=ge('actor-page');
   if(!ap){
-    // create actor page dynamically if not in HTML
     var div=document.createElement('div');
     div.id='actor-page';
     div.style.cssText='display:none;position:fixed;inset:0;z-index:7000;background:var(--bg);overflow-y:auto;';
@@ -1976,7 +2021,6 @@ function installAB(){
   });
 }
 
-
 // ═══ MOVIE CHANNELS ═══
 var _allProviders=[];
 var _curProviderId=null;
@@ -1984,7 +2028,7 @@ var _curProviderType='movie';
 
 function loadHomeChannels(){
   tmdb('/watch/providers/movie',{watch_region:'US',language:'en-US'}).then(function(d){
-    _allProviders=(d.results||[]).slice(0,20);
+    _allProviders=(d.results||[]).slice(0,60);  // UPGRADED TO 60+ CHANNELS
     var strip=ge('home-channels-strip');
     if(!strip)return;
     strip.innerHTML=_allProviders.map(function(p){
@@ -2034,7 +2078,6 @@ function openProvider(id,name,logo){
   ge('provider-logo-img').src=logo;
   ge('provider-page').classList.add('open');
   document.body.style.overflow='hidden';
-  // reset tabs
   document.querySelectorAll('#prov-tab-movie,#prov-tab-tv').forEach(function(b){b.classList.remove('active');});
   ge('prov-tab-movie').classList.add('active');
   loadProviderContent(id,'movie');
@@ -2097,9 +2140,25 @@ function fetchProviderPage(id,type,page){
 var toastT;
 function toast(msg){var t=ge('toast');t.textContent=msg;t.classList.add('on');clearTimeout(toastT);toastT=setTimeout(function(){t.classList.remove('on');},2500);}
 
+// ═══ THEME TOGGLE (NEW) ═══
+function toggleTheme(){
+  var isDark = document.body.getAttribute('data-theme') === 'dark';
+  document.body.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  localStorage.setItem('fw-theme', isDark ? 'light' : 'dark');
+}
+
+// ═══ PWA (NEW) ═══
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('data:text/javascript,' + encodeURIComponent(`
+    self.addEventListener('install', () => self.skipWaiting());
+    self.addEventListener('activate', () => self.clients.claim());
+  `));
+}
+
 // ═══ INIT ═══
 updateWLCount();
 loadHome();
+loadHomeChannels();  // 60+ channels now loaded
 </script>
 </body>
 </html>
