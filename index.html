@@ -1554,6 +1554,9 @@ function setFDYear(pg,val){filterState[pg].year=val;}
 
 // ═══ DETAIL ═══
 function openDetail(id,type){
+  var cp=ge('channels-page');if(cp&&cp.classList.contains('open'))closeChannels();
+  var pp=ge('provider-page');if(pp&&pp.classList.contains('open'))closeProvider();
+  var ap=ge('actor-page');if(ap&&ap.classList.contains('open'))closeActorProfile();
   prevPage=curPage;
   pType=type;pId=id;pEpS=1;pEpE=1;pSrv=0;pIsAnime=false;pDubMode=false;
   go('detail',true);
@@ -2043,29 +2046,47 @@ function switchProviderTab(type,btn){
   _curProviderType=type;
   document.querySelectorAll('#prov-tab-movie,#prov-tab-tv').forEach(function(b){b.classList.remove('active');});
   btn.classList.add('active');
+  ge('provider-grid').innerHTML='<div class="spinwrap"><div class="spinner"></div></div>';
   loadProviderContent(_curProviderId,type);
 }
 
 function loadProviderContent(id,type){
+  _providerPage=1;
+  _providerItems=[];
   var grid=ge('provider-grid');
   grid.innerHTML='<div class="spinwrap"><div class="spinner"></div></div>';
+  fetchProviderPage(id,type,1);
+}
+var _providerPage=1,_providerItems=[];
+function fetchProviderPage(id,type,page){
+  var grid=ge('provider-grid');
   var endpoint=type==='tv'?'/discover/tv':'/discover/movie';
   tmdb(endpoint,{
     with_watch_providers:id,
     watch_region:'US',
     sort_by:'popularity.desc',
-    language:'en-US'
+    language:'en-US',
+    page:page
   }).then(function(d){
     var items=d.results||[];
-    if(!items.length){
+    if(page===1)_providerItems=items;
+    else _providerItems=_providerItems.concat(items);
+    var hasMore=d.page<d.total_pages&&d.page<10;
+    if(!_providerItems.length){
       grid.innerHTML='<div style="padding:40px;text-align:center;color:var(--muted)">No content found</div>';
       return;
     }
-    grid.innerHTML=items.map(function(item){
-      return makeCard(item,type,false);
-    }).join('');
+    var cards=_providerItems.map(function(item){return makeCard(item,type,false);}).join('');
+    if(hasMore){
+      var nextPage=d.page+1;
+      cards+='<div style="grid-column:1/-1;text-align:center;padding:20px">'
+        +'<button class="btn" style="border:1px solid var(--red);color:var(--red);background:transparent" '
+        +'onclick="fetchProviderPage('+id+',\''+type+'\','+nextPage+')">Load More</button></div>';
+    }
+    grid.innerHTML=cards;
+    _providerPage=page;
   }).catch(function(){
-    grid.innerHTML='<div style="padding:40px;text-align:center;color:var(--muted)">Failed to load</div>';
+    if(page===1)grid.innerHTML='<div style="padding:40px;text-align:center;color:var(--muted)">Failed to load</div>';
   });
 }
 
