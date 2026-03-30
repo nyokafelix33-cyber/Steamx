@@ -233,8 +233,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
   padding:2px 5px;font-size:9px;font-weight:800;letter-spacing:.3px;
 }
 
-  50%    { box-shadow:0 2px 16px rgba(255,100,0,.85); }
-}
+
 .card-title{font-size:12px;font-weight:600;line-height:1.3;color:var(--text)}
 .card-meta{font-size:10px;color:var(--muted);margin-top:2px}
 
@@ -395,6 +394,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
 #player-modal.open{display:flex}
 
 /* TOP BAR — fixed height, never hidden, always clickable */
+#pm-topbar.hidden,#pm-bottombar.hidden{opacity:0;pointer-events:none;}
 #pm-topbar{
   flex:0 0 54px;
   width:100%;
@@ -1215,7 +1215,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
     <div class="pm-ep-badge" id="pm-ep-badge" style="display:none"></div>
   </div>
   <div id="pm-iframe-wrap">
-    <iframe id="pm-iframe" src="" allowfullscreen allow="autoplay;encrypted-media;picture-in-picture" referrerpolicy="no-referrer" sandbox="allow-scripts allow-same-origin allow-forms allow-presentation allow-pointer-lock"></iframe>
+    <iframe id="pm-iframe" src="" allowfullscreen allow="autoplay;encrypted-media;picture-in-picture" referrerpolicy="no-referrer" ></iframe>
     <!-- Ad shield overlay -->
     <div id="ad-shield-overlay"></div>
   </div>
@@ -1246,7 +1246,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
   <div class="nav-item active" onclick="go('home')"><i>🏠</i>Home</div>
   <div class="nav-item" onclick="go('movies')"><i>🎬</i>Movies</div>
   <div class="nav-item" onclick="go('series')"><i>📺</i>Series</div>
-  <div class="nav-item" onclick="go('channels')"><i>📡</i>Channels</div>
+  <div class="nav-item" onclick="openChannels()"><i>📡</i>Channels</div>
   <div class="nav-item" onclick="go('wl')"><i>⭐</i>Watchlist</div>
 </div>
 
@@ -2007,18 +2007,54 @@ function clearSearch(){ge('sinput').value='';ge('sclr').className='btn';if(curPa
 // ═══ AD SHIELD ═══
 function installAB(){
   if(window._abOn)return;window._abOn=true;
-  var orig=window.open;
+
+  // Kill window.open popups
   window.open=function(url){
     if(!url)return null;
-    var safe=['youtube','youtu.be','tmdb','vidsrc','vidlink','videasy','vidfast','embed.su','multiembed','goojara','soaper','archive.org','dl.vidsrc'];
-    if(safe.some(function(d){return url.indexOf(d)>=0;}))return orig.apply(window,arguments);
-    toast('Ad blocked!');return{closed:false,close:function(){},focus:function(){}};
+    var safe=['youtube','youtu.be','tmdb','vidsrc','vidlink','videasy','embed.su','vidsrc.rip'];
+    if(safe.some(function(d){return String(url).indexOf(d)>=0;}))return null;
+    toast('🛡 Ad blocked!');return null;
   };
-  window.addEventListener('beforeunload',function(e){
-    if(ge('player-modal')&&ge('player-modal').classList.contains('open')){
-      e.preventDefault();e.returnValue='';return'';
+
+  // Kill alert/confirm used by ad scripts
+  window.alert=function(){};
+  window.confirm=function(){return false;};
+
+  // visibilitychange — catches redirect on Android the instant it fires
+  document.addEventListener('visibilitychange',function(){
+    if(document.hidden&&ge('player-modal').classList.contains('open')){
+      history.back();
     }
   });
+
+  // pagehide — iOS Safari
+  window.addEventListener('pagehide',function(){
+    if(ge('player-modal').classList.contains('open')){
+      history.back();
+    }
+  },true);
+
+  // Block external link clicks
+  document.addEventListener('click',function(e){
+    var a=e.target.closest('a[href]');
+    if(!a)return;
+    var href=String(a.href||'');
+    if(href.indexOf('javascript')>=0||href.indexOf('#')===0)return;
+    if(href.indexOf(location.hostname)<0&&href.indexOf('http')===0){
+      e.preventDefault();e.stopImmediatePropagation();
+      toast('🛡 Ad blocked!');
+    }
+  },true);
+
+  // MutationObserver — kills injected ad iframes instantly
+  var obs=new MutationObserver(function(muts){
+    muts.forEach(function(m){
+      m.addedNodes.forEach(function(n){
+        if(n.tagName==='IFRAME'&&n.id!=='pm-iframe'){n.remove();toast('🛡 Ad blocked!');}
+      });
+    });
+  });
+  obs.observe(document.documentElement,{childList:true,subtree:true});
 }
 
 // ═══ MOVIE CHANNELS ═══
@@ -2158,7 +2194,6 @@ if ('serviceWorker' in navigator) {
 // ═══ INIT ═══
 updateWLCount();
 loadHome();
-loadHomeChannels();  // 60+ channels now loaded
 </script>
 </body>
 </html>
