@@ -228,7 +228,8 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
   padding:2px 5px;font-size:9px;font-weight:800;letter-spacing:.3px;
 }
 
-
+  50%    { box-shadow:0 2px 16px rgba(255,100,0,.85); }
+}
 .card-title{font-size:12px;font-weight:600;line-height:1.3;color:var(--text)}
 .card-meta{font-size:10px;color:var(--muted);margin-top:2px}
 
@@ -389,7 +390,6 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
 #player-modal.open{display:flex}
 
 /* TOP BAR — fixed height, never hidden, always clickable */
-#pm-topbar.hidden,#pm-bottombar.hidden{opacity:0;pointer-events:none;}
 #pm-topbar{
   flex:0 0 54px;
   width:100%;
@@ -881,107 +881,6 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
 .cast-card-tap:hover .cast-img-overlay,
 .cast-card-tap:active .cast-img-overlay{opacity:1;}
 
-/* ── MOVIE CHANNELS STRIP ── */
-.channels-strip{
-  display:flex;
-  flex-direction:row;
-  gap:10px;
-  overflow-x:auto;
-  overflow-y:hidden;
-  padding:4px 16px 12px;
-  scrollbar-width:none;
-  -webkit-overflow-scrolling:touch;
-  white-space:nowrap;
-}
-.channels-strip::-webkit-scrollbar{display:none}
-.ch-logo{
-  display:inline-flex;
-  flex-direction:column;
-  flex-shrink:0;
-  width:72px;height:72px;
-  border-radius:14px;
-  overflow:hidden;
-  background:#1a1a2a;
-  border:2px solid rgba(255,255,255,.08);
-  cursor:pointer;
-  transition:transform .2s;
-  align-items:center;justify-content:center;
-}
-.ch-logo:active{transform:scale(.92)}
-.ch-logo img{width:100%;height:100%;object-fit:cover;}
-
-/* ── CHANNELS FULL PAGE ── */
-#channels-page{
-  display:none;
-  visibility:hidden;
-  position:fixed;
-  inset:0;
-  z-index:8000;
-  background:var(--bg);
-  overflow-y:auto;
-  overflow-x:hidden;
-}
-#channels-page.open{display:block;visibility:visible;}
-.channels-page-header{
-  position:sticky;top:0;z-index:10;
-  background:var(--bg);
-  display:flex;align-items:center;gap:14px;
-  padding:14px 16px;
-  border-bottom:1px solid rgba(255,255,255,.07);
-}
-.channels-page-header h2{font-size:18px;font-weight:800;flex:1}
-.channels-grid{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:12px;
-  padding:16px;
-}
-.ch-card{
-  border-radius:16px;overflow:hidden;
-  background:#1a1a2a;
-  border:2px solid rgba(255,255,255,.06);
-  cursor:pointer;
-  transition:transform .2s;
-  aspect-ratio:1;
-  display:flex;align-items:center;justify-content:center;
-}
-.ch-card:active{transform:scale(.93);}
-.ch-card img{width:100%;height:100%;object-fit:cover;}
-
-/* ── PROVIDER PAGE ── */
-#provider-page{
-  display:none;
-  visibility:hidden;
-  position:fixed;
-  inset:0;
-  z-index:8100;
-  background:var(--bg);
-  overflow-y:auto;
-  overflow-x:hidden;
-}
-#provider-page.open{display:block;visibility:visible;}
-.provider-header{
-  position:sticky;top:0;z-index:10;
-  background:var(--bg);
-  display:flex;align-items:center;gap:14px;
-  padding:14px 16px;
-  border-bottom:1px solid rgba(255,255,255,.07);
-}
-.provider-header-logo{
-  width:40px;height:40px;border-radius:10px;overflow:hidden;flex-shrink:0;
-}
-.provider-header-logo img{width:100%;height:100%;object-fit:cover;}
-.provider-header h2{font-size:16px;font-weight:800;flex:1;}
-
-/* ── SEC-SEE-ALL ── */
-.sec-see-all{
-  font-size:12px;font-weight:600;color:var(--red);cursor:pointer;
-  padding:4px 10px;border-radius:8px;
-  border:1px solid var(--red);
-  background:rgba(229,9,26,.08);white-space:nowrap;
-}
-.sec-head{display:flex;align-items:center;justify-content:space-between;padding:0 16px 10px;}
-
 </style>
   <!-- Ad & redirect protection -->
   <meta http-equiv="Content-Security-Policy" content="
@@ -1127,8 +1026,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
 
 <!-- WATCHLIST PAGE -->
 <div id="wl-page" class="page">
-  <div style="padding:16px 16px 8px;display:flex;align-items:center;gap:12px">
-    <button onclick="goBack()" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);color:#fff;width:36px;height:36px;border-radius:50%;font-size:18px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center">&#8592;</button>
+  <div style="padding:16px 16px 8px">
     <div class="sec-title" style="font-size:20px;padding-left:12px">My Watchlist</div>
   </div>
   <div class="grid" id="wl-grid"></div>
@@ -1136,40 +1034,11 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
 
 <!-- SEARCH RESULTS PAGE -->
 <div id="search-page" class="page">
-  <div style="padding:16px 16px 8px;display:flex;align-items:center;gap:12px;justify-content:space-between">
-    <div style="display:flex;align-items:center;gap:10px">
-      <button onclick="goBack()" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);color:#fff;width:36px;height:36px;border-radius:50%;font-size:18px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center">&#8592;</button>
-      <div class="sec-title" style="font-size:16px;padding-left:12px" id="sr-title">Results</div>
-    </div>
+  <div style="padding:16px 16px 8px;display:flex;align-items:center;justify-content:space-between">
+    <div class="sec-title" style="font-size:16px;padding-left:12px" id="sr-title">Results</div>
     <button class="btn btn-ghost btn-sm" onclick="clearSearch()">&#215; Clear</button>
   </div>
   <div class="grid" id="sr-grid2"></div>
-</div>
-
-
-<!-- CHANNELS PAGE -->
-<div id="channels-page">
-  <div class="channels-page-header">
-    <button onclick="closeChannels()" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);color:#fff;width:36px;height:36px;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0">&#8592;</button>
-    <h2>Movie Channels</h2>
-  </div>
-  <div class="channels-grid" id="channels-grid">
-    <div class="spinwrap"><div class="spinner"></div></div>
-  </div>
-</div>
-
-<!-- PROVIDER MOVIES PAGE -->
-<div id="provider-page">
-  <div class="provider-header">
-    <button onclick="closeProvider()" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);color:#fff;width:36px;height:36px;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0">&#8592;</button>
-    <div class="provider-header-logo"><img id="provider-logo-img" src="" alt=""></div>
-    <h2 id="provider-name-title">Loading...</h2>
-  </div>
-  <div style="display:flex;gap:8px;padding:12px 16px 4px;overflow-x:auto;scrollbar-width:none;">
-    <button class="pm-srv active" id="prov-tab-movie" onclick="switchProviderTab('movie',this)">Movies</button>
-    <button class="pm-srv" id="prov-tab-tv" onclick="switchProviderTab('tv',this)">TV Shows</button>
-  </div>
-  <div class="grid" id="provider-grid" style="padding-bottom:40px;"></div>
 </div>
 
 <!-- FULLSCREEN PLAYER MODAL -->
@@ -1180,7 +1049,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
     <div class="pm-ep-badge" id="pm-ep-badge" style="display:none"></div>
   </div>
   <div id="pm-iframe-wrap">
-    <iframe id="pm-iframe" src="" allowfullscreen allow="autoplay;encrypted-media;picture-in-picture" referrerpolicy="no-referrer"></iframe>
+    <iframe id="pm-iframe" src="" allowfullscreen allow="autoplay;encrypted-media;picture-in-picture" referrerpolicy="no-referrer" sandbox="allow-scripts allow-same-origin allow-forms allow-presentation allow-pointer-lock"></iframe>
     <!-- Ad shield overlay -->
     <div id="ad-shield-overlay"></div>
   </div>
@@ -1370,13 +1239,11 @@ function loadHome(){
 
 function renderHome(d){
   var h='';
-  h+='<div class="section"><div class="sec-head"><div class="sec-title">&#127916; Movie Channels</div><span class="sec-see-all" onclick="openChannels()">See All ›</span></div></div><div class="channels-strip" id="home-channels-strip"><div class="spinwrap" style="padding:20px"><div class="spinner"></div></div></div>';
   h+=makeSection('&#128293; Trending',d.trending||[],'',true);
   h+=makeSection('&#127916; Popular Movies',d.popular||[],'movie',false);
   h+=makeSection('&#128250; Top Series',d.tv||[],'tv',false);
   h+=makeSection('&#127981; Anime',d.anime||[],'tv',false);
   ge('home-sections').innerHTML=h;
-  loadHomeChannels();
 }
 
 function makeSection(title,items,type,isTrending){
@@ -1554,9 +1421,6 @@ function setFDYear(pg,val){filterState[pg].year=val;}
 
 // ═══ DETAIL ═══
 function openDetail(id,type){
-  var cp=ge('channels-page');if(cp&&cp.classList.contains('open'))closeChannels();
-  var pp=ge('provider-page');if(pp&&pp.classList.contains('open'))closeProvider();
-  var ap=ge('actor-page');if(ap&&ap.classList.contains('open'))closeActorProfile();
   prevPage=curPage;
   pType=type;pId=id;pEpS=1;pEpE=1;pSrv=0;pIsAnime=false;pDubMode=false;
   go('detail',true);
@@ -1956,172 +1820,20 @@ function doSearch(q){
 }
 function clearSearch(){ge('sinput').value='';ge('sclr').className='btn';if(curPage==='search')go('home',true);}
 
-// ═══ AD BLOCKER ═══
+// ═══ AD SHIELD ═══
 function installAB(){
   if(window._abOn)return;window._abOn=true;
-
-  // Kill window.open popups completely
+  var orig=window.open;
   window.open=function(url){
     if(!url)return null;
-    var safe=['youtube','youtu.be','tmdb','vidsrc','vidlink','videasy','embed.su','vidsrc.rip'];
-    if(safe.some(function(d){return String(url).indexOf(d)>=0;}))return null;
-    toast('🛡 Ad blocked!');return null;
+    var safe=['youtube','youtu.be','tmdb','vidsrc','vidlink','videasy','vidfast','embed.su','multiembed','goojara','soaper','archive.org','dl.vidsrc'];
+    if(safe.some(function(d){return url.indexOf(d)>=0;}))return orig.apply(window,arguments);
+    toast('Ad blocked!');return{closed:false,close:function(){},focus:function(){}};
   };
-
-  // Kill alert/confirm used by ad scripts
-  window.alert=function(){};
-  window.confirm=function(){return false;};
-
-  // visibilitychange — fires the instant ad redirects you on Android
-  document.addEventListener('visibilitychange',function(){
-    if(document.hidden&&ge('player-modal').classList.contains('open')){
-      history.back();
+  window.addEventListener('beforeunload',function(e){
+    if(ge('player-modal')&&ge('player-modal').classList.contains('open')){
+      e.preventDefault();e.returnValue='';return'';
     }
-  });
-
-  // pagehide — iOS Safari redirect
-  window.addEventListener('pagehide',function(){
-    if(ge('player-modal').classList.contains('open')){
-      history.back();
-    }
-  },true);
-
-  // Block external link clicks
-  document.addEventListener('click',function(e){
-    var a=e.target.closest('a[href]');
-    if(!a)return;
-    var href=String(a.href||'');
-    if(href.indexOf('javascript')>=0||href.indexOf('#')===0)return;
-    if(href.indexOf(location.hostname)<0&&href.indexOf('http')===0){
-      e.preventDefault();e.stopImmediatePropagation();
-      toast('🛡 Ad blocked!');
-    }
-  },true);
-
-  // MutationObserver — kills injected ad iframes instantly
-  var obs=new MutationObserver(function(muts){
-    muts.forEach(function(m){
-      m.addedNodes.forEach(function(n){
-        if(n.tagName==='IFRAME'&&n.id!=='pm-iframe'){n.remove();toast('🛡 Ad blocked!');}
-      });
-    });
-  });
-  obs.observe(document.documentElement,{childList:true,subtree:true});
-}
-
-// ═══ MOVIE CHANNELS ═══
-var _allProviders=[];
-var _curProviderId=null;
-var _curProviderType='movie';
-
-function loadHomeChannels(){
-  tmdb('/watch/providers/movie',{watch_region:'US',language:'en-US'}).then(function(d){
-    _allProviders=(d.results||[]).slice(0,20);
-    var strip=ge('home-channels-strip');
-    if(!strip)return;
-    strip.innerHTML=_allProviders.map(function(p){
-      return '<div class="ch-logo" onclick="openProvider('+p.provider_id+',\'' +xe(p.provider_name)+ '\',\'' +iurl(p.logo_path,'w92')+ '\')">'
-        +'<img src="'+iurl(p.logo_path,'w92')+'" alt="'+xe(p.provider_name)+'" onerror="this.parentNode.style.background=\'#222\'">'
-        +'</div>';
-    }).join('');
-  }).catch(function(){
-    var strip=ge('home-channels-strip');
-    if(strip)strip.innerHTML='<div style="color:var(--muted);font-size:13px;padding:20px">Could not load channels</div>';
-  });
-}
-
-function openChannels(){
-  var pg=ge('channels-page');
-  pg.classList.add('open');
-  document.body.style.overflow='hidden';
-  if(_allProviders.length){
-    renderChannelsGrid(_allProviders);
-  } else {
-    tmdb('/watch/providers/movie',{watch_region:'US',language:'en-US'}).then(function(d){
-      _allProviders=d.results||[];
-      renderChannelsGrid(_allProviders);
-    });
-  }
-}
-
-function renderChannelsGrid(providers){
-  var grid=ge('channels-grid');
-  if(!grid)return;
-  grid.innerHTML=providers.map(function(p){
-    return '<div class="ch-card" onclick="openProvider('+p.provider_id+',\'' +xe(p.provider_name)+ '\',\'' +iurl(p.logo_path,'w185')+ '\')">'
-      +'<img src="'+iurl(p.logo_path,'w185')+'" alt="'+xe(p.provider_name)+'" onerror="this.style.display=\'none\'">'
-      +'</div>';
-  }).join('');
-}
-
-function closeChannels(){
-  ge('channels-page').classList.remove('open');
-  document.body.style.overflow='';
-}
-
-function openProvider(id,name,logo){
-  _curProviderId=id;
-  _curProviderType='movie';
-  ge('provider-name-title').textContent=name;
-  ge('provider-logo-img').src=logo;
-  ge('provider-page').classList.add('open');
-  document.body.style.overflow='hidden';
-  // reset tabs
-  document.querySelectorAll('#prov-tab-movie,#prov-tab-tv').forEach(function(b){b.classList.remove('active');});
-  ge('prov-tab-movie').classList.add('active');
-  loadProviderContent(id,'movie');
-}
-
-function closeProvider(){
-  ge('provider-page').classList.remove('open');
-  document.body.style.overflow='';
-}
-
-function switchProviderTab(type,btn){
-  _curProviderType=type;
-  document.querySelectorAll('#prov-tab-movie,#prov-tab-tv').forEach(function(b){b.classList.remove('active');});
-  btn.classList.add('active');
-  ge('provider-grid').innerHTML='<div class="spinwrap"><div class="spinner"></div></div>';
-  loadProviderContent(_curProviderId,type);
-}
-
-function loadProviderContent(id,type){
-  _providerPage=1;
-  _providerItems=[];
-  var grid=ge('provider-grid');
-  grid.innerHTML='<div class="spinwrap"><div class="spinner"></div></div>';
-  fetchProviderPage(id,type,1);
-}
-var _providerPage=1,_providerItems=[];
-function fetchProviderPage(id,type,page){
-  var grid=ge('provider-grid');
-  var endpoint=type==='tv'?'/discover/tv':'/discover/movie';
-  tmdb(endpoint,{
-    with_watch_providers:id,
-    watch_region:'US',
-    sort_by:'popularity.desc',
-    language:'en-US',
-    page:page
-  }).then(function(d){
-    var items=d.results||[];
-    if(page===1)_providerItems=items;
-    else _providerItems=_providerItems.concat(items);
-    var hasMore=d.page<d.total_pages&&d.page<10;
-    if(!_providerItems.length){
-      grid.innerHTML='<div style="padding:40px;text-align:center;color:var(--muted)">No content found</div>';
-      return;
-    }
-    var cards=_providerItems.map(function(item){return makeCard(item,type,false);}).join('');
-    if(hasMore){
-      var nextPage=d.page+1;
-      cards+='<div style="grid-column:1/-1;text-align:center;padding:20px">'
-        +'<button class="btn" style="border:1px solid var(--red);color:var(--red);background:transparent" '
-        +'onclick="fetchProviderPage('+id+',\''+type+'\','+nextPage+')">Load More</button></div>';
-    }
-    grid.innerHTML=cards;
-    _providerPage=page;
-  }).catch(function(){
-    if(page===1)grid.innerHTML='<div style="padding:40px;text-align:center;color:var(--muted)">Failed to load</div>';
   });
 }
 
