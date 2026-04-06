@@ -14,7 +14,7 @@
     https://vidsrc.xyz https://vidsrc.me
     https://www.youtube.com https://youtube.com
     https://daddylive.pw;
-  navigate-to 'self';
+  navigate-to 'self' https://daddylive.pw;
 ">
 <meta name="referrer" content="no-referrer">
 <title>FengWorld – Watch Free</title>
@@ -627,7 +627,7 @@ button{font-family:'Inter',sans-serif;}
       border:1px solid rgba(29,185,84,.3);border-radius:4px;padding:2px 7px;flex-shrink:0;">● LIVE</div>
   </div>
   <div id="lp-iframe-wrap">
-    <iframe id="lp-iframe" src="" allowfullscreen allow="autoplay;encrypted-media;picture-in-picture;fullscreen" referrerpolicy="no-referrer" loading="eager"></iframe>
+    <iframe id="lp-iframe" src="" allowfullscreen allow="autoplay;encrypted-media;picture-in-picture;fullscreen" loading="eager"></iframe>
   </div>
   <div id="lp-bottombar">
     <div class="lp-srv-row" id="lp-srv-row"></div>
@@ -792,42 +792,50 @@ function clearHistory(){
 
 /* ══ LIVE TV ══ */
 var TV_CHANNELS=[
-  // USA
-  {id:'1',name:'ESPN USA',cat:'Sports',logo:'https://daddylive.pw/logos/espn.png'},
-  {id:'2',name:'ESPN2 USA',cat:'Sports',logo:'https://daddylive.pw/logos/espn2.png'},
-  {id:'39',name:'Fox Sports 1',cat:'Sports',logo:'https://daddylive.pw/logos/fox_sports_1.png'},
-  {id:'54',name:'FOX USA',cat:'News',logo:'https://daddylive.pw/logos/fox.png'},
-  {id:'304',name:'ABC USA',cat:'Entertainment',logo:'https://daddylive.pw/logos/abc.png'},
-  {id:'305',name:'NBC USA',cat:'Entertainment',logo:'https://daddylive.pw/logos/nbc.png'},
-  {id:'306',name:'CBS USA',cat:'Entertainment',logo:'https://daddylive.pw/logos/cbs.png'},
-  {id:'321',name:'HBO USA',cat:'Entertainment',logo:'https://daddylive.pw/logos/hbo.png'},
-  {id:'322',name:'History USA',cat:'Documentary',logo:'https://daddylive.pw/logos/history.png'},
-  {id:'323',name:'CNN',cat:'News',logo:'https://daddylive.pw/logos/cnn.png'},
-  {id:'347',name:'Fox News',cat:'News',logo:'https://daddylive.pw/logos/fox_news.png'},
-  {id:'382',name:'HGTV',cat:'Lifestyle',logo:'https://daddylive.pw/logos/hgtv.png'},
-  {id:'301',name:'Freeform',cat:'Entertainment',logo:'https://daddylive.pw/logos/freeform.png'},
-  {id:'317',name:'FX USA',cat:'Entertainment',logo:'https://daddylive.pw/logos/fx.png'},
-  {id:'318',name:'GOLF Channel',cat:'Sports',logo:'https://daddylive.pw/logos/golf_channel.png'},
-  {id:'319',name:'Game Show Net',cat:'Entertainment',logo:'https://daddylive.pw/logos/game_show_network.png'},
-  {id:'381',name:'FX Movie',cat:'Movies',logo:'https://daddylive.pw/logos/fx_movie.png'},
-  {id:'596',name:'NBA TV USA',cat:'Sports',logo:'https://daddylive.pw/logos/nba_tv.png'},
-  {id:'597',name:'GolTV USA',cat:'Sports',logo:'https://daddylive.pw/logos/goltv.png'},
-  {id:'664',name:'BeIN Sports',cat:'Sports',logo:'https://daddylive.pw/logos/bein_sports.png'},
-  // UK
-  {id:'104',name:'BBC One',cat:'UK',logo:'https://daddylive.pw/logos/bbc_one.png'},
-  {id:'105',name:'BBC Two',cat:'UK',logo:'https://daddylive.pw/logos/bbc_two.png'},
-  {id:'106',name:'ITV',cat:'UK',logo:'https://daddylive.pw/logos/itv.png'},
-  {id:'107',name:'Channel 4',cat:'UK',logo:'https://daddylive.pw/logos/channel_4.png'},
-  {id:'108',name:'Sky Sports',cat:'UK',logo:'https://daddylive.pw/logos/sky_sports_main_event.png'},
-  {id:'109',name:'BT Sport 1',cat:'UK',logo:'https://daddylive.pw/logos/bt_sport_1.png'},
-  {id:'110',name:'Sky Sports F1',cat:'UK',logo:'https://daddylive.pw/logos/sky_sports_f1.png'},
-  {id:'111',name:'TNT Sports 1',cat:'UK',logo:'https://daddylive.pw/logos/bt_sport_2.png'},
-  // International
-  {id:'200',name:'Al Jazeera',cat:'News',logo:'https://daddylive.pw/logos/al_jazeera.png'},
-  {id:'204',name:'Eurosport 1',cat:'Sports',logo:'https://daddylive.pw/logos/eurosport_1.png'},
-  {id:'205',name:'Eurosport 2',cat:'Sports',logo:'https://daddylive.pw/logos/eurosport_2.png'},
-  {id:'150',name:'DAZN 1',cat:'Sports',logo:'https://daddylive.pw/logos/dazn_1.png'},
-  {id:'151',name:'DAZN 2',cat:'Sports',logo:'https://daddylive.pw/logos/dazn_2.png'},
+  // ── SPORTS ──
+  {id:'1',   name:'ESPN',         cat:'Sports',  emoji:'🏈'},
+  {id:'2',   name:'ESPN2',        cat:'Sports',  emoji:'⚽'},
+  {id:'39',  name:'Fox Sports 1', cat:'Sports',  emoji:'🏀'},
+  {id:'758', name:'Fox Sports 2', cat:'Sports',  emoji:'🎾'},
+  {id:'596', name:'NBA TV',       cat:'Sports',  emoji:'🏀'},
+  {id:'318', name:'Golf Channel', cat:'Sports',  emoji:'⛳'},
+  {id:'597', name:'GolTV',        cat:'Sports',  emoji:'⚽'},
+  {id:'664', name:'BeIN Sports',  cat:'Sports',  emoji:'🏆'},
+  {id:'204', name:'Eurosport 1',  cat:'Sports',  emoji:'🎽'},
+  {id:'205', name:'Eurosport 2',  cat:'Sports',  emoji:'🚴'},
+  {id:'150', name:'DAZN 1',       cat:'Sports',  emoji:'🥊'},
+  {id:'151', name:'DAZN 2',       cat:'Sports',  emoji:'🏋️'},
+  // ── NEWS ──
+  {id:'323', name:'CNN',          cat:'News',    emoji:'📺'},
+  {id:'347', name:'Fox News',     cat:'News',    emoji:'📰'},
+  {id:'54',  name:'FOX',          cat:'News',    emoji:'🦊'},
+  {id:'200', name:'Al Jazeera',   cat:'News',    emoji:'🌍'},
+  // ── ENTERTAINMENT ──
+  {id:'304', name:'ABC',          cat:'Entertainment', emoji:'🎬'},
+  {id:'305', name:'NBC',          cat:'Entertainment', emoji:'🎭'},
+  {id:'306', name:'CBS',          cat:'Entertainment', emoji:'📡'},
+  {id:'321', name:'HBO',          cat:'Entertainment', emoji:'🎥'},
+  {id:'301', name:'Freeform',     cat:'Entertainment', emoji:'✨'},
+  {id:'317', name:'FX',           cat:'Entertainment', emoji:'🎞️'},
+  {id:'319', name:'Game Show Net',cat:'Entertainment', emoji:'🎮'},
+  {id:'298', name:'FXX',          cat:'Entertainment', emoji:'🎪'},
+  // ── MOVIES ──
+  {id:'381', name:'FX Movie',     cat:'Movies',  emoji:'🎬'},
+  {id:'381', name:'TCM',          cat:'Movies',  emoji:'🎞️'},
+  {id:'699', name:'Great Am. Family',cat:'Movies',emoji:'👨‍👩‍👧'},
+  // ── LIFESTYLE ──
+  {id:'382', name:'HGTV',         cat:'Lifestyle',emoji:'🏠'},
+  {id:'322', name:'History',      cat:'Lifestyle',emoji:'📜'},
+  {id:'279', name:'FUSE TV',      cat:'Lifestyle',emoji:'🎵'},
+  // ── UK ──
+  {id:'104', name:'BBC One',      cat:'UK',      emoji:'🇬🇧'},
+  {id:'105', name:'BBC Two',      cat:'UK',      emoji:'🇬🇧'},
+  {id:'106', name:'ITV',          cat:'UK',      emoji:'🇬🇧'},
+  {id:'107', name:'Channel 4',    cat:'UK',      emoji:'4️⃣'},
+  {id:'108', name:'Sky Sports',   cat:'UK',      emoji:'🏆'},
+  {id:'109', name:'BT Sport 1',   cat:'UK',      emoji:'⚽'},
+  {id:'110', name:'Sky Sports F1',cat:'UK',      emoji:'🏎️'},
+  {id:'111', name:'TNT Sports',   cat:'UK',      emoji:'💥'},
 ];
 
 var tvCurCat='All';
@@ -960,19 +968,12 @@ function renderSportsDay(data,dayIdx){
 
 function renderFallbackSports(body){
   // Show popular sports channels as fallback
-  var sportChannels=[
-    {id:'1',name:'ESPN USA',emoji:'🏈'},{id:'2',name:'ESPN2',emoji:'⚽'},
-    {id:'39',name:'Fox Sports 1',emoji:'🏀'},{id:'664',name:'BeIN Sports',emoji:'⚽'},
-    {id:'204',name:'Eurosport 1',emoji:'🎾'},{id:'205',name:'Eurosport 2',emoji:'🚴'},
-    {id:'596',name:'NBA TV',emoji:'🏀'},{id:'318',name:'Golf Channel',emoji:'⛳'},
-    {id:'109',name:'BT Sport 1',emoji:'⚽'},{id:'110',name:'Sky Sports F1',emoji:'🏎️'},
-    {id:'150',name:'DAZN 1',emoji:'🥊'},{id:'151',name:'DAZN 2',emoji:'🏋️'},
-  ];
+  var sportChannels=TV_CHANNELS.filter(function(c){return c.cat==='Sports';});
   body.innerHTML='<div style="padding:14px 14px 4px;font-size:.75rem;color:var(--muted);">Popular Sports Channels</div>';
   var grid=document.createElement('div');grid.className='ch-grid';
   sportChannels.forEach(function(ch){
     var div=document.createElement('div');div.className='ch-card';
-    div.innerHTML='<div style="font-size:1.8rem;margin-bottom:6px;">'+ch.emoji+'</div>'
+    div.innerHTML='<div style="font-size:2rem;margin-bottom:7px;line-height:1">'+ch.emoji+'</div>'
       +'<div class="ch-name">'+ch.name+'</div>';
     div.addEventListener('click',function(){playLiveChannel(ch.id,ch.name);});
     grid.appendChild(div);
