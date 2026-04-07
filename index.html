@@ -1858,10 +1858,15 @@ function closeDlPage(){
   document.body.style.overflow='';
 }
 function openVidVault(quality){
-  /* Build a VidVault search URL for the title + quality */
-  var q=encodeURIComponent(pTitle+' '+quality);
-  var url='https://vidvault.ru/?s='+q;
-  byId('dl-ifr-title').textContent=pTitle+' – '+quality;
+  /* VidVault accepts TMDb ID directly — no search page needed */
+  var url;
+  if(pType==='movie'){
+    url='https://vidvault.ru/movie/'+pId;
+  } else {
+    url='https://vidvault.ru/tv/'+pId+'/'+pEpS+'/'+pEpE;
+  }
+  url+='?quality='+encodeURIComponent(quality);
+  byId('dl-ifr-title').textContent=pTitle+' \u2013 '+quality;
   byId('dl-iframe').src=url;
   byId('dl-iframe-wrap').classList.add('open');
 }
