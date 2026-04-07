@@ -13,7 +13,8 @@
     https://autoembed.cc https://www.2embed.stream
     https://vidsrc.xyz https://vidsrc.me
     https://www.youtube.com https://youtube.com
-    https://daddylive.pw;
+    https://daddylive.pw
+    https://vidvault.ru;
   navigate-to 'self' https://daddylive.pw;
 ">
 <meta name="referrer" content="no-referrer">
@@ -398,6 +399,52 @@ button{font-family:'Inter',sans-serif;}
 .mi-live{color:var(--accent)!important;}
 .mi-live svg{color:var(--accent)!important;}
 
+/* DOWNLOAD PAGE */
+#dl-page{display:none;position:fixed;inset:0;z-index:8600;background:var(--bg);
+  overflow-y:auto;padding-bottom:var(--bot-h);}
+#dl-page.open{display:block;}
+.dl-head{position:sticky;top:0;background:var(--bg);z-index:1;border-bottom:1px solid var(--border);
+  height:var(--nav-h);display:flex;align-items:center;gap:10px;padding:0 14px;}
+.dl-head h2{font-size:.95rem;font-weight:700;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.dl-hero{display:flex;gap:14px;padding:18px 14px 14px;border-bottom:1px solid var(--border);}
+.dl-poster{width:90px;flex-shrink:0;border-radius:8px;overflow:hidden;background:var(--card);}
+.dl-poster img{width:100%;aspect-ratio:2/3;object-fit:cover;display:block;}
+.dl-info{flex:1;min-width:0;}
+.dl-info h3{font-size:1rem;font-weight:800;margin-bottom:6px;line-height:1.3;}
+.dl-info .dl-meta{font-size:.72rem;color:var(--muted);margin-bottom:8px;line-height:1.6;}
+.dl-info .dl-badge{display:inline-block;background:rgba(29,185,84,.15);border:1px solid rgba(29,185,84,.3);
+  color:var(--accent);font-size:.62rem;font-weight:700;border-radius:4px;padding:2px 8px;}
+.dl-section{padding:18px 14px 0;}
+.dl-section-title{font-size:.78rem;font-weight:800;color:var(--muted);text-transform:uppercase;
+  letter-spacing:.1em;margin-bottom:12px;}
+.dl-quality-grid{display:flex;flex-direction:column;gap:10px;padding-bottom:8px;}
+.dl-quality-btn{display:flex;align-items:center;justify-content:space-between;
+  padding:14px 16px;border-radius:10px;background:var(--card);border:1.5px solid var(--border);
+  cursor:pointer;transition:all .2s;font-family:inherit;color:#fff;text-decoration:none;}
+.dl-quality-btn:active{border-color:var(--accent);background:rgba(29,185,84,.08);}
+.dl-q-left{display:flex;align-items:center;gap:12px;}
+.dl-q-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;}
+.dl-q-icon.q4k{background:rgba(229,9,26,.15);border:1px solid rgba(229,9,26,.3);}
+.dl-q-icon.q1080{background:rgba(246,201,14,.12);border:1px solid rgba(246,201,14,.25);}
+.dl-q-icon.q720{background:rgba(29,185,84,.12);border:1px solid rgba(29,185,84,.25);}
+.dl-q-icon.q480{background:rgba(100,149,237,.12);border:1px solid rgba(100,149,237,.25);}
+.dl-q-label{text-align:left;}
+.dl-q-res{font-size:.84rem;font-weight:800;line-height:1.2;}
+.dl-q-desc{font-size:.66rem;color:var(--muted);margin-top:1px;}
+.dl-q-size{font-size:.7rem;color:var(--muted);font-weight:600;}
+.dl-q-arrow{color:var(--accent);font-size:1rem;flex-shrink:0;}
+.dl-note{margin:16px 14px;padding:12px 14px;background:rgba(29,185,84,.06);
+  border:1px solid rgba(29,185,84,.18);border-radius:8px;
+  font-size:.72rem;color:rgba(255,255,255,.55);line-height:1.6;}
+.dl-note strong{color:rgba(255,255,255,.75);}
+.dl-iframe-wrap{display:none;position:fixed;inset:0;z-index:8700;background:#000;flex-direction:column;}
+.dl-iframe-wrap.open{display:flex;}
+.dl-ifr-head{flex:0 0 54px;display:flex;align-items:center;gap:10px;padding:8px 14px;
+  background:rgba(0,0,0,.92);border-bottom:1px solid rgba(255,255,255,.08);}
+.dl-ifr-title{flex:1;font-size:.82rem;font-weight:700;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
+.dl-ifr-body{flex:1;position:relative;overflow:hidden;background:#111;}
+.dl-ifr-body iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:none;}
+
 </style>
 </head>
 <body>
@@ -536,6 +583,9 @@ button{font-family:'Inter',sans-serif;}
       </button>
       <button class="dbtn db-wl" onclick="addWL()">
         <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>+ Watchlist
+      </button>
+      <button class="dbtn db-wl db-sh" onclick="openDlPage()" title="Download">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
       </button>
       <button class="dbtn db-wl db-sh" onclick="shareItem()">
         <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
@@ -700,6 +750,97 @@ button{font-family:'Inter',sans-serif;}
     <div style="font-size:1rem;font-weight:800;margin-bottom:12px;color:#fff" id="pm-ep-show"></div>
     <div class="seas-row" id="pm-seas"></div>
     <div id="pm-ep-list"><div class="spin-wrap"><div class="spin"></div></div></div>
+  </div>
+</div>
+
+<!-- DOWNLOAD PAGE -->
+<div id="dl-page">
+  <div class="dl-head">
+    <button class="back-btn" onclick="closeDlPage()">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+    <h2 id="dl-page-title">Download</h2>
+  </div>
+  <div class="dl-hero">
+    <div class="dl-poster"><img id="dl-poster-img" src="" alt=""/></div>
+    <div class="dl-info">
+      <h3 id="dl-item-title"></h3>
+      <div class="dl-meta" id="dl-item-meta"></div>
+      <span class="dl-badge">Free Download</span>
+    </div>
+  </div>
+  <div class="dl-section">
+    <div class="dl-section-title">Choose Quality</div>
+    <div class="dl-quality-grid">
+      <button class="dl-quality-btn" onclick="openVidVault('2160p')">
+        <div class="dl-q-left">
+          <div class="dl-q-icon q4k">🎬</div>
+          <div class="dl-q-label">
+            <div class="dl-q-res">4K Ultra HD</div>
+            <div class="dl-q-desc">2160p · Best Quality</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div class="dl-q-size">~15 GB</div>
+          <div class="dl-q-arrow">↓</div>
+        </div>
+      </button>
+      <button class="dl-quality-btn" onclick="openVidVault('1080p')">
+        <div class="dl-q-left">
+          <div class="dl-q-icon q1080">⭐</div>
+          <div class="dl-q-label">
+            <div class="dl-q-res">Full HD</div>
+            <div class="dl-q-desc">1080p · Great Quality</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div class="dl-q-size">~4 GB</div>
+          <div class="dl-q-arrow">↓</div>
+        </div>
+      </button>
+      <button class="dl-quality-btn" onclick="openVidVault('720p')">
+        <div class="dl-q-left">
+          <div class="dl-q-icon q720">✅</div>
+          <div class="dl-q-label">
+            <div class="dl-q-res">HD</div>
+            <div class="dl-q-desc">720p · Good Quality</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div class="dl-q-size">~1.5 GB</div>
+          <div class="dl-q-arrow">↓</div>
+        </div>
+      </button>
+      <button class="dl-quality-btn" onclick="openVidVault('480p')">
+        <div class="dl-q-left">
+          <div class="dl-q-icon q480">📱</div>
+          <div class="dl-q-label">
+            <div class="dl-q-res">SD</div>
+            <div class="dl-q-desc">480p · Mobile Friendly</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div class="dl-q-size">~700 MB</div>
+          <div class="dl-q-arrow">↓</div>
+        </div>
+      </button>
+    </div>
+  </div>
+  <div class="dl-note">
+    <strong>How it works:</strong> Select a quality above — FengWorld will open the download page inside the app. No external tabs or redirects. Files are sourced via VidVault.
+  </div>
+</div>
+
+<!-- VIDVAULT IFRAME OVERLAY -->
+<div class="dl-iframe-wrap" id="dl-iframe-wrap">
+  <div class="dl-ifr-head">
+    <button class="pm-back" onclick="closeVidVault()">&#8592;</button>
+    <div class="dl-ifr-title" id="dl-ifr-title">Download</div>
+    <div style="font-size:.62rem;color:var(--accent);font-weight:800;background:rgba(29,185,84,.12);
+      border:1px solid rgba(29,185,84,.3);border-radius:4px;padding:2px 8px;flex-shrink:0;">VidVault</div>
+  </div>
+  <div class="dl-ifr-body">
+    <iframe id="dl-iframe" src="" allowfullscreen allow="autoplay;encrypted-media" loading="lazy" referrerpolicy="no-referrer"></iframe>
   </div>
 </div>
 
@@ -1073,7 +1214,24 @@ function gcCard(item,type){
   div.innerHTML=(poster?'<img src="'+poster+'" alt="'+title+'" loading="lazy" onerror="this.src=\'\'"/>'
     :'<div style="aspect-ratio:2/3;background:var(--card);display:flex;align-items:center;justify-content:center;font-size:.65rem;color:var(--muted);padding:8px;text-align:center">'+title+'</div>')
     +(rating?'<div class="gc-rate">★ '+rating+'</div>':'')
+    +'<div class="gc-dl-btn" title="Download" style="position:absolute;bottom:36px;right:5px;'
+      +'width:26px;height:26px;border-radius:6px;background:rgba(0,0,0,.72);'
+      +'display:flex;align-items:center;justify-content:center;z-index:3;cursor:pointer;'
+      +'border:1px solid rgba(255,255,255,.15);">'
+      +'<svg width="13" height="13" fill="none" stroke="#1db954" stroke-width="2.2" viewBox="0 0 24 24">'
+      +'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>'
+      +'<polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div>'
     +'<div class="gc-info"><div class="gc-name">'+title+'</div><div class="gc-year">'+year+'</div></div>';
+  /* Download button — stops propagation so it doesn't open detail */
+  var dlBtn=div.querySelector('.gc-dl-btn');
+  dlBtn.addEventListener('click',function(e){
+    e.stopPropagation();
+    /* Set global state for the download page */
+    pType=type||(item.media_type==='movie'?'movie':'tv');
+    pId=item.id;pTitle=item.title||item.name||'';
+    curDet=item;detData=null;
+    openDlPage();
+  });
   div.addEventListener('click',function(){openDet(item,type);});
   return div;
 }
@@ -1086,7 +1244,22 @@ function pcCard(item,type){
   div.className='pc';
   div.innerHTML=(poster?'<img src="'+poster+'" alt="'+title+'" loading="lazy"/>':'')
     +(rating?'<div class="pc-rate">★ '+rating+'</div>':'')
+    +'<div class="pc-dl" style="position:absolute;bottom:30px;right:5px;'
+      +'width:22px;height:22px;border-radius:5px;background:rgba(0,0,0,.72);'
+      +'display:flex;align-items:center;justify-content:center;z-index:3;cursor:pointer;'
+      +'border:1px solid rgba(255,255,255,.12);">'
+      +'<svg width="11" height="11" fill="none" stroke="#1db954" stroke-width="2.2" viewBox="0 0 24 24">'
+      +'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>'
+      +'<polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div>'
     +'<div class="pc-info"><div class="pc-name">'+title+'</div><div class="pc-year">'+year+'</div></div>';
+  var dlBtn=div.querySelector('.pc-dl');
+  dlBtn.addEventListener('click',function(e){
+    e.stopPropagation();
+    pType=type||(item.media_type==='movie'?'movie':'tv');
+    pId=item.id;pTitle=item.title||item.name||'';
+    curDet=item;detData=null;
+    openDlPage();
+  });
   div.addEventListener('click',function(){openDet(item,type);});
   return div;
 }
@@ -1593,8 +1766,8 @@ function pmLoadSeas(s,btn){
 
 /* ── AD BLOCKER ── */
 function anyPlayerOpen(){
-  var pm=byId('player-modal');var lp=byId('live-player');
-  return (pm&&pm.classList.contains('open'))||(lp&&lp.classList.contains('open'));
+  var pm=byId('player-modal');var lp=byId('live-player');var dl=byId('dl-iframe-wrap');
+  return (pm&&pm.classList.contains('open'))||(lp&&lp.classList.contains('open'))||(dl&&dl.classList.contains('open'));
 }
 
 function installAB(){
@@ -1637,12 +1810,12 @@ function installAB(){
       m.addedNodes.forEach(function(n){
         if(n.nodeType!==1)return;
         /* Remove injected iframes */
-        if(n.tagName==='IFRAME'&&n.id!=='pm-iframe'&&n.id!=='lp-iframe'){
+        if(n.tagName==='IFRAME'&&n.id!=='pm-iframe'&&n.id!=='lp-iframe'&&n.id!=='dl-iframe'){
           n.remove();return;
         }
         /* Also check inside added nodes */
         n.querySelectorAll&&n.querySelectorAll('iframe').forEach(function(f){
-          if(f.id!=='pm-iframe'&&f.id!=='lp-iframe')f.remove();
+          if(f.id!=='pm-iframe'&&f.id!=='lp-iframe'&&f.id!=='dl-iframe')f.remove();
         });
       });
     });
@@ -1663,6 +1836,38 @@ function installAB(){
       configurable:true
     });
   }catch(e){}
+}
+
+/* ── DOWNLOAD PAGE ── */
+function openDlPage(){
+  if(!pId||!pTitle)return;
+  var poster=curDet?iurl(curDet.poster_path,'w342'):'';
+  var year=(curDet?(curDet.release_date||curDet.first_air_date||''):'').slice(0,4);
+  var typeLabel=pType==='movie'?'Movie':'TV Series';
+  byId('dl-page-title').textContent='Download';
+  byId('dl-item-title').textContent=pTitle;
+  byId('dl-item-meta').textContent=(year?year+' · ':'')+typeLabel+(detData&&detData.vote_average?' · ★ '+detData.vote_average.toFixed(1):'');
+  var img=byId('dl-poster-img');
+  img.src=poster||'';
+  img.onerror=function(){this.style.opacity='.3';};
+  byId('dl-page').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeDlPage(){
+  byId('dl-page').classList.remove('open');
+  document.body.style.overflow='';
+}
+function openVidVault(quality){
+  /* Build a VidVault search URL for the title + quality */
+  var q=encodeURIComponent(pTitle+' '+quality);
+  var url='https://vidvault.ru/?s='+q;
+  byId('dl-ifr-title').textContent=pTitle+' – '+quality;
+  byId('dl-iframe').src=url;
+  byId('dl-iframe-wrap').classList.add('open');
+}
+function closeVidVault(){
+  byId('dl-iframe').src='';
+  byId('dl-iframe-wrap').classList.remove('open');
 }
 
 /* ── SHARE ── */
