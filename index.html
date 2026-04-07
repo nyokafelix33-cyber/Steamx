@@ -840,7 +840,8 @@ button{font-family:'Inter',sans-serif;}
       border:1px solid rgba(29,185,84,.3);border-radius:4px;padding:2px 8px;flex-shrink:0;">VidVault</div>
   </div>
   <div class="dl-ifr-body">
-    <iframe id="dl-iframe" src="" allowfullscreen allow="autoplay;encrypted-media" loading="lazy" referrerpolicy="no-referrer"></iframe>
+    <iframe id="dl-iframe" src="" loading="lazy" referrerpolicy="no-referrer"
+      sandbox="allow-scripts allow-same-origin allow-forms allow-downloads allow-popups-to-escape-sandbox"></iframe>
   </div>
 </div>
 
@@ -1794,12 +1795,18 @@ function installAB(){
     if(anyPlayerOpen()){history.back();}
   },true);
 
-  /* 5. Intercept ALL anchor clicks that try to leave the site */
+  /* 5. Intercept ALL anchor clicks that try to leave the site.
+        Exception: allow vidvault.ru direct file/download links through.
+        Block everything else (ads, redirects, etc.) */
   document.addEventListener('click',function(e){
     var a=e.target.closest('a[href]');if(!a)return;
     var h=String(a.href||'');
     if(!h||h.indexOf('javascript')>=0||h.indexOf('#')===0)return;
-    if(h.indexOf(location.hostname)<0&&h.indexOf('http')===0){
+    if(h.indexOf(location.hostname)>=0)return; /* same origin — allow */
+    if(h.indexOf('http')===0){
+      /* Allow real vidvault download file links */
+      if(h.indexOf('vidvault.ru')>=0){return;}
+      /* Block everything else */
       e.preventDefault();e.stopImmediatePropagation();
     }
   },true);
@@ -1869,6 +1876,7 @@ function openVidVault(quality){
   byId('dl-ifr-title').textContent=pTitle+' \u2013 '+quality;
   byId('dl-iframe').src=url;
   byId('dl-iframe-wrap').classList.add('open');
+  installAB();
 }
 function closeVidVault(){
   byId('dl-iframe').src='';
@@ -1892,6 +1900,7 @@ document.addEventListener('keydown',function(e){
 
 /* ── INIT ── */
 document.addEventListener('DOMContentLoaded',function(){
+  installAB();
   buildHome();
   buildMovPills();
   buildSerPills();
