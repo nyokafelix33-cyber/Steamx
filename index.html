@@ -400,9 +400,6 @@ button{font-family:'Inter',sans-serif;}
 .mi-live svg{color:var(--accent)!important;}
 
 /* DOWNLOAD PAGE */
-#dl-page{display:none;position:fixed;inset:0;z-index:8600;background:var(--bg);
-  overflow-y:auto;padding-bottom:var(--bot-h);}
-#dl-page.open{display:block;}
 .dl-head{position:sticky;top:0;background:var(--bg);z-index:1;border-bottom:1px solid var(--border);
   height:var(--nav-h);display:flex;align-items:center;gap:10px;padding:0 14px;}
 .dl-head h2{font-size:.95rem;font-weight:700;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
@@ -417,11 +414,6 @@ button{font-family:'Inter',sans-serif;}
 .dl-section{padding:18px 14px 0;}
 .dl-section-title{font-size:.78rem;font-weight:800;color:var(--muted);text-transform:uppercase;
   letter-spacing:.1em;margin-bottom:12px;}
-.dl-quality-grid{display:flex;flex-direction:column;gap:10px;padding-bottom:8px;}
-.dl-quality-btn{display:flex;align-items:center;justify-content:space-between;
-  padding:14px 16px;border-radius:10px;background:var(--card);border:1.5px solid var(--border);
-  cursor:pointer;transition:all .2s;font-family:inherit;color:#fff;text-decoration:none;}
-.dl-quality-btn:active{border-color:var(--accent);background:rgba(29,185,84,.08);}
 .dl-q-left{display:flex;align-items:center;gap:12px;}
 .dl-q-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;}
 .dl-q-icon.q4k{background:rgba(229,9,26,.15);border:1px solid rgba(229,9,26,.3);}
@@ -446,6 +438,7 @@ button{font-family:'Inter',sans-serif;}
 .dl-ifr-body iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:none;}
 
 </style>
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest/dist/hls.min.js"></script>
 </head>
 <body>
 
@@ -676,8 +669,11 @@ button{font-family:'Inter',sans-serif;}
     <div style="font-size:.6rem;color:var(--accent);font-weight:800;background:rgba(29,185,84,.15);
       border:1px solid rgba(29,185,84,.3);border-radius:4px;padding:2px 7px;flex-shrink:0;">● LIVE</div>
   </div>
-  <div id="lp-iframe-wrap">
-    <iframe id="lp-iframe" src="" allowfullscreen allow="autoplay;encrypted-media;picture-in-picture;fullscreen" loading="eager"></iframe>
+  <div id="lp-iframe-wrap" style="flex:1;position:relative;overflow:hidden;background:#000;min-height:0;">
+    <!-- HLS video for M3U streams -->
+    <video id="lp-video" style="position:absolute;top:0;left:0;width:100%;height:100%;background:#000;display:none;" controls autoplay playsinline></video>
+    <!-- iframe fallback for non-HLS streams -->
+    <iframe id="lp-iframe" src="" allowfullscreen allow="autoplay;encrypted-media;picture-in-picture;fullscreen" loading="eager" style="position:absolute;top:0;left:0;width:100%;height:100%;border:none;background:#000;display:none;"></iframe>
   </div>
   <div id="lp-bottombar">
     <div class="lp-srv-row" id="lp-srv-row"></div>
@@ -753,84 +749,6 @@ button{font-family:'Inter',sans-serif;}
   </div>
 </div>
 
-<!-- DOWNLOAD PAGE -->
-<div id="dl-page">
-  <div class="dl-head">
-    <button class="back-btn" onclick="closeDlPage()">
-      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
-    </button>
-    <h2 id="dl-page-title">Download</h2>
-  </div>
-  <div class="dl-hero">
-    <div class="dl-poster"><img id="dl-poster-img" src="" alt=""/></div>
-    <div class="dl-info">
-      <h3 id="dl-item-title"></h3>
-      <div class="dl-meta" id="dl-item-meta"></div>
-      <span class="dl-badge">Free Download</span>
-    </div>
-  </div>
-  <div class="dl-section">
-    <div class="dl-section-title">Choose Quality</div>
-    <div class="dl-quality-grid">
-      <button class="dl-quality-btn" onclick="openVidVault('2160p')">
-        <div class="dl-q-left">
-          <div class="dl-q-icon q4k">🎬</div>
-          <div class="dl-q-label">
-            <div class="dl-q-res">4K Ultra HD</div>
-            <div class="dl-q-desc">2160p · Best Quality</div>
-          </div>
-        </div>
-        <div style="display:flex;align-items:center;gap:10px;">
-          <div class="dl-q-size">~15 GB</div>
-          <div class="dl-q-arrow">↓</div>
-        </div>
-      </button>
-      <button class="dl-quality-btn" onclick="openVidVault('1080p')">
-        <div class="dl-q-left">
-          <div class="dl-q-icon q1080">⭐</div>
-          <div class="dl-q-label">
-            <div class="dl-q-res">Full HD</div>
-            <div class="dl-q-desc">1080p · Great Quality</div>
-          </div>
-        </div>
-        <div style="display:flex;align-items:center;gap:10px;">
-          <div class="dl-q-size">~4 GB</div>
-          <div class="dl-q-arrow">↓</div>
-        </div>
-      </button>
-      <button class="dl-quality-btn" onclick="openVidVault('720p')">
-        <div class="dl-q-left">
-          <div class="dl-q-icon q720">✅</div>
-          <div class="dl-q-label">
-            <div class="dl-q-res">HD</div>
-            <div class="dl-q-desc">720p · Good Quality</div>
-          </div>
-        </div>
-        <div style="display:flex;align-items:center;gap:10px;">
-          <div class="dl-q-size">~1.5 GB</div>
-          <div class="dl-q-arrow">↓</div>
-        </div>
-      </button>
-      <button class="dl-quality-btn" onclick="openVidVault('480p')">
-        <div class="dl-q-left">
-          <div class="dl-q-icon q480">📱</div>
-          <div class="dl-q-label">
-            <div class="dl-q-res">SD</div>
-            <div class="dl-q-desc">480p · Mobile Friendly</div>
-          </div>
-        </div>
-        <div style="display:flex;align-items:center;gap:10px;">
-          <div class="dl-q-size">~700 MB</div>
-          <div class="dl-q-arrow">↓</div>
-        </div>
-      </button>
-    </div>
-  </div>
-  <div class="dl-note">
-    <strong>How it works:</strong> Select a quality above — FengWorld will open the download page inside the app. No external tabs or redirects. Files are sourced via VidVault.
-  </div>
-</div>
-
 <!-- VIDVAULT IFRAME OVERLAY -->
 <div class="dl-iframe-wrap" id="dl-iframe-wrap">
   <div class="dl-ifr-head">
@@ -840,8 +758,9 @@ button{font-family:'Inter',sans-serif;}
       border:1px solid rgba(29,185,84,.3);border-radius:4px;padding:2px 8px;flex-shrink:0;">VidVault</div>
   </div>
   <div class="dl-ifr-body">
-    <iframe id="dl-iframe" src="" loading="lazy" referrerpolicy="no-referrer"
-      sandbox="allow-scripts allow-same-origin allow-forms allow-downloads"></iframe>
+    <iframe id="dl-iframe" src="" loading="eager"
+      allow="autoplay;fullscreen"
+      sandbox="allow-scripts allow-same-origin allow-forms allow-downloads allow-popups allow-top-navigation-by-user-activation"></iframe>
   </div>
 </div>
 
@@ -934,51 +853,60 @@ function clearHistory(){
 
 /* ══ LIVE TV ══ */
 var TV_CHANNELS=[
-  // ── SPORTS ──
-  {id:'1',   name:'ESPN',         cat:'Sports',  emoji:'🏈'},
-  {id:'2',   name:'ESPN2',        cat:'Sports',  emoji:'⚽'},
-  {id:'39',  name:'Fox Sports 1', cat:'Sports',  emoji:'🏀'},
-  {id:'758', name:'Fox Sports 2', cat:'Sports',  emoji:'🎾'},
-  {id:'596', name:'NBA TV',       cat:'Sports',  emoji:'🏀'},
-  {id:'318', name:'Golf Channel', cat:'Sports',  emoji:'⛳'},
-  {id:'597', name:'GolTV',        cat:'Sports',  emoji:'⚽'},
-  {id:'664', name:'BeIN Sports',  cat:'Sports',  emoji:'🏆'},
-  {id:'204', name:'Eurosport 1',  cat:'Sports',  emoji:'🎽'},
-  {id:'205', name:'Eurosport 2',  cat:'Sports',  emoji:'🚴'},
-  {id:'150', name:'DAZN 1',       cat:'Sports',  emoji:'🥊'},
-  {id:'151', name:'DAZN 2',       cat:'Sports',  emoji:'🏋️'},
-  // ── NEWS ──
-  {id:'323', name:'CNN',          cat:'News',    emoji:'📺'},
-  {id:'347', name:'Fox News',     cat:'News',    emoji:'📰'},
-  {id:'54',  name:'FOX',          cat:'News',    emoji:'🦊'},
-  {id:'200', name:'Al Jazeera',   cat:'News',    emoji:'🌍'},
-  // ── ENTERTAINMENT ──
-  {id:'304', name:'ABC',          cat:'Entertainment', emoji:'🎬'},
-  {id:'305', name:'NBC',          cat:'Entertainment', emoji:'🎭'},
-  {id:'306', name:'CBS',          cat:'Entertainment', emoji:'📡'},
-  {id:'321', name:'HBO',          cat:'Entertainment', emoji:'🎥'},
-  {id:'301', name:'Freeform',     cat:'Entertainment', emoji:'✨'},
-  {id:'317', name:'FX',           cat:'Entertainment', emoji:'🎞️'},
-  {id:'319', name:'Game Show Net',cat:'Entertainment', emoji:'🎮'},
-  {id:'298', name:'FXX',          cat:'Entertainment', emoji:'🎪'},
-  // ── MOVIES ──
-  {id:'381', name:'FX Movie',     cat:'Movies',  emoji:'🎬'},
-  {id:'381', name:'TCM',          cat:'Movies',  emoji:'🎞️'},
-  {id:'699', name:'Great Am. Family',cat:'Movies',emoji:'👨‍👩‍👧'},
-  // ── LIFESTYLE ──
-  {id:'382', name:'HGTV',         cat:'Lifestyle',emoji:'🏠'},
-  {id:'322', name:'History',      cat:'Lifestyle',emoji:'📜'},
-  {id:'279', name:'FUSE TV',      cat:'Lifestyle',emoji:'🎵'},
-  // ── UK ──
-  {id:'104', name:'BBC One',      cat:'UK',      emoji:'🇬🇧'},
-  {id:'105', name:'BBC Two',      cat:'UK',      emoji:'🇬🇧'},
-  {id:'106', name:'ITV',          cat:'UK',      emoji:'🇬🇧'},
-  {id:'107', name:'Channel 4',    cat:'UK',      emoji:'4️⃣'},
-  {id:'108', name:'Sky Sports',   cat:'UK',      emoji:'🏆'},
-  {id:'109', name:'BT Sport 1',   cat:'UK',      emoji:'⚽'},
-  {id:'110', name:'Sky Sports F1',cat:'UK',      emoji:'🏎️'},
-  {id:'111', name:'TNT Sports',   cat:'UK',      emoji:'💥'},
-];
+  {n:'Kanali 7',l:'https://i.imgur.com/rL2v9pM.png',g:'Albania',u:'https://fe.tring.al/delta/105/out/u/1200_1.m3u8',hls:true},
+  {n:'A2 CNN Albania',l:'https://i.imgur.com/TgO3Lzi.png',g:'Albania',u:'https://tv.a2news.com/live/smil:a2cnnweb.stream.smil/playlist.m3u8',hls:true},
+  {n:'AlbKanale Music TV',l:'https://i.imgur.com/JdKxscs.png',g:'Albania',u:'https://albportal.net/albkanalemusic.m3u8',hls:true},
+  {n:'Alpo TV',l:'https://i.imgur.com/Pr4ixiA.png',g:'Albania',u:'https://5d00db0e0fcd5.streamlock.net/7236/7236/playlist.m3u8',hls:true},
+  {n:'CNA',l:'https://i.imgur.com/X3ukD5t.png',g:'Albania',u:'https://live1.mediadesk.al/cnatvlive.m3u8',hls:true},
+  {n:'News 24',l:'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2d/News_24_%28Albania%29.svg/1024px-News_24_%28Albania%29.svg.png',g:'Albania',u:'https://tv.balkanweb.com/news24/livestream/playlist.m3u8',hls:true},
+  {n:'Ora News',l:'https://i.imgur.com/ILZY5bJ.png',g:'Albania',u:'https://live1.mediadesk.al/oranews.m3u8',hls:true},
+  {n:'Panorama TV',l:'https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Panorama_logo.svg/512px-Panorama_logo.svg.png',g:'Albania',u:'http://198.244.188.94/panorama/livestream/playlist.m3u8',hls:true},
+  {n:'Report TV',l:'https://i.imgur.com/yuRDJYY.png',g:'Albania',u:'https://deb10stream.duckdns.org/hls/stream.m3u8',hls:true},
+  {n:'Syri',l:'https://i.imgur.com/4zVyj1M.png',g:'Albania',u:'https://stream.syritv.al/SyriTV/index.m3u8',hls:true},
+  {n:'Tropoja',l:'https://i.imgur.com/D3hNOVS.png',g:'Albania',u:'https://live.prostream.al/al/smil:tropojatv.smil/playlist.m3u8',hls:true},
+  {n:'TV 7 Albania',l:'https://i.imgur.com/k9WqPLZ.png',g:'Albania',u:'https://5d00db0e0fcd5.streamlock.net/7064/7064/playlist.m3u8',hls:true},
+  {n:'TV Apollon',l:'https://i.imgur.com/gUz2AjM.png',g:'Albania',u:'https://live.apollon.tv/Apollon-WEB/video.m3u8?token=tnt3u76re30d2',hls:true},
+  {n:'Vizion Plus',l:'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Vizion_Plus.svg/512px-Vizion_Plus.svg.png',g:'Albania',u:'https://fe.tring.al/delta/105/out/u/rdghfhsfhfshs.m3u8',hls:true},
+  {n:'Andorra TV',l:'https://upload.wikimedia.org/wikipedia/commons/3/32/Logo_Andorra_Televisi%C3%B3.png',g:'Andorra',u:'https://videos.rtva.ad/live/rtva/playlist.m3u8',hls:true},
+  {n:'Aunar',l:'http://tvabierta.weebly.com/uploads/5/1/3/4/51344345/aunar.png',g:'Argentina',u:'https://5fb24b460df87.streamlock.net/live-cont.ar/mirador/playlist.m3u8',hls:true},
+  {n:'Cine.AR',l:'https://i.imgur.com/RPLyrIC.png',g:'Argentina',u:'https://5fb24b460df87.streamlock.net/live-cont.ar/cinear/playlist.m3u8',hls:true},
+  {n:'Tec TV',l:'https://i.imgur.com/EGCq1wc.png',g:'Argentina',u:'https://tv.initium.net.ar:3939/live/tectvmainlive.m3u8',hls:true},
+  {n:'DeporTV',l:'https://i.imgur.com/iyYLNRt.png',g:'Argentina',u:'https://5fb24b460df87.streamlock.net/live-cont.ar/deportv/playlist.m3u8',hls:true},
+  {n:'Canal E',l:'https://i.ibb.co/y4pkxH3/Qtc8-M2-PG-400x400.jpg',g:'Argentina',u:'https://unlimited1-us.dps.live/perfiltv/perfiltv.smil/perfiltv/livestream2/chunks.m3u8',hls:true},
+  {n:'Telemax',l:'https://i.imgur.com/gfX0hdB.png',g:'Argentina',u:'https://live-edge01.telecentro.net.ar/live/smil:tlx.smil/playlist.m3u8',hls:true},
+  {n:'Net TV',l:'https://i.imgur.com/EWmshtx.png',g:'Argentina',u:'https://unlimited1-us.dps.live/nettv/nettv.smil/playlist.m3u8',hls:true},
+  {n:'TV Universidad',l:'https://i.imgur.com/tvLHiAT.png',g:'Argentina',u:'https://stratus.stream.cespi.unlp.edu.ar/hls/tvunlp.m3u8',hls:true},
+  {n:'Barricada TV',l:'https://www.barricadatv.org/?p=23082',g:'Argentina',u:'https://live-ak.vimeocdn.com/exp=1696402364~acl=%2F9f41e203-241b-4eb7-b0b5-b1839903408f%2F%2A~hmac=d4819f301510676a986bfe610b664765ee2b1a23e1e1ca3214398f949a0b2778/9f41e203-241b-4eb7-b0b5-b1839903408f/hls.m3u8?min_seconds=30',hls:true},
+  {n:'Urbana Tevé',l:'https://yt3.ggpht.com/ytc/AKedOLQLeFMWMeoumi-o24ohLPXSEdNL5-oJ9W5oP5KnnA=s900-c-k-c0x00ffffff-no-rj',g:'Argentina',u:'https://cdnhd.iblups.com/hls/DD3nXkAkWk.m3u8',hls:true},
+  {n:'Comarca TV',l:'http://directostv.teleame.com/wp-content/uploads/2020/10/Comarca-TV-en-vivo-Online.png',g:'Argentina',u:'https://video-weaver.ord56.hls.ttvnw.net/v1/playlist/Cq4FFLOPxq44Qy0kxjcr_wXuRRwjKU6gJ80Tc5eWRkaz5XdeNfeq7DzoNAstinu7BLtnw7jYDANX5yCDozdlS55_kYfuDyqQhwF0JpzU75lDUv5NOuUVWBwlP0m1Bh1JMn21v_OvA_teSCI7hcIFl2DoINrr8bHnpSS8EUvXNesfdX_LcfQH-clqftQ0sCreLIbTvxI5MyL6Wnm8jGh2yg48A2c_k9YHDH6TpM3tLo-pbRrrfByqMq-IoMQREf5DV_sTfHtAzinQQU3Np309s2ScJwcBlAjzz4VJ7svuJ1UbWBBylenSTnrXQW5Vws7OqG2kcoAHHpAQN6BQCpxaXO6dE7MLg7Nq6E7961fHEVSqFCRQg2Y5orbSsEwMo7_S4s5POZSQX1tn04QDuHfLixx-aBcbctSSFmI1CNZ3YDCEZVvWHOU6SyKQcsZeJCFLA1DsxqY3DeAn6n7xpPS4pdsizKqlqsT66liv_L-48h7jGujNZPDHge0fcgUs_7b7jlKJlKv-S_s1mGgLqPEUEQ8dhn5AugB0kfjAGgcTHIP_qLPRY0M7OikuBaMxh1pUpPkVG9AX4jCg1cwCgcfa64OP9ed4pwMjoiKm0dIfytTQ8hWjwXtkv16nJDfZ3kkqaMnM8ErZG6tRw-JVy3nRooKubY7Re0Fc1RHB85_eX2NYQD88N7r-UgaiO2ax0FQ-E_IdfuwSmp5oDy6Di6pT7r_zDRN3znbV64s4i-INUg-D2Leeq4xqYhe_Zhj-3AoxXDWCB0-DCc1kFEComkNpY01YA19zEm01TKLCbdaJwdC6bQpSEoJkOCoPAMnxm7oPNlqZRbhM4TVCJ34f4Y1guzaDomcEABl4Cii2UF-OhskRUZF-SUWjWdO6z62UqZagzG2QOTr6VBH-ItT_16fLsRUaDGTVKzgYHT8XcSqTkyABKgl1cy1lYXN0LTEwjQY.m3u8',hls:true},
+  {n:'El Trece',l:'https://i.imgur.com/ZK7AQFg.png',g:'Argentina',u:'https://live-01-02-eltrece.vodgc.net/eltrecetv/index.m3u8',hls:true},
+  {n:'El Nueve',l:'https://i.imgur.com/EtcVSm4.png',g:'Argentina',u:'https://octubre-live.cdn.vustreams.com/live/channel09/live.isml/live.m3u8',hls:true},
+  {n:'Telefe',l:'https://i.imgur.com/wrZfMXn.png',g:'Argentina',u:'https://telefe.com/Api/Videos/GetSourceUrl/694564/0/HLS?.m3u8',hls:true},
+  {n:'Armenia 1',l:'https://i.imgur.com/HIwJ4lc.png',g:'Armenia',u:'https://amtv1.livestreamingcdn.com/am2abr/index.m3u8',hls:true},
+  {n:'Kentron TV',l:'https://i.imgur.com/eCaxBFn.png',g:'Armenia',u:'https://gineu9.bozztv.com/gin-36bay2/gin-kentron/tracks-v1a1/mono.m3u8',hls:true},
+  {n:'Armenia TV',l:'https://i.imgur.com/UnoI5uM.png',g:'Armenia',u:'https://cdn.hayastantv.com:8088/armenia/tracks-v1a1/mono.m3u8',hls:true},
+  {n:'5TV',l:'https://i.imgur.com/jOGZZDo.png',g:'Armenia',u:'https://cdn.hayastantv.com:8088/5tv/tracks-v1a1/mono.m3u8',hls:true},
+  {n:'TVSN',l:'https://i.imgur.com/p3QCBOo.png',g:'Australia',u:'https://tvsn-i.akamaihd.net/hls/live/261837/tvsn/tvsn_750.m3u8',hls:true},
+  {n:'ABC News',l:'https://upload.wikimedia.org/wikipedia/en/thumb/d/df/ABC_News_Channel.svg/640px-ABC_News_Channel.svg.png',g:'Australia',u:'https://abc-iview-mediapackagestreams-2.akamaized.net/out/v1/6e1cc6d25ec0480ea099a5399d73bc4b/index.m3u8',hls:true},
+  {n:'M4TV',l:'https://i.imgur.com/HZohlNk.png',g:'Australia',u:'https://5a32c05065c79.streamlock.net/live/stream/playlist.m3u8',hls:true},
+  {n:'Racing.com',l:'https://i.imgur.com/pma0OCf.png',g:'Australia',u:'https://racingvic-i.akamaized.net/hls/live/598695/racingvic/1500.m3u8',hls:true},
+  {n:'9Go!',l:'https://i.imgur.com/1CFGu5O.png',g:'Australia',u:'https://9now-livestreams.akamaized.net/hls/live/2008312/go-syd/master.m3u8',hls:true},
+  {n:'9Life',l:'https://i.imgur.com/ZCUiqlL.png',g:'Australia',u:'https://9now-livestreams.akamaized.net/hls/live/2008313/life-syd/master.m3u8',hls:true},
+  {n:'9Rush',l:'https://upload.wikimedia.org/wikipedia/en/c/c2/Logo_of_9RUSH.png',g:'Australia',u:'https://9now-livestreams.akamaized.net/hls/live/2010626/rush-syd/master.m3u8',hls:true},
+  {n:'ORF 1',l:'https://i.imgur.com/ft2LuRl.jpg',g:'Austria',u:'https://orf1.mdn.ors.at/out/u/orf1/q8c/manifest.m3u8',hls:true},
+  {n:'ESPN',g:'Sports',dad:'1',hls:false},
+  {n:'ESPN2',g:'Sports',dad:'2',hls:false},
+  {n:'Fox Sports 1',g:'Sports',dad:'39',hls:false},
+  {n:'NBA TV',g:'Sports',dad:'596',hls:false},
+  {n:'BeIN Sports',g:'Sports',dad:'664',hls:false},
+  {n:'CNN',g:'News',dad:'323',hls:false},
+  {n:'Fox News',g:'News',dad:'347',hls:false},
+  {n:'BBC One',g:'UK',dad:'104',hls:false},
+  {n:'ITV',g:'UK',dad:'106',hls:false},
+  {n:'Sky Sports',g:'UK',dad:'108',hls:false},
+  {n:'Eurosport 1',g:'Sports',dad:'204',hls:false},
+  {n:'DAZN 1',g:'Sports',dad:'150',hls:false},
+];;
 
 var tvCurCat='All';
 function openLiveTV(){
@@ -992,7 +920,7 @@ function closeLiveTV(){
   document.body.style.overflow='';
 }
 function buildTVCats(){
-  var cats=['All','Sports','News','Entertainment','Movies','Documentary','Lifestyle','UK'];
+  var cats=['All', 'Albania', 'Andorra', 'Argentina', 'Armenia', 'Australia', 'Austria', 'Sports', 'News', 'UK'];
   var c=byId('tv-cats');c.innerHTML='';
   cats.forEach(function(cat){
     var b=document.createElement('button');b.className='lcat'+(cat==='All'?' on':'');
@@ -1006,7 +934,7 @@ function buildTVCats(){
 }
 function renderTVChannels(cat){
   var g=byId('tv-grid');g.innerHTML='';
-  var items=cat==='All'?TV_CHANNELS:TV_CHANNELS.filter(function(c){return c.cat===cat;});
+  var items=cat==='All'?TV_CHANNELS:TV_CHANNELS.filter(function(c){return c.g===cat;});
   if(!items.length){g.innerHTML='<div class="ip-empty" style="grid-column:1/-1"><p>No channels in this category</p></div>';return;}
   items.forEach(function(ch){
     var div=document.createElement('div');div.className='ch-card';
@@ -1110,14 +1038,14 @@ function renderSportsDay(data,dayIdx){
 
 function renderFallbackSports(body){
   // Show popular sports channels as fallback
-  var sportChannels=TV_CHANNELS.filter(function(c){return c.cat==='Sports';});
+  var sportChannels=TV_CHANNELS.filter(function(c){return c.g==='Sports';});
   body.innerHTML='<div style="padding:14px 14px 4px;font-size:.75rem;color:var(--muted);">Popular Sports Channels</div>';
   var grid=document.createElement('div');grid.className='ch-grid';
   sportChannels.forEach(function(ch){
     var div=document.createElement('div');div.className='ch-card';
-    div.innerHTML='<div style="font-size:2rem;margin-bottom:7px;line-height:1">'+ch.emoji+'</div>'
-      +'<div class="ch-name">'+ch.name+'</div>';
-    div.addEventListener('click',function(){playLiveChannel(ch.id,ch.name);});
+    div.innerHTML='<div style="font-size:2rem;margin-bottom:7px;line-height:1">🏆</div>'
+      +'<div class="ch-name">'+ch.n+'</div>';
+    div.addEventListener('click',function(){playLiveChannel(ch.n,ch.n,!!ch.hls,ch.u||'',ch.dad||'');});
     grid.appendChild(div);
   });
   body.appendChild(grid);
@@ -1127,22 +1055,66 @@ function renderFallbackSports(body){
 var lpCurId=null,lpCurPlayer=1;
 var LP_PLAYERS=[1,2,3,4,5,6,7,8];
 
-function playLiveChannel(channelId,name){
+var _hlsInstance=null;
+function playLiveChannel(channelId,name,isHls,hlsUrl,dadId){
   lpCurId=channelId;lpCurPlayer=1;
   byId('lp-title').textContent=name||'Live';
-  // Build player buttons
-  byId('lp-srv-row').innerHTML=LP_PLAYERS.map(function(p){
-    return '<button class="lp-srv'+(p===1?' on':'')+'" onclick="lpSwitch('+p+')">Player '+p+'</button>';
-  }).join('');
-  var src='https://daddylive.pw/embed/stream.php?id='+channelId+'&player=1&source=tv';
-  byId('lp-iframe').src=src;
   byId('live-player').classList.add('open');
   document.body.style.overflow='hidden';
   try{if(screen.orientation&&screen.orientation.lock)screen.orientation.lock('landscape').catch(function(){});}catch(e){}
   installAB();
+
+  var vid=byId('lp-video');
+  var ifr=byId('lp-iframe');
+
+  if(isHls&&hlsUrl){
+    /* Real HLS stream — use video tag + HLS.js */
+    ifr.style.display='none'; ifr.src='';
+    vid.style.display='block';
+    if(_hlsInstance){_hlsInstance.destroy();_hlsInstance=null;}
+    if(Hls.isSupported()){
+      _hlsInstance=new Hls({enableWorker:true,lowLatencyMode:true});
+      _hlsInstance.loadSource(hlsUrl);
+      _hlsInstance.attachMedia(vid);
+      _hlsInstance.on(Hls.Events.MANIFEST_PARSED,function(){vid.play().catch(function(){});});
+      _hlsInstance.on(Hls.Events.ERROR,function(e,d){
+        if(d.fatal){toast('Stream unavailable — try another channel');closeLivePlayer();}
+      });
+    } else if(vid.canPlayType('application/vnd.apple.mpegurl')){
+      /* Safari native HLS */
+      vid.src=hlsUrl;
+      vid.play().catch(function(){});
+    }
+    byId('lp-srv-row').innerHTML='<span style="font-size:.72rem;color:var(--accent);font-weight:700;padding:6px 12px;">● LIVE STREAM</span>';
+  } else if(dadId){
+    /* DaddyLive embed */
+    vid.style.display='none'; vid.src='';
+    ifr.style.display='block';
+    ifr.src='https://daddylive.pw/embed/stream.php?id='+dadId+'&player=1&source=tv';
+    byId('lp-srv-row').innerHTML=LP_PLAYERS.map(function(p){
+      return '<button class="lp-srv'+(p===1?' on':'')+'" onclick="lpSwitchDad('+dadId+','+p+')">P'+p+'</button>';
+    }).join('');
+  } else {
+    vid.style.display='none';
+    ifr.style.display='block';
+    ifr.src='https://daddylive.pw/embed/stream.php?id='+channelId+'&player=1&source=tv';
+    byId('lp-srv-row').innerHTML=LP_PLAYERS.map(function(p){
+      return '<button class="lp-srv'+(p===1?' on':'')+'" onclick="lpSwitchDad('+channelId+','+p+')">P'+p+'</button>';
+    }).join('');
+  }
+}
+function lpSwitchDad(id,p){
+  lpCurPlayer=p;
+  byId('lp-iframe').src='https://daddylive.pw/embed/stream.php?id='+id+'&player='+p+'&source=tv';
+  byId('lp-srv-row').querySelectorAll('.lp-srv').forEach(function(b,i){b.classList.toggle('on',LP_PLAYERS[i]===p);});
+  toast('Player '+p+' loading...');
 }
 function closeLivePlayer(){
-  byId('lp-iframe').src='';
+  var vid=byId('lp-video');
+  var ifr=byId('lp-iframe');
+  if(_hlsInstance){_hlsInstance.destroy();_hlsInstance=null;}
+  if(vid){vid.pause();vid.src='';vid.style.display='none';}
+  if(ifr){ifr.src='';ifr.style.display='none';}
   byId('live-player').classList.remove('open');
   document.body.style.overflow='';
   try{if(screen.orientation&&screen.orientation.unlock)screen.orientation.unlock();}catch(e){}
@@ -1766,131 +1738,133 @@ function pmLoadSeas(s,btn){
 }
 
 /* ── AD BLOCKER ── */
+
+
 function anyPlayerOpen(){
-  var pm=byId('player-modal');var lp=byId('live-player');var dl=byId('dl-iframe-wrap');
-  return (pm&&pm.classList.contains('open'))||(lp&&lp.classList.contains('open'))||(dl&&dl.classList.contains('open'));
+  var pm=byId('player-modal');
+  var lp=byId('live-player');
+  var dl=byId('dl-iframe-wrap');
+  return (pm&&pm.classList.contains('open'))
+      || (lp&&lp.classList.contains('open'))
+      || (dl&&dl.classList.contains('open'));
 }
 
 function installAB(){
-  if(window._abOn)return;window._abOn=true;
+  /* Run every time a player opens — reset the flag each call so
+     visibilitychange listener re-registers fresh */
+  if(window._abOn)return;
+  window._abOn=true;
 
-  /* 1. Kill ALL window.open — no exceptions */
-  window.open=function(){return null;};window.top.open=function(){return null;};
+  /* ── 1. Kill window.open completely ── */
+  window.open=function(){return null;};
 
-  /* 2. Kill dialogs ad scripts use */
+  /* ── 2. Kill ad dialogs ── */
   window.alert=function(){};
   window.confirm=function(){return false;};
   window.prompt=function(){return null;};
 
-  /* 3. visibilitychange — fires the instant browser navigates away on Android.
-        history.back() with NO delay cancels the navigation before it completes. */
+  /* ── 3. Override location setter ──
+     Catches ads that do: window.top.location = "https://adsite.com" */
+  try{
+    var _realLocation=window.location;
+    Object.defineProperty(window,'location',{
+      configurable:true,
+      get:function(){return _realLocation;},
+      set:function(v){
+        var s=String(v||'');
+        /* Only allow navigation to our own origin */
+        if(s.indexOf(location.hostname)>=0||
+           s.indexOf('vidvault')>=0||
+           s.indexOf('javascript')===0){
+          _realLocation.href=s;
+        }
+        /* Everything else silently dropped */
+      }
+    });
+  }catch(e){}
+
+  /* ── 4. visibilitychange — fires before browser loads ad page.
+     history.back() with ZERO delay cancels the navigation. ── */
   document.addEventListener('visibilitychange',function(){
     if(document.hidden&&anyPlayerOpen()){
       history.back();
     }
   });
 
-  /* 4. pagehide — iOS Safari equivalent */
+  /* ── 5. pagehide — iOS Safari ── */
   window.addEventListener('pagehide',function(){
     if(anyPlayerOpen()){history.back();}
   },true);
 
-  /* 5. Intercept ALL anchor clicks that try to leave the site.
-        Exception: allow vidvault.ru direct file/download links through.
-        Block everything else (ads, redirects, etc.) */
+  /* ── 6. Block external anchor clicks ── */
   document.addEventListener('click',function(e){
     var a=e.target.closest('a[href]');if(!a)return;
     var h=String(a.href||'');
     if(!h||h.indexOf('javascript')>=0||h.indexOf('#')===0)return;
-    if(h.indexOf(location.hostname)>=0)return; /* same origin — allow */
+    if(h.indexOf(location.hostname)>=0)return;
+    /* Allow vidvault download links through */
+    if(h.indexOf('vidvault')>=0)return;
     if(h.indexOf('http')===0){
-      /* Allow real vidvault download file links */
-      if(h.indexOf('vidvault.ru')>=0){return;}
-      /* Block everything else */
-      e.preventDefault();e.stopImmediatePropagation();
+      e.preventDefault();
+      e.stopImmediatePropagation();
     }
   },true);
 
-  /* 5b. Block mousedown/mouseup on external links */
-  document.addEventListener('mousedown',function(e){
-    var a=e.target.closest('a[href]');
-    if(a&&String(a.href||'').indexOf('http')===0&&String(a.href||'').indexOf(location.hostname)<0){
-      if(String(a.href||'').indexOf('vidvault.ru')<0){e.preventDefault();e.stopImmediatePropagation();}
-    }
-  },true);
-
-  /* 6. Block ALL new iframes injected by ads — only our two players allowed */
+  /* ── 7. MutationObserver — kills injected iframes & scripts ── */
+  var ALLOWED_IFRAMES=['pm-iframe','lp-iframe','dl-iframe'];
   new MutationObserver(function(muts){
     muts.forEach(function(m){
       m.addedNodes.forEach(function(n){
         if(n.nodeType!==1)return;
-        /* Remove injected iframes */
-        if(n.tagName==='IFRAME'&&n.id!=='pm-iframe'&&n.id!=='lp-iframe'&&n.id!=='dl-iframe'){
+        if(n.tagName==='IFRAME'&&ALLOWED_IFRAMES.indexOf(n.id)<0){
           n.remove();return;
         }
-        /* Also check inside added nodes */
-        n.querySelectorAll&&n.querySelectorAll('iframe').forEach(function(f){
-          if(f.id!=='pm-iframe'&&f.id!=='lp-iframe'&&f.id!=='dl-iframe')f.remove();
-        });
+        if(n.querySelectorAll){
+          n.querySelectorAll('iframe').forEach(function(f){
+            if(ALLOWED_IFRAMES.indexOf(f.id)<0)f.remove();
+          });
+        }
       });
     });
   }).observe(document.documentElement,{childList:true,subtree:true});
 
-  /* 7. Override location setter — catches ads that set window.top.location directly */
-  try{
-    var _loc=window.location;
-    Object.defineProperty(window,'location',{
-      get:function(){return _loc;},
-      set:function(v){
-        if(!anyPlayerOpen()){_loc.href=v;return;}
-        var s=String(v||'');
-        /* Only allow navigation to our own domain */
-        if(s.indexOf(location.hostname)>=0||s.indexOf('javascript')===0)_loc.href=s;
-        /* Block everything else silently */
-      },
-      configurable:true
-    });
-  }catch(e){}
+  /* ── 8. URL watchdog — polls every 200ms while a player is open.
+     If URL changed away from our site, immediately go back. ── */
+  var _safeHref=location.href;
+  setInterval(function(){
+    if(!anyPlayerOpen())return;
+    if(location.href!==_safeHref&&location.href.indexOf(location.hostname)<0){
+      location.replace(_safeHref);
+    }
+  },200);
 }
 
 /* ── DOWNLOAD PAGE ── */
 function openDlPage(){
-  if(!pId||!pTitle)return;
-  var poster=curDet?iurl(curDet.poster_path,'w342'):'';
-  var year=(curDet?(curDet.release_date||curDet.first_air_date||''):'').slice(0,4);
-  var typeLabel=pType==='movie'?'Movie':'TV Series';
-  byId('dl-page-title').textContent='Download';
-  byId('dl-item-title').textContent=pTitle;
-  byId('dl-item-meta').textContent=(year?year+' · ':'')+typeLabel+(detData&&detData.vote_average?' · ★ '+detData.vote_average.toFixed(1):'');
-  var img=byId('dl-poster-img');
-  img.src=poster||'';
-  img.onerror=function(){this.style.opacity='.3';};
-  byId('dl-page').classList.add('open');
-  document.body.style.overflow='hidden';
+  /* Go straight to VidVault — no quality picker */
+  if(!pId)return;
+  openVidVault();
 }
 function closeDlPage(){
-  byId('dl-page').classList.remove('open');
-  document.body.style.overflow='';
+  closeVidVault();
 }
-function openVidVault(quality){
-  /* VidVault accepts TMDb ID directly — no search page needed */
+function openVidVault(){
+  if(!pId)return;
   var url;
   if(pType==='movie'){
     url='https://vidvault.ru/movie/'+pId;
   } else {
     url='https://vidvault.ru/tv/'+pId+'/'+pEpS+'/'+pEpE;
   }
-  url+='?quality='+encodeURIComponent(quality);
-  byId('dl-ifr-title').textContent=pTitle+' – '+quality;
+  byId('dl-ifr-title').textContent=pTitle||'Download';
   byId('dl-iframe').src=url;
   byId('dl-iframe-wrap').classList.add('open');
   document.body.style.overflow='hidden';
-  /* Re-apply ad blocker to iframe content */
-  setTimeout(function(){installAB();},500);
 }
 function closeVidVault(){
   byId('dl-iframe').src='';
   byId('dl-iframe-wrap').classList.remove('open');
+  document.body.style.overflow='';
 }
 
 /* ── SHARE ── */
