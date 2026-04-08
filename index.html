@@ -18,25 +18,6 @@
   navigate-to 'self' https://daddylive.pw;
 ">
 <meta name="referrer" content="no-referrer">
-<!-- Kill popup/redirect ads as early as possible, before any iframe loads -->
-<script>
-window.open=function(){return null;};
-window.alert=function(){};
-window.confirm=function(){return false;};
-window.prompt=function(){return null;};
-try{
-  var __loc=window.location;
-  Object.defineProperty(window,'location',{
-    get:function(){return __loc;},
-    set:function(v){
-      var s=String(v||'');
-      if(s.indexOf(__loc.hostname)>=0||s.startsWith('javascript')||s.startsWith('#'))__loc.href=s;
-    },configurable:true
-  });
-}catch(e){}
-document.write=function(){};
-document.writeln=function(){};
-</script>
 <title>FengWorld – Watch Free</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=Bebas+Neue&display=swap" rel="stylesheet"/>
 <style>
@@ -860,7 +841,7 @@ button{font-family:'Inter',sans-serif;}
   </div>
   <div class="dl-ifr-body">
     <iframe id="dl-iframe" src="" loading="lazy" referrerpolicy="no-referrer"
-      sandbox="allow-scripts allow-same-origin allow-forms allow-downloads allow-popups allow-popups-to-escape-sandbox"></iframe>
+      sandbox="allow-scripts allow-same-origin allow-forms allow-downloads"></iframe>
   </div>
 </div>
 
@@ -1790,77 +1771,87 @@ function anyPlayerOpen(){
   return (pm&&pm.classList.contains('open'))||(lp&&lp.classList.contains('open'))||(dl&&dl.classList.contains('open'));
 }
 
-/* Run immediately — before any iframe loads */
-(function nuclearAB(){
-  /* 1. Kill window.open — ads use this to spawn popups */
-  window.open=function(){return null;};
+function installAB(){
+  if(window._abOn)return;window._abOn=true;
 
-  /* 2. Kill JS dialogs ads use to delay/confuse */
+  /* 1. Kill ALL window.open — no exceptions */
+  window.open=function(){return null;};window.top.open=function(){return null;};
+
+  /* 2. Kill dialogs ad scripts use */
   window.alert=function(){};
   window.confirm=function(){return false;};
   window.prompt=function(){return null;};
 
-  /* 3. Override location — block any script setting window.location to an ad URL */
-  try{
-    var _loc=window.location;
-    Object.defineProperty(window,'location',{
-      get:function(){return _loc;},
-      set:function(v){
-        var s=String(v||'');
-        /* Only allow same-origin navigation */
-        if(s.indexOf(_loc.hostname)>=0||s.startsWith('javascript'))_loc.href=s;
-        /* Silently drop everything else */
-      },
-      configurable:true
-    });
-  }catch(e){}
-
-  /* 4. Block visibilitychange redirect (Android) */
+  /* 3. visibilitychange — fires the instant browser navigates away on Android.
+        history.back() with NO delay cancels the navigation before it completes. */
   document.addEventListener('visibilitychange',function(){
-    if(document.hidden&&anyPlayerOpen()){history.back();}
+    if(document.hidden&&anyPlayerOpen()){
+      history.back();
+    }
   });
 
-  /* 5. Block pagehide redirect (iOS Safari) */
+  /* 4. pagehide — iOS Safari equivalent */
   window.addEventListener('pagehide',function(){
     if(anyPlayerOpen()){history.back();}
   },true);
 
-  /* 6. Intercept ALL outbound anchor clicks.
-        - Allow vidvault.ru links (CDN download links live on various domains but
-          are triggered FROM inside our sandboxed iframe, so they won't hit this
-          handler — this is a safety catch for any direct anchor on our page).
-        - Block everything else that isn't same-origin. */
+  /* 5. Intercept ALL anchor clicks that try to leave the site.
+        Exception: allow vidvault.ru direct file/download links through.
+        Block everything else (ads, redirects, etc.) */
   document.addEventListener('click',function(e){
-    var a=e.target.closest('a[href]');
-    if(!a)return;
+    var a=e.target.closest('a[href]');if(!a)return;
     var h=String(a.href||'');
-    if(!h||h.startsWith('javascript')||h.startsWith('#')||h.startsWith('blob:'))return;
-    if(h.indexOf(location.hostname)>=0)return; /* same-origin — allow */
-    /* Block all external navigation from our own page */
-    e.preventDefault();
-    e.stopImmediatePropagation();
+    if(!h||h.indexOf('javascript')>=0||h.indexOf('#')===0)return;
+    if(h.indexOf(location.hostname)>=0)return; /* same origin — allow */
+    if(h.indexOf('http')===0){
+      /* Allow real vidvault download file links */
+      if(h.indexOf('vidvault.ru')>=0){return;}
+      /* Block everything else */
+      e.preventDefault();e.stopImmediatePropagation();
+    }
   },true);
 
-  /* 7. MutationObserver — remove any ad iframes injected into our DOM */
-  var ALLOWED_IFR=['pm-iframe','lp-iframe','dl-iframe'];
+  /* 5b. Block mousedown/mouseup on external links */
+  document.addEventListener('mousedown',function(e){
+    var a=e.target.closest('a[href]');
+    if(a&&String(a.href||'').indexOf('http')===0&&String(a.href||'').indexOf(location.hostname)<0){
+      if(String(a.href||'').indexOf('vidvault.ru')<0){e.preventDefault();e.stopImmediatePropagation();}
+    }
+  },true);
+
+  /* 6. Block ALL new iframes injected by ads — only our two players allowed */
   new MutationObserver(function(muts){
     muts.forEach(function(m){
       m.addedNodes.forEach(function(n){
         if(n.nodeType!==1)return;
-        if(n.tagName==='IFRAME'&&ALLOWED_IFR.indexOf(n.id)<0){n.remove();return;}
+        /* Remove injected iframes */
+        if(n.tagName==='IFRAME'&&n.id!=='pm-iframe'&&n.id!=='lp-iframe'&&n.id!=='dl-iframe'){
+          n.remove();return;
+        }
+        /* Also check inside added nodes */
         n.querySelectorAll&&n.querySelectorAll('iframe').forEach(function(f){
-          if(ALLOWED_IFR.indexOf(f.id)<0)f.remove();
+          if(f.id!=='pm-iframe'&&f.id!=='lp-iframe'&&f.id!=='dl-iframe')f.remove();
         });
       });
     });
   }).observe(document.documentElement,{childList:true,subtree:true});
 
-  /* 8. Block document.write — some ad scripts use it to inject redirects */
-  document.write=function(){};
-  document.writeln=function(){};
-})();
-
-function installAB(){/* already ran above — kept for call-site compatibility */}
+  /* 7. Override location setter — catches ads that set window.top.location directly */
+  try{
+    var _loc=window.location;
+    Object.defineProperty(window,'location',{
+      get:function(){return _loc;},
+      set:function(v){
+        if(!anyPlayerOpen()){_loc.href=v;return;}
+        var s=String(v||'');
+        /* Only allow navigation to our own domain */
+        if(s.indexOf(location.hostname)>=0||s.indexOf('javascript')===0)_loc.href=s;
+        /* Block everything else silently */
+      },
+      configurable:true
+    });
+  }catch(e){}
+}
 
 /* ── DOWNLOAD PAGE ── */
 function openDlPage(){
@@ -1870,7 +1861,7 @@ function openDlPage(){
   var typeLabel=pType==='movie'?'Movie':'TV Series';
   byId('dl-page-title').textContent='Download';
   byId('dl-item-title').textContent=pTitle;
-  byId('dl-item-meta').textContent=(year?year+' \u00b7 ':'')+typeLabel+(detData&&detData.vote_average?' \u00b7 \u2605 '+detData.vote_average.toFixed(1):'');
+  byId('dl-item-meta').textContent=(year?year+' · ':'')+typeLabel+(detData&&detData.vote_average?' · ★ '+detData.vote_average.toFixed(1):'');
   var img=byId('dl-poster-img');
   img.src=poster||'';
   img.onerror=function(){this.style.opacity='.3';};
@@ -1882,19 +1873,20 @@ function closeDlPage(){
   document.body.style.overflow='';
 }
 function openVidVault(quality){
-  /*  VidVault uses TMDb ID — load the movie/TV page directly.
-      All quality options are shown by VidVault on that page.
-      We pass quality as a hash hint (#quality) but VidVault
-      shows the download buttons right away regardless.         */
+  /* VidVault accepts TMDb ID directly — no search page needed */
   var url;
   if(pType==='movie'){
     url='https://vidvault.ru/movie/'+pId;
   } else {
     url='https://vidvault.ru/tv/'+pId+'/'+pEpS+'/'+pEpE;
   }
-  byId('dl-ifr-title').textContent=pTitle+' \u2013 '+quality;
+  url+='?quality='+encodeURIComponent(quality);
+  byId('dl-ifr-title').textContent=pTitle+' – '+quality;
   byId('dl-iframe').src=url;
   byId('dl-iframe-wrap').classList.add('open');
+  document.body.style.overflow='hidden';
+  /* Re-apply ad blocker to iframe content */
+  setTimeout(function(){installAB();},500);
 }
 function closeVidVault(){
   byId('dl-iframe').src='';
